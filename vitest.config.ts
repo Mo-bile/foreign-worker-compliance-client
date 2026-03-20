@@ -7,6 +7,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["@testing-library/jest-dom/vitest"],
     globals: true,
+    exclude: ["**/node_modules/**", "**/e2e/**"],
     env: {
       BACKEND_URL: "http://localhost:8080",
     },

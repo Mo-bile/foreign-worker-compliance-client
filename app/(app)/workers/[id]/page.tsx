@@ -3,7 +3,12 @@
 import { use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InsuranceBadge } from "@/components/workers/insurance-badge";
@@ -12,11 +17,7 @@ import { useWorker } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
 import { NATIONALITY_LABELS, VISA_TYPE_LABELS } from "@/types/api";
 
-export default function WorkerDetailPage({
-  params,
-}: {
-  readonly params: Promise<{ id: string }>;
-}) {
+export default function WorkerDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const workerId = Number(id);
   const worker = useWorker(workerId);
@@ -43,7 +44,8 @@ export default function WorkerDetailPage({
   const w = worker.data;
   if (!w) return null;
 
-  const nationalityLabel = NATIONALITY_LABELS[w.nationality as keyof typeof NATIONALITY_LABELS] || w.nationality;
+  const nationalityLabel =
+    NATIONALITY_LABELS[w.nationality as keyof typeof NATIONALITY_LABELS] || w.nationality;
   const visaTypeLabel = VISA_TYPE_LABELS[w.visaType as keyof typeof VISA_TYPE_LABELS] || w.visaType;
 
   return (
@@ -82,7 +84,9 @@ export default function WorkerDetailPage({
         </CardHeader>
         <CardContent>
           {w.insuranceEligibilities.length === 0 ? (
-            <p className="text-muted-foreground text-sm py-4 text-center">보험 자격 정보가 없습니다</p>
+            <p className="text-muted-foreground text-sm py-4 text-center">
+              보험 자격 정보가 없습니다
+            </p>
           ) : (
             <Table>
               <TableHeader>
@@ -96,7 +100,9 @@ export default function WorkerDetailPage({
                 {w.insuranceEligibilities.map((ie) => (
                   <TableRow key={ie.insuranceType}>
                     <TableCell className="font-medium">{ie.insuranceType}</TableCell>
-                    <TableCell><InsuranceBadge status={ie.status} /></TableCell>
+                    <TableCell>
+                      <InsuranceBadge status={ie.status} />
+                    </TableCell>
                     <TableCell className="text-muted-foreground">{ie.reason}</TableCell>
                   </TableRow>
                 ))}

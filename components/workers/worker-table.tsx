@@ -52,8 +52,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
       search.trim() === "" ||
       worker.name.toLowerCase().includes(search.toLowerCase()) ||
       nationalityLabel.toLowerCase().includes(search.toLowerCase());
-    const matchesVisa =
-      visaFilter === "ALL" || worker.visaType === visaFilter;
+    const matchesVisa = visaFilter === "ALL" || worker.visaType === visaFilter;
 
     return matchesSearch && matchesVisa;
   });
@@ -108,13 +107,10 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
           <TableBody>
             {filteredWorkers.map((worker) => {
               const nationalityLabel =
-                NATIONALITY_LABELS[
-                  worker.nationality as keyof typeof NATIONALITY_LABELS
-                ] ?? worker.nationality;
-              const visaLabel =
-                VISA_TYPE_LABELS[worker.visaType as VisaType] ?? worker.visaType;
-              const statusLabel =
-                WORKER_STATUS_LABELS[worker.status] ?? worker.status;
+                NATIONALITY_LABELS[worker.nationality as keyof typeof NATIONALITY_LABELS] ??
+                worker.nationality;
+              const visaLabel = VISA_TYPE_LABELS[worker.visaType as VisaType] ?? worker.visaType;
+              const statusLabel = WORKER_STATUS_LABELS[worker.status] ?? worker.status;
               const statusClass =
                 WORKER_STATUS_COLORS[worker.status] ??
                 "text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full text-xs font-medium";
@@ -129,9 +125,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                   <TableCell>{nationalityLabel}</TableCell>
                   <TableCell>
                     <span className="font-mono text-xs">{worker.visaType}</span>
-                    <span className="ml-1.5 text-muted-foreground">
-                      {visaLabel}
-                    </span>
+                    <span className="ml-1.5 text-muted-foreground">{visaLabel}</span>
                   </TableCell>
                   <TableCell>{worker.visaExpiryDate}</TableCell>
                   <TableCell>

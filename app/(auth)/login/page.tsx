@@ -31,7 +31,9 @@ export default function LoginPage() {
               <Label htmlFor="password">비밀번호</Label>
               <Input id="password" type="password" />
             </div>
-            <Button type="submit" className="w-full">로그인</Button>
+            <Button type="submit" className="w-full">
+              로그인
+            </Button>
           </form>
         </CardContent>
       </Card>

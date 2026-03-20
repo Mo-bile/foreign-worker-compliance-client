@@ -1,10 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import type { DeadlineStatus } from "@/types/api";
 
-const STATUS_CONFIG: Record<
-  DeadlineStatus,
-  { label: string; className: string }
-> = {
+const STATUS_CONFIG: Record<DeadlineStatus, { label: string; className: string }> = {
   OVERDUE: {
     label: "기한초과",
     className: "bg-red-100 text-red-800 hover:bg-red-200",

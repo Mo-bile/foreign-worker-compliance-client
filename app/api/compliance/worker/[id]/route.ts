@@ -2,10 +2,7 @@ import { NextResponse } from "next/server";
 import { apiClient, ApiError } from "@/lib/api-client";
 import type { ComplianceDeadlineResponse } from "@/types/api";
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const deadlines = await apiClient.get<ComplianceDeadlineResponse[]>(

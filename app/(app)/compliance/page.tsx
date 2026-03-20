@@ -24,10 +24,7 @@ export default function CompliancePage() {
           deadlines={upcoming.data}
           isLoading={upcoming.isLoading}
         />
-        <DeadlineChart
-          deadlines={upcoming.data}
-          isLoading={upcoming.isLoading}
-        />
+        <DeadlineChart deadlines={upcoming.data} isLoading={upcoming.isLoading} />
       </div>
     </div>
   );

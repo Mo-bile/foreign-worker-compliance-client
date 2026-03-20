@@ -18,11 +18,7 @@ export const metadata: Metadata = {
   description: "외국인 근로자 고용 컴플라이언스 관리 시스템",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  readonly children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { readonly children: React.ReactNode }) {
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">

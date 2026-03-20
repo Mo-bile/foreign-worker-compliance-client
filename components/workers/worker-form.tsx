@@ -85,9 +85,7 @@ export function WorkerForm() {
               aria-invalid={!!errors.name}
               placeholder="홍길동"
             />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            )}
+            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
           </div>
 
           {/* 사업장 ID */}
@@ -112,10 +110,7 @@ export function WorkerForm() {
               name="nationalityCode"
               control={control}
               render={({ field }) => (
-                <Select
-                  value={field.value ?? ""}
-                  onValueChange={(value) => field.onChange(value)}
-                >
+                <Select value={field.value ?? ""} onValueChange={(value) => field.onChange(value)}>
                   <SelectTrigger
                     id="nationalityCode"
                     aria-label="국적"
@@ -146,10 +141,7 @@ export function WorkerForm() {
               name="visaType"
               control={control}
               render={({ field }) => (
-                <Select
-                  value={field.value ?? ""}
-                  onValueChange={(value) => field.onChange(value)}
-                >
+                <Select value={field.value ?? ""} onValueChange={(value) => field.onChange(value)}>
                   <SelectTrigger
                     id="visaType"
                     aria-label="비자 유형"
@@ -232,11 +224,7 @@ export function WorkerForm() {
           {/* 여권번호 (선택) */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="passportNumber">여권번호 (선택)</Label>
-            <Input
-              id="passportNumber"
-              {...register("passportNumber")}
-              placeholder="M12345678"
-            />
+            <Input id="passportNumber" {...register("passportNumber")} placeholder="M12345678" />
           </div>
 
           {/* 외국인등록번호 (선택) */}
@@ -277,11 +265,7 @@ export function WorkerForm() {
         </CardContent>
 
         <CardFooter className="flex justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-          >
+          <Button type="button" variant="outline" onClick={() => router.back()}>
             취소
           </Button>
           <Button type="submit" disabled={isPending}>

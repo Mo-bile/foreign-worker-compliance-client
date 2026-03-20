@@ -1,5 +1,10 @@
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,7 +51,9 @@ export function DeadlineTable({ title, deadlines, isLoading, limit }: DeadlineTa
                   <TableCell>{d.workerId}</TableCell>
                   <TableCell>{d.description}</TableCell>
                   <TableCell>{d.dueDate}</TableCell>
-                  <TableCell><StatusBadge status={d.status} /></TableCell>
+                  <TableCell>
+                    <StatusBadge status={d.status} />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

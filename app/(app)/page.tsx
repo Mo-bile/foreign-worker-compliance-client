@@ -48,10 +48,7 @@ export default function DashboardPage() {
           isLoading={overdue.isLoading}
           limit={5}
         />
-        <DeadlineChart
-          deadlines={upcoming.data}
-          isLoading={upcoming.isLoading}
-        />
+        <DeadlineChart deadlines={upcoming.data} isLoading={upcoming.isLoading} />
       </div>
     </div>
   );
