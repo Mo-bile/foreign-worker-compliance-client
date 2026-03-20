@@ -48,8 +48,8 @@ const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 export const registerWorkerRequestSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
   passportNumber: z.string().optional(),
-  nationalityCode: z.enum(NATIONALITIES, { errorMap: () => ({ message: "국적을 선택해주세요" }) }),
-  visaType: z.enum(VISA_TYPES, { errorMap: () => ({ message: "비자 유형을 선택해주세요" }) }),
+  nationalityCode: z.enum(NATIONALITIES, { error: "국적을 선택해주세요" }),
+  visaType: z.enum(VISA_TYPES, { error: "비자 유형을 선택해주세요" }),
   visaExpiryDate: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
   entryDate: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
   registrationNumber: z.string().optional(),
