@@ -2,6 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { ComplianceDeadlineResponse } from "@/types/api";
+import { paginateItems } from "@/lib/pagination";
+import type { PaginatedResult } from "@/lib/pagination";
 
 export function useOverdueDeadlines() {
   return useQuery<readonly ComplianceDeadlineResponse[]>({
@@ -37,4 +39,71 @@ export function useWorkerDeadlines(workerId: number) {
     },
     enabled: workerId > 0,
   });
+}
+
+export interface ComplianceFilterValues {
+  readonly deadlineType: string;
+  readonly status: string;
+}
+
+function filterDeadlines(
+  deadlines: readonly ComplianceDeadlineResponse[],
+  filters: ComplianceFilterValues,
+): readonly ComplianceDeadlineResponse[] {
+  return deadlines.filter((d) => {
+    if (filters.deadlineType !== "ALL" && d.deadlineType !== filters.deadlineType) return false;
+    if (filters.status !== "ALL" && d.status !== filters.status) return false;
+    return true;
+  });
+}
+
+export function usePaginatedOverdueDeadlines(
+  filters: ComplianceFilterValues,
+  page: number,
+): {
+  deadlines: PaginatedResult<ComplianceDeadlineResponse> | undefined;
+  isLoading: boolean;
+  isError: boolean;
+} {
+  const query = useQuery<readonly ComplianceDeadlineResponse[]>({
+    queryKey: ["compliance", "overdue"],
+    queryFn: async () => {
+      const res = await fetch("/api/compliance/overdue");
+      if (!res.ok) throw new Error("기한초과 데이터를 불러올 수 없습니다");
+      return res.json();
+    },
+    refetchInterval: 30_000,
+  });
+
+  const deadlines = query.data
+    ? paginateItems(filterDeadlines(query.data, filters), page)
+    : undefined;
+
+  return { deadlines, isLoading: query.isLoading, isError: query.isError };
+}
+
+export function usePaginatedUpcomingDeadlines(
+  days: number,
+  filters: ComplianceFilterValues,
+  page: number,
+): {
+  deadlines: PaginatedResult<ComplianceDeadlineResponse> | undefined;
+  isLoading: boolean;
+  isError: boolean;
+} {
+  const query = useQuery<readonly ComplianceDeadlineResponse[]>({
+    queryKey: ["compliance", "upcoming", days],
+    queryFn: async () => {
+      const res = await fetch(`/api/compliance/upcoming?days=${days}`);
+      if (!res.ok) throw new Error("임박 데드라인을 불러올 수 없습니다");
+      return res.json();
+    },
+    refetchInterval: 30_000,
+  });
+
+  const deadlines = query.data
+    ? paginateItems(filterDeadlines(query.data, filters), page)
+    : undefined;
+
+  return { deadlines, isLoading: query.isLoading, isError: query.isError };
 }

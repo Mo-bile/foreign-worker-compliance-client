@@ -35,6 +35,9 @@ export const handlers = [
 
   http.get(`${BACKEND}/api/compliance/overdue`, () => HttpResponse.json(mockOverdueDeadlines)),
   http.get(`${BACKEND}/api/compliance/upcoming`, () => HttpResponse.json(mockUpcomingDeadlines)),
+  // Next.js Route Handler relative paths (used by React Query hooks in jsdom tests)
+  http.get("*/api/compliance/overdue", () => HttpResponse.json(mockOverdueDeadlines)),
+  http.get("*/api/compliance/upcoming", () => HttpResponse.json(mockUpcomingDeadlines)),
 
   http.get(`${BACKEND}/api/compliance/worker/:id`, ({ params }) => {
     const deadlines = [...mockOverdueDeadlines, ...mockUpcomingDeadlines].filter(
