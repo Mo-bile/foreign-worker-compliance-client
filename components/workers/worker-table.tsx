@@ -50,18 +50,18 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
     setPage(1);
   };
 
-  const handleVisaChange = (value: string) => {
-    setVisaFilter(value as VisaType | "ALL");
+  const handleVisaChange = (value: string | null) => {
+    if (value) setVisaFilter(value as VisaType | "ALL");
     setPage(1);
   };
 
-  const handleStatusChange = (value: string) => {
-    setStatusFilter(value as WorkerStatus | "ALL");
+  const handleStatusChange = (value: string | null) => {
+    if (value) setStatusFilter(value as WorkerStatus | "ALL");
     setPage(1);
   };
 
-  const handleInsuranceChange = (value: string) => {
-    setInsuranceFilter(value as InsuranceStatus | "ALL");
+  const handleInsuranceChange = (value: string | null) => {
+    if (value) setInsuranceFilter(value as InsuranceStatus | "ALL");
     setPage(1);
   };
 
@@ -165,8 +165,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                 const nationalityLabel =
                   NATIONALITY_LABELS[worker.nationality as keyof typeof NATIONALITY_LABELS] ??
                   worker.nationality;
-                const visaLabel =
-                  VISA_TYPE_LABELS[worker.visaType as VisaType] ?? worker.visaType;
+                const visaLabel = VISA_TYPE_LABELS[worker.visaType as VisaType] ?? worker.visaType;
                 const statusLabel =
                   WORKER_STATUS_LABELS[worker.status as WorkerStatus] ?? worker.status;
                 const statusClass =

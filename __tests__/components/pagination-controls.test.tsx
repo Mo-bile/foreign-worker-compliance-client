@@ -29,12 +29,14 @@ describe("PaginationControls", () => {
 
   it("첫_페이지에서_이전_버튼이_비활성이다", () => {
     render(<PaginationControls {...defaultProps} />);
-    expect(screen.getByRole("button", { name: "이전 페이지" })).toBeDisabled();
+    const btn = screen.getByRole("button", { name: "이전 페이지" });
+    expect(btn.hasAttribute("disabled")).toBe(true);
   });
 
   it("마지막_페이지에서_다음_버튼이_비활성이다", () => {
     render(<PaginationControls {...defaultProps} currentPage={3} />);
-    expect(screen.getByRole("button", { name: "다음 페이지" })).toBeDisabled();
+    const btn = screen.getByRole("button", { name: "다음 페이지" });
+    expect(btn.hasAttribute("disabled")).toBe(true);
   });
 
   it("다음_버튼_클릭시_onPageChange를_호출한다", async () => {
@@ -60,12 +62,7 @@ describe("PaginationControls", () => {
 
   it("총_페이지가_8_이상이면_말줄임을_표시한다", () => {
     render(
-      <PaginationControls
-        {...defaultProps}
-        currentPage={5}
-        totalPages={10}
-        totalItems={200}
-      />,
+      <PaginationControls {...defaultProps} currentPage={5} totalPages={10} totalItems={200} />,
     );
     expect(screen.getByRole("button", { name: "1 페이지" })).toBeDefined();
     expect(screen.getByRole("button", { name: "4 페이지" })).toBeDefined();
