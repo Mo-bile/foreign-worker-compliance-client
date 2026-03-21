@@ -90,6 +90,42 @@ export const DEADLINE_STATUSES = [
 ] as const;
 export type DeadlineStatus = (typeof DEADLINE_STATUSES)[number];
 
+// ─── WorkerStatus ────────────────────────────────────────────
+export const WORKER_STATUSES = ["ACTIVE", "INACTIVE", "TERMINATED"] as const;
+export type WorkerStatus = (typeof WORKER_STATUSES)[number];
+
+export const WORKER_STATUS_LABELS: Record<WorkerStatus, string> = {
+  ACTIVE: "활성",
+  INACTIVE: "비활성",
+  TERMINATED: "퇴사",
+};
+
+export const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
+  ACTIVE: "text-green-700 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium",
+  INACTIVE: "text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full text-xs font-medium",
+  TERMINATED: "text-red-700 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium",
+};
+
+// ─── InsuranceStatus ─────────────────────────────────────────
+export const INSURANCE_STATUSES = ["의무", "임의", "면제"] as const;
+export type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
+
+// ─── Label Maps ──────────────────────────────────────────────
+export const DEADLINE_TYPE_LABELS: Record<DeadlineType, string> = {
+  VISA_EXPIRY: "비자 만료",
+  INSURANCE_ENROLLMENT: "보험 가입",
+  CHANGE_REPORT: "변경 신고",
+  CONTRACT_RENEWAL: "계약 갱신",
+};
+
+export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
+  PENDING: "대기",
+  APPROACHING: "임박",
+  URGENT: "긴급",
+  OVERDUE: "초과",
+  COMPLETED: "완료",
+};
+
 // ─── Zod Schemas ──────────────────────────────────────────
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
