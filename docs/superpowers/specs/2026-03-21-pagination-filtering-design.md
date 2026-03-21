@@ -171,10 +171,10 @@ function usePaginatedWorkers(params: WorkerFilterParams): {
 ```
 
 - 반환 필드명을 `workers`로 하여 React Query의 `data`와 중첩 방지
-- `queryKey`: `["workers", "paginated", params]`
+- `queryKey`: `["workers"]` — 기존 `useWorkers()`와 동일한 키를 사용하여 캐시 공유 (중복 fetch 방지). 훅 내부에서 전체 데이터에 클라이언트 사이드 필터+페이지네이션을 적용하는 래퍼 구조.
 - 내부에서 전체 workers fetch → 필터링 → `paginateItems()` 적용
 - 기존 `useWorkers()` 훅은 유지 (대시보드 등에서 사용)
-- 기존 `useRegisterWorker`의 `invalidateQueries({ queryKey: ["workers"] })`가 부분 매칭으로 자동 무효화
+- 기존 `useRegisterWorker`의 `invalidateQueries({ queryKey: ["workers"] })`가 동일 키이므로 자동 무효화
 
 ### 5. Compliance 페이지 필터링
 
@@ -225,8 +225,8 @@ function usePaginatedUpcomingDeadlines(
 ```
 
 - `page`를 `filters`와 분리하여 두 훅이 독립적으로 페이지를 관리할 수 있도록 설계
-- `queryKey`: `usePaginatedOverdueDeadlines` → `["compliance", "overdue", "paginated", filters, page]`, `usePaginatedUpcomingDeadlines` → `["compliance", "upcoming", "paginated", days, filters, page]`
-- 기존 `useOverdueDeadlines()`, `useUpcomingDeadlines()` 훅은 유지 (대시보드에서 사용)
+- `queryKey`: 기존 훅과 동일한 키 사용 — `usePaginatedOverdueDeadlines` → `["compliance", "overdue"]`, `usePaginatedUpcomingDeadlines` → `["compliance", "upcoming", days]`. 캐시를 공유하여 중복 fetch를 방지하고, 차트용 `useUpcomingDeadlines(30)`과 동시 마운트 시에도 네트워크 요청 1회만 발생.
+- 기존 `useOverdueDeadlines()`, `useUpcomingDeadlines()` 훅은 유지 (대시보드, 차트에서 사용)
 - 30초 refetchInterval 유지
 
 ## 에러 및 빈 상태 처리
