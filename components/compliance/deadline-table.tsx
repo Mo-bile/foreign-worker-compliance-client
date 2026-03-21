@@ -67,6 +67,11 @@ export function DeadlineTable({
     }
   }
 
+  const hasOriginalData = deadlines && deadlines.length > 0;
+  const emptyMessage = hasOriginalData
+    ? "조건에 맞는 결과가 없습니다"
+    : "데이터가 없습니다";
+
   return (
     <Card>
       <CardHeader>
@@ -80,7 +85,7 @@ export function DeadlineTable({
             ))}
           </div>
         ) : !items?.length ? (
-          <p className="text-muted-foreground text-sm py-4 text-center">데이터가 없습니다</p>
+          <p className="text-muted-foreground text-sm py-4 text-center">{emptyMessage}</p>
         ) : (
           <>
             <Table>
