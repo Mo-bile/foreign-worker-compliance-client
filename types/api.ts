@@ -153,7 +153,7 @@ export type RegisterWorkerRequest = z.infer<typeof registerWorkerRequestSchema>;
 // ─── Response Types ───────────────────────────────────────
 export interface InsuranceEligibilityDto {
   readonly insuranceType: string;
-  readonly status: string;
+  readonly status: InsuranceStatus;
   readonly reason: string;
 }
 

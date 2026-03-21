@@ -60,19 +60,14 @@ export interface WorkerFilterParams {
   readonly insuranceStatus: string;
 }
 
+// TODO: 현재 WorkerTable이 자체 필터링/페이지네이션을 수행하므로 프로덕션에서 미사용.
+// 서버 사이드 필터링 전환 시 이 훅을 페이지에 연결하고 WorkerTable 내부 필터 로직을 제거할 것.
 export function usePaginatedWorkers(params: WorkerFilterParams): {
   workers: PaginatedResult<WorkerResponse> | undefined;
   isLoading: boolean;
   isError: boolean;
 } {
-  const query = useQuery<readonly WorkerResponse[]>({
-    queryKey: ["workers"],
-    queryFn: async () => {
-      const res = await fetch("/api/workers");
-      if (!res.ok) throw new Error("근로자 목록을 불러올 수 없습니다");
-      return res.json();
-    },
-  });
+  const query = useWorkers();
 
   const workers = query.data
     ? paginateItems(filterWorkers(query.data, params), params.page)

@@ -65,15 +65,7 @@ export function usePaginatedOverdueDeadlines(
   isLoading: boolean;
   isError: boolean;
 } {
-  const query = useQuery<readonly ComplianceDeadlineResponse[]>({
-    queryKey: ["compliance", "overdue"],
-    queryFn: async () => {
-      const res = await fetch("/api/compliance/overdue");
-      if (!res.ok) throw new Error("기한초과 데이터를 불러올 수 없습니다");
-      return res.json();
-    },
-    refetchInterval: 30_000,
-  });
+  const query = useOverdueDeadlines();
 
   const deadlines = query.data
     ? paginateItems(filterDeadlines(query.data, filters), page)
@@ -91,15 +83,7 @@ export function usePaginatedUpcomingDeadlines(
   isLoading: boolean;
   isError: boolean;
 } {
-  const query = useQuery<readonly ComplianceDeadlineResponse[]>({
-    queryKey: ["compliance", "upcoming", days],
-    queryFn: async () => {
-      const res = await fetch(`/api/compliance/upcoming?days=${days}`);
-      if (!res.ok) throw new Error("임박 데드라인을 불러올 수 없습니다");
-      return res.json();
-    },
-    refetchInterval: 30_000,
-  });
+  const query = useUpcomingDeadlines(days);
 
   const deadlines = query.data
     ? paginateItems(filterDeadlines(query.data, filters), page)

@@ -2,8 +2,14 @@ import type { WorkerResponse, ComplianceDeadlineResponse } from "@/types/api";
 
 // ─── 목 데이터 생성 헬퍼 ─────────────────────────────────
 const SAMPLE_NATIONALITIES = [
-  "VIETNAM", "CHINA", "INDONESIA", "PHILIPPINES",
-  "THAILAND", "CAMBODIA", "MYANMAR", "NEPAL",
+  "VIETNAM",
+  "CHINA",
+  "INDONESIA",
+  "PHILIPPINES",
+  "THAILAND",
+  "CAMBODIA",
+  "MYANMAR",
+  "NEPAL",
 ] as const;
 const SAMPLE_VISA_TYPES = ["E9", "H2", "E7", "E8", "F2", "F5", "F6", "E7_4"] as const;
 const SAMPLE_STATUSES = ["ACTIVE", "INACTIVE", "TERMINATED"] as const;
@@ -25,7 +31,11 @@ function generateWorker(id: number): WorkerResponse {
     insuranceEligibilities: [
       { insuranceType: "국민연금", status: SAMPLE_INSURANCE[insIdx], reason: "테스트 사유" },
       { insuranceType: "건강보험", status: "의무", reason: "전원 의무가입" },
-      { insuranceType: "고용보험", status: SAMPLE_INSURANCE[(insIdx + 1) % 3], reason: "테스트 사유" },
+      {
+        insuranceType: "고용보험",
+        status: SAMPLE_INSURANCE[(insIdx + 1) % 3],
+        reason: "테스트 사유",
+      },
       { insuranceType: "산재보험", status: "의무", reason: "전원 의무가입" },
     ],
   };
@@ -66,7 +76,10 @@ export const mockWorkers: readonly WorkerResponse[] = [
 
 // ─── 데드라인 목 데이터 ──────────────────────────────────
 const SAMPLE_DEADLINE_TYPES = [
-  "VISA_EXPIRY", "INSURANCE_ENROLLMENT", "CHANGE_REPORT", "CONTRACT_RENEWAL",
+  "VISA_EXPIRY",
+  "INSURANCE_ENROLLMENT",
+  "CHANGE_REPORT",
+  "CONTRACT_RENEWAL",
 ] as const;
 const SAMPLE_DEADLINE_DESCS: Record<string, string> = {
   VISA_EXPIRY: "비자 갱신 필요",

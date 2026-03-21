@@ -57,9 +57,7 @@ describe("usePaginatedWorkers", () => {
 
     expect(result.current.workers).toBeDefined();
     expect(
-      result.current.workers!.items.every((w) =>
-        w.name.toLowerCase().includes("nguyen"),
-      ),
+      result.current.workers!.items.every((w) => w.name.toLowerCase().includes("nguyen")),
     ).toBe(true);
   });
 
@@ -79,9 +77,7 @@ describe("usePaginatedWorkers", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.workers).toBeDefined();
-    expect(
-      result.current.workers!.items.every((w) => w.nationality === "VIETNAM"),
-    ).toBe(true);
+    expect(result.current.workers!.items.every((w) => w.nationality === "VIETNAM")).toBe(true);
   });
 
   it("비자_유형_필터가_적용된다", async () => {
@@ -100,9 +96,7 @@ describe("usePaginatedWorkers", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.workers).toBeDefined();
-    expect(
-      result.current.workers!.items.every((w) => w.visaType === "E9"),
-    ).toBe(true);
+    expect(result.current.workers!.items.every((w) => w.visaType === "E9")).toBe(true);
   });
 
   it("상태_필터가_적용된다", async () => {
@@ -121,9 +115,7 @@ describe("usePaginatedWorkers", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.workers).toBeDefined();
-    expect(
-      result.current.workers!.items.every((w) => w.status === "ACTIVE"),
-    ).toBe(true);
+    expect(result.current.workers!.items.every((w) => w.status === "ACTIVE")).toBe(true);
   });
 
   it("보험_상태_필터가_적용된다", async () => {

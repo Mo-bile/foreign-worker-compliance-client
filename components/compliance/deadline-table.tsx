@@ -30,6 +30,7 @@ interface DeadlineTableProps {
   readonly isLoading: boolean;
   readonly limit?: number;
   readonly pagination?: PaginationProps;
+  readonly hasUnfilteredData?: boolean;
 }
 
 export function DeadlineTable({
@@ -38,6 +39,7 @@ export function DeadlineTable({
   isLoading,
   limit,
   pagination,
+  hasUnfilteredData,
 }: DeadlineTableProps) {
   const [internalPage, setInternalPage] = useState(1);
 
@@ -67,10 +69,8 @@ export function DeadlineTable({
     }
   }
 
-  const hasOriginalData = deadlines && deadlines.length > 0;
-  const emptyMessage = hasOriginalData
-    ? "조건에 맞는 결과가 없습니다"
-    : "데이터가 없습니다";
+  const hasData = hasUnfilteredData ?? (deadlines != null && deadlines.length > 0);
+  const emptyMessage = hasData ? "조건에 맞는 결과가 없습니다" : "데이터가 없습니다";
 
   return (
     <Card>

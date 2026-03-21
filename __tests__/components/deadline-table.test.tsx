@@ -15,17 +15,13 @@ const testDeadlines: ComplianceDeadlineResponse[] = Array.from({ length: 25 }, (
 
 describe("DeadlineTable", () => {
   it("limit이_있으면_해당_건수만_표시하고_페이지네이션_미표시", () => {
-    render(
-      <DeadlineTable title="테스트" deadlines={testDeadlines} isLoading={false} limit={5} />,
-    );
+    render(<DeadlineTable title="테스트" deadlines={testDeadlines} isLoading={false} limit={5} />);
     expect(screen.getAllByText(/테스트 데드라인/)).toHaveLength(5);
     expect(screen.queryByLabelText("다음 페이지")).toBeNull();
   });
 
   it("limit_없으면_내부_페이지네이션이_동작한다", async () => {
-    render(
-      <DeadlineTable title="테스트" deadlines={testDeadlines} isLoading={false} />,
-    );
+    render(<DeadlineTable title="테스트" deadlines={testDeadlines} isLoading={false} />);
     expect(screen.getByText(/총 25건 중 1-20/)).toBeDefined();
     expect(screen.getByLabelText("다음 페이지")).toBeDefined();
     await userEvent.click(screen.getByLabelText("다음 페이지"));
@@ -72,16 +68,12 @@ describe("DeadlineTable", () => {
   });
 
   it("빈_데이터일_때_메시지를_표시한다", () => {
-    render(
-      <DeadlineTable title="테스트" deadlines={[]} isLoading={false} />,
-    );
+    render(<DeadlineTable title="테스트" deadlines={[]} isLoading={false} />);
     expect(screen.getByText("데이터가 없습니다")).toBeDefined();
   });
 
   it("로딩_중에_스켈레톤을_표시한다", () => {
-    render(
-      <DeadlineTable title="테스트" deadlines={undefined} isLoading={true} />,
-    );
+    render(<DeadlineTable title="테스트" deadlines={undefined} isLoading={true} />);
     expect(document.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);
   });
 });

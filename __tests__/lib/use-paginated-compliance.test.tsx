@@ -35,34 +35,29 @@ describe("usePaginatedOverdueDeadlines", () => {
 
   it("데드라인_유형_필터가_적용된다", async () => {
     const { result } = renderHook(
-      () =>
-        usePaginatedOverdueDeadlines({ deadlineType: "VISA_EXPIRY", status: "ALL" }, 1),
+      () => usePaginatedOverdueDeadlines({ deadlineType: "VISA_EXPIRY", status: "ALL" }, 1),
       { wrapper: createWrapper() },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(
-      result.current.deadlines!.items.every((d) => d.deadlineType === "VISA_EXPIRY"),
-    ).toBe(true);
+    expect(result.current.deadlines!.items.every((d) => d.deadlineType === "VISA_EXPIRY")).toBe(
+      true,
+    );
   });
 
   it("상태_필터가_적용된다", async () => {
     const { result } = renderHook(
-      () =>
-        usePaginatedOverdueDeadlines({ deadlineType: "ALL", status: "OVERDUE" }, 1),
+      () => usePaginatedOverdueDeadlines({ deadlineType: "ALL", status: "OVERDUE" }, 1),
       { wrapper: createWrapper() },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(
-      result.current.deadlines!.items.every((d) => d.status === "OVERDUE"),
-    ).toBe(true);
+    expect(result.current.deadlines!.items.every((d) => d.status === "OVERDUE")).toBe(true);
   });
 });
 
 describe("usePaginatedUpcomingDeadlines", () => {
   it("필터_없이_첫_페이지를_반환한다", async () => {
     const { result } = renderHook(
-      () =>
-        usePaginatedUpcomingDeadlines(30, { deadlineType: "ALL", status: "ALL" }, 1),
+      () => usePaginatedUpcomingDeadlines(30, { deadlineType: "ALL", status: "ALL" }, 1),
       { wrapper: createWrapper() },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
