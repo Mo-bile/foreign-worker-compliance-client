@@ -2,6 +2,10 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { WorkerResponse, RegisterWorkerRequest } from "@/types/api";
+import { paginateItems } from "@/lib/pagination";
+import type { PaginatedResult } from "@/lib/pagination";
+import { NATIONALITY_LABELS } from "@/types/api";
+import type { Nationality } from "@/types/api";
 
 export function useWorkers() {
   return useQuery<readonly WorkerResponse[]>({
@@ -45,5 +49,63 @@ export function useRegisterWorker() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
+  });
+}
+
+export interface WorkerFilterParams {
+  readonly page: number;
+  readonly search: string;
+  readonly visaType: string;
+  readonly status: string;
+  readonly insuranceStatus: string;
+}
+
+export function usePaginatedWorkers(params: WorkerFilterParams): {
+  workers: PaginatedResult<WorkerResponse> | undefined;
+  isLoading: boolean;
+  isError: boolean;
+} {
+  const query = useQuery<readonly WorkerResponse[]>({
+    queryKey: ["workers"],
+    queryFn: async () => {
+      const res = await fetch("/api/workers");
+      if (!res.ok) throw new Error("근로자 목록을 불러올 수 없습니다");
+      return res.json();
+    },
+  });
+
+  const workers = query.data
+    ? paginateItems(filterWorkers(query.data, params), params.page)
+    : undefined;
+
+  return { workers, isLoading: query.isLoading, isError: query.isError };
+}
+
+function filterWorkers(
+  workers: readonly WorkerResponse[],
+  params: WorkerFilterParams,
+): readonly WorkerResponse[] {
+  return workers.filter((worker) => {
+    if (params.search.trim() !== "") {
+      const searchLower = params.search.toLowerCase();
+      const nationalityLabel =
+        NATIONALITY_LABELS[worker.nationality as Nationality] ?? worker.nationality;
+      const matchesSearch =
+        worker.name.toLowerCase().includes(searchLower) ||
+        nationalityLabel.toLowerCase().includes(searchLower);
+      if (!matchesSearch) return false;
+    }
+
+    if (params.visaType !== "ALL" && worker.visaType !== params.visaType) return false;
+    if (params.status !== "ALL" && worker.status !== params.status) return false;
+
+    if (params.insuranceStatus !== "ALL") {
+      const hasMatch = worker.insuranceEligibilities.some(
+        (ie) => ie.status === params.insuranceStatus,
+      );
+      if (!hasMatch) return false;
+    }
+
+    return true;
   });
 }

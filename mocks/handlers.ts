@@ -5,6 +5,8 @@ const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
 export const handlers = [
   http.get(`${BACKEND}/api/workers`, () => HttpResponse.json(mockWorkers)),
+  // Next.js Route Handler relative paths (used by React Query hooks in jsdom tests)
+  http.get("*/api/workers", () => HttpResponse.json(mockWorkers)),
 
   http.get(`${BACKEND}/api/workers/:id`, ({ params }) => {
     const worker = mockWorkers.find((w) => w.id === Number(params.id));
