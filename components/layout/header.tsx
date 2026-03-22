@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 const NAV_ITEMS = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
@@ -55,7 +56,8 @@ export function Header() {
 
       <span className="ml-2 text-lg font-bold md:ml-0">FWC</span>
 
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
+        <ThemeToggle />
         <Avatar className="h-8 w-8">
           <AvatarFallback>HR</AvatarFallback>
         </Avatar>
