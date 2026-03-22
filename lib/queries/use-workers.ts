@@ -13,14 +13,16 @@ import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 import { NATIONALITY_LABELS } from "@/types/api";
 
-export function useWorkers() {
+export function useWorkers(companyId?: number | null) {
   return useQuery<readonly WorkerResponse[]>({
-    queryKey: ["workers"],
+    queryKey: ["workers", { companyId }],
     queryFn: async () => {
-      const res = await fetch("/api/workers");
+      const params = companyId ? `?companyId=${companyId}` : "";
+      const res = await fetch(`/api/workers${params}`);
       if (!res.ok) throw new Error("근로자 목록을 불러올 수 없습니다");
       return res.json();
     },
+    enabled: companyId === null || companyId === undefined || companyId > 0,
   });
 }
 
@@ -74,12 +76,15 @@ export interface WorkerFilterParams {
 
 // TODO: 현재 WorkerTable이 자체 필터링/페이지네이션을 수행하므로 프로덕션에서 미사용.
 // 서버 사이드 필터링 전환 시 이 훅을 페이지에 연결하고 WorkerTable 내부 필터 로직을 제거할 것.
-export function usePaginatedWorkers(params: WorkerFilterParams): {
+export function usePaginatedWorkers(
+  companyId: number | null | undefined,
+  params: WorkerFilterParams,
+): {
   workers: PaginatedResult<WorkerResponse> | undefined;
   isLoading: boolean;
   isError: boolean;
 } {
-  const query = useWorkers();
+  const query = useWorkers(companyId);
 
   const workers = query.data
     ? paginateItems(filterWorkers(query.data, params), params.page)
