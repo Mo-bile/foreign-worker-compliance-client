@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,17 +12,59 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "./status-badge";
+import { paginateItems } from "@/lib/pagination";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import type { PaginationControlsProps } from "@/components/ui/pagination-controls";
 import type { ComplianceDeadlineResponse } from "@/types/api";
 
 interface DeadlineTableProps {
   readonly title: string;
   readonly deadlines: readonly ComplianceDeadlineResponse[] | undefined;
   readonly isLoading: boolean;
+  readonly isError?: boolean;
   readonly limit?: number;
+  readonly pagination?: PaginationControlsProps;
+  readonly hasUnfilteredData?: boolean;
 }
 
-export function DeadlineTable({ title, deadlines, isLoading, limit }: DeadlineTableProps) {
-  const items = limit ? deadlines?.slice(0, limit) : deadlines;
+export function DeadlineTable({
+  title,
+  deadlines,
+  isLoading,
+  isError,
+  limit,
+  pagination,
+  hasUnfilteredData,
+}: DeadlineTableProps) {
+  const [internalPage, setInternalPage] = useState(1);
+
+  // 3-way branching to support different consumers:
+  // dashboard summary (limit), compliance page with filters (external pagination),
+  // and standalone usage (internal pagination)
+  let items: readonly ComplianceDeadlineResponse[] | undefined;
+  let paginationControls: PaginationControlsProps | null = null;
+
+  if (limit) {
+    items = deadlines?.slice(0, limit);
+  } else if (pagination) {
+    items = deadlines;
+    paginationControls = pagination;
+  } else if (deadlines) {
+    const paginated = paginateItems(deadlines, internalPage);
+    items = paginated.items;
+    if (paginated.totalPages > 1) {
+      paginationControls = {
+        currentPage: paginated.currentPage,
+        totalPages: paginated.totalPages,
+        totalItems: paginated.totalItems,
+        pageSize: paginated.pageSize,
+        onPageChange: setInternalPage,
+      };
+    }
+  }
+
+  const hasData = hasUnfilteredData ?? (deadlines != null && deadlines.length > 0);
+  const emptyMessage = hasData ? "조건에 맞는 결과가 없습니다" : "데이터가 없습니다";
 
   return (
     <Card>
@@ -33,31 +78,46 @@ export function DeadlineTable({ title, deadlines, isLoading, limit }: DeadlineTa
               <Skeleton key={i} className="h-10 w-full" />
             ))}
           </div>
+        ) : isError ? (
+          <p className="text-destructive text-sm py-4 text-center">
+            데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.
+          </p>
         ) : !items?.length ? (
-          <p className="text-muted-foreground text-sm py-4 text-center">데이터가 없습니다</p>
+          <p className="text-muted-foreground text-sm py-4 text-center">{emptyMessage}</p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>근로자 ID</TableHead>
-                <TableHead>설명</TableHead>
-                <TableHead>기한</TableHead>
-                <TableHead>상태</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((d) => (
-                <TableRow key={d.id}>
-                  <TableCell>{d.workerId}</TableCell>
-                  <TableCell>{d.description}</TableCell>
-                  <TableCell>{d.dueDate}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={d.status} />
-                  </TableCell>
+          <>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>근로자 ID</TableHead>
+                  <TableHead>설명</TableHead>
+                  <TableHead>기한</TableHead>
+                  <TableHead>상태</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {items.map((d) => (
+                  <TableRow key={d.id}>
+                    <TableCell>{d.workerId}</TableCell>
+                    <TableCell>{d.description}</TableCell>
+                    <TableCell>{d.dueDate}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={d.status} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            {paginationControls && (
+              <PaginationControls
+                currentPage={paginationControls.currentPage}
+                totalPages={paginationControls.totalPages}
+                totalItems={paginationControls.totalItems}
+                pageSize={paginationControls.pageSize}
+                onPageChange={paginationControls.onPageChange}
+              />
+            )}
+          </>
         )}
       </CardContent>
     </Card>

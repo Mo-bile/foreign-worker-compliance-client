@@ -9,9 +9,10 @@ import type { ComplianceDeadlineResponse } from "@/types/api";
 interface DeadlineChartProps {
   readonly deadlines: readonly ComplianceDeadlineResponse[] | undefined;
   readonly isLoading: boolean;
+  readonly isError?: boolean;
 }
 
-export function DeadlineChart({ deadlines, isLoading }: DeadlineChartProps) {
+export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartProps) {
   const chartData = useMemo(() => {
     if (!deadlines) return [];
 
@@ -34,6 +35,10 @@ export function DeadlineChart({ deadlines, isLoading }: DeadlineChartProps) {
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-64 w-full" />
+        ) : isError ? (
+          <p className="text-destructive text-sm py-8 text-center">
+            데이터를 불러오는 중 오류가 발생했습니다.
+          </p>
         ) : chartData.length === 0 ? (
           <p className="text-muted-foreground text-sm py-8 text-center">데이터가 없습니다</p>
         ) : (

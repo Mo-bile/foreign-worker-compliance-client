@@ -7,9 +7,10 @@ interface StatCardProps {
   readonly value: number | undefined;
   readonly icon: LucideIcon;
   readonly isLoading: boolean;
+  readonly isError?: boolean;
 }
 
-export function StatCard({ title, value, icon: Icon, isLoading }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, isLoading, isError }: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -19,6 +20,8 @@ export function StatCard({ title, value, icon: Icon, isLoading }: StatCardProps)
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-8 w-16" />
+        ) : isError ? (
+          <p className="text-2xl font-bold text-destructive">—</p>
         ) : (
           <p className="text-2xl font-bold">{value ?? 0}</p>
         )}

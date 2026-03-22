@@ -1,7 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { ComplianceDeadlineResponse } from "@/types/api";
+import type { ComplianceDeadlineResponse, DeadlineType, DeadlineStatus, FilterOption } from "@/types/api";
+import { paginateItems } from "@/lib/pagination";
+import type { PaginatedResult } from "@/lib/pagination";
 
 export function useOverdueDeadlines() {
   return useQuery<readonly ComplianceDeadlineResponse[]>({
@@ -37,4 +39,55 @@ export function useWorkerDeadlines(workerId: number) {
     },
     enabled: workerId > 0,
   });
+}
+
+export interface ComplianceFilterValues {
+  readonly deadlineType: FilterOption<DeadlineType>;
+  readonly status: FilterOption<DeadlineStatus>;
+}
+
+function filterDeadlines(
+  deadlines: readonly ComplianceDeadlineResponse[],
+  filters: ComplianceFilterValues,
+): readonly ComplianceDeadlineResponse[] {
+  return deadlines.filter((d) => {
+    if (filters.deadlineType !== "ALL" && d.deadlineType !== filters.deadlineType) return false;
+    if (filters.status !== "ALL" && d.status !== filters.status) return false;
+    return true;
+  });
+}
+
+export function usePaginatedOverdueDeadlines(
+  filters: ComplianceFilterValues,
+  page: number,
+): {
+  deadlines: PaginatedResult<ComplianceDeadlineResponse> | undefined;
+  isLoading: boolean;
+  isError: boolean;
+} {
+  const query = useOverdueDeadlines();
+
+  const deadlines = query.data
+    ? paginateItems(filterDeadlines(query.data, filters), page)
+    : undefined;
+
+  return { deadlines, isLoading: query.isLoading, isError: query.isError };
+}
+
+export function usePaginatedUpcomingDeadlines(
+  days: number,
+  filters: ComplianceFilterValues,
+  page: number,
+): {
+  deadlines: PaginatedResult<ComplianceDeadlineResponse> | undefined;
+  isLoading: boolean;
+  isError: boolean;
+} {
+  const query = useUpcomingDeadlines(days);
+
+  const deadlines = query.data
+    ? paginateItems(filterDeadlines(query.data, filters), page)
+    : undefined;
+
+  return { deadlines, isLoading: query.isLoading, isError: query.isError };
 }

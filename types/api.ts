@@ -90,6 +90,39 @@ export const DEADLINE_STATUSES = [
 ] as const;
 export type DeadlineStatus = (typeof DEADLINE_STATUSES)[number];
 
+// ─── WorkerStatus ────────────────────────────────────────────
+export const WORKER_STATUSES = ["ACTIVE", "INACTIVE", "TERMINATED"] as const;
+export type WorkerStatus = (typeof WORKER_STATUSES)[number];
+
+export const WORKER_STATUS_LABELS: Record<WorkerStatus, string> = {
+  ACTIVE: "활성",
+  INACTIVE: "비활성",
+  TERMINATED: "퇴사",
+};
+
+// ─── Filter Utility Type ─────────────────────────────────────
+export type FilterOption<T extends string> = T | "ALL";
+
+// ─── InsuranceStatus ─────────────────────────────────────────
+export const INSURANCE_STATUSES = ["의무", "임의", "면제"] as const;
+export type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
+
+// ─── Label Maps ──────────────────────────────────────────────
+export const DEADLINE_TYPE_LABELS: Record<DeadlineType, string> = {
+  VISA_EXPIRY: "비자 만료",
+  INSURANCE_ENROLLMENT: "보험 가입",
+  CHANGE_REPORT: "변경 신고",
+  CONTRACT_RENEWAL: "계약 갱신",
+};
+
+export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
+  PENDING: "대기",
+  APPROACHING: "임박",
+  URGENT: "긴급",
+  OVERDUE: "초과",
+  COMPLETED: "완료",
+};
+
 // ─── Zod Schemas ──────────────────────────────────────────
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -117,17 +150,17 @@ export type RegisterWorkerRequest = z.infer<typeof registerWorkerRequestSchema>;
 // ─── Response Types ───────────────────────────────────────
 export interface InsuranceEligibilityDto {
   readonly insuranceType: string;
-  readonly status: string;
+  readonly status: InsuranceStatus;
   readonly reason: string;
 }
 
 export interface WorkerResponse {
   readonly id: number;
   readonly name: string;
-  readonly nationality: string;
-  readonly visaType: string;
+  readonly nationality: Nationality;
+  readonly visaType: VisaType;
   readonly visaExpiryDate: string;
-  readonly status: string;
+  readonly status: WorkerStatus;
   readonly insuranceEligibilities: readonly InsuranceEligibilityDto[];
 }
 
