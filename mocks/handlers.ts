@@ -71,6 +71,7 @@ export const handlers = [
   // Test endpoints (for api-client tests)
   http.get(`${BACKEND}/test`, () => HttpResponse.json({ message: "ok" })),
   http.post(`${BACKEND}/test`, () => HttpResponse.json({ id: 1 })),
+  http.put(`${BACKEND}/test/put`, () => HttpResponse.json({ id: 1 })),
   http.get(`${BACKEND}/test/404`, () =>
     HttpResponse.json(
       {
