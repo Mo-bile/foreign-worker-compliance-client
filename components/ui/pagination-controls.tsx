@@ -1,13 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { PaginationMeta } from "@/lib/pagination";
 
-interface PaginationControlsProps {
-  readonly currentPage: number;
-  readonly totalPages: number;
-  readonly totalItems: number;
-  readonly pageSize: number;
+export type PaginationControlsProps = PaginationMeta & {
   readonly onPageChange: (page: number) => void;
-}
+};
 
 function getPageNumbers(currentPage: number, totalPages: number): (number | "ellipsis")[] {
   if (totalPages <= 7) {

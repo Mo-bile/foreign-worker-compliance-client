@@ -40,7 +40,8 @@ export default function CompliancePage() {
   const overdueAll = useOverdueDeadlines();
   const overdue = usePaginatedOverdueDeadlines(filters, overduePage);
   const upcoming = usePaginatedUpcomingDeadlines(30, filters, upcomingPage);
-  // Chart uses same queryKey as usePaginatedUpcomingDeadlines → no extra fetch
+  // useUpcomingDeadlines(30) is already called inside usePaginatedUpcomingDeadlines above,
+  // so React Query deduplicates — no extra fetch for the chart.
   const upcomingAll = useUpcomingDeadlines(30);
 
   const resetPages = useCallback(() => {
@@ -100,6 +101,7 @@ export default function CompliancePage() {
         title="기한초과 데드라인"
         deadlines={overdue.deadlines?.items}
         isLoading={overdue.isLoading}
+        isError={overdue.isError}
         hasUnfilteredData={(overdueAll.data?.length ?? 0) > 0}
         pagination={
           overdue.deadlines && overdue.deadlines.totalPages > 0
@@ -119,6 +121,7 @@ export default function CompliancePage() {
           title="임박 데드라인 (30일)"
           deadlines={upcoming.deadlines?.items}
           isLoading={upcoming.isLoading}
+          isError={upcoming.isError}
           hasUnfilteredData={(upcomingAll.data?.length ?? 0) > 0}
           pagination={
             upcoming.deadlines && upcoming.deadlines.totalPages > 0

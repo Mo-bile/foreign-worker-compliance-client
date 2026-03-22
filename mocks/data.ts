@@ -41,7 +41,7 @@ function generateWorker(id: number): WorkerResponse {
   };
 }
 
-// 기존 2건 (enum 키로 교정) + 23건 생성 = 총 25건
+// 수동 작성 2건 + 자동 생성 23건 = 총 25건
 export const mockWorkers: readonly WorkerResponse[] = [
   {
     id: 1,

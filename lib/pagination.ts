@@ -8,6 +8,11 @@ export interface PaginatedResult<T> {
   readonly pageSize: number;
 }
 
+export type PaginationMeta = Pick<
+  PaginatedResult<unknown>,
+  "currentPage" | "totalPages" | "totalItems" | "pageSize"
+>;
+
 export function paginateItems<T>(
   items: readonly T[],
   page: number,

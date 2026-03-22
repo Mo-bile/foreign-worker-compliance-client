@@ -1,11 +1,17 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { WorkerResponse, RegisterWorkerRequest } from "@/types/api";
+import type {
+  WorkerResponse,
+  RegisterWorkerRequest,
+  VisaType,
+  WorkerStatus,
+  InsuranceStatus,
+  FilterOption,
+} from "@/types/api";
 import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 import { NATIONALITY_LABELS } from "@/types/api";
-import type { Nationality } from "@/types/api";
 
 export function useWorkers() {
   return useQuery<readonly WorkerResponse[]>({
@@ -41,8 +47,14 @@ export function useRegisterWorker() {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message ?? "등록에 실패했습니다");
+        let message = "등록에 실패했습니다";
+        try {
+          const body = await res.json();
+          if (body.message) message = body.message;
+        } catch {
+          // Server returned non-JSON error response — use default message
+        }
+        throw new Error(message);
       }
       return res.json();
     },
@@ -55,9 +67,9 @@ export function useRegisterWorker() {
 export interface WorkerFilterParams {
   readonly page: number;
   readonly search: string;
-  readonly visaType: string;
-  readonly status: string;
-  readonly insuranceStatus: string;
+  readonly visaType: FilterOption<VisaType>;
+  readonly status: FilterOption<WorkerStatus>;
+  readonly insuranceStatus: FilterOption<InsuranceStatus>;
 }
 
 // TODO: 현재 WorkerTable이 자체 필터링/페이지네이션을 수행하므로 프로덕션에서 미사용.
@@ -83,8 +95,7 @@ function filterWorkers(
   return workers.filter((worker) => {
     if (params.search.trim() !== "") {
       const searchLower = params.search.toLowerCase();
-      const nationalityLabel =
-        NATIONALITY_LABELS[worker.nationality as Nationality] ?? worker.nationality;
+      const nationalityLabel = NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
       const matchesSearch =
         worker.name.toLowerCase().includes(searchLower) ||
         nationalityLabel.toLowerCase().includes(searchLower);

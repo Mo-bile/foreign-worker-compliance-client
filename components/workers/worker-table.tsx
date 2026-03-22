@@ -8,10 +8,15 @@ import {
   NATIONALITY_LABELS,
   WORKER_STATUSES,
   WORKER_STATUS_LABELS,
-  WORKER_STATUS_COLORS,
   INSURANCE_STATUSES,
 } from "@/types/api";
 import type { VisaType, WorkerStatus, InsuranceStatus, WorkerResponse } from "@/types/api";
+
+const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
+  ACTIVE: "text-green-700 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium",
+  INACTIVE: "text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full text-xs font-medium",
+  TERMINATED: "text-red-700 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium",
+};
 import {
   Table,
   TableBody,
@@ -51,24 +56,25 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   };
 
   const handleVisaChange = (value: string | null) => {
-    if (value) setVisaFilter(value as VisaType | "ALL");
+    if (!value) return;
+    setVisaFilter(value as VisaType | "ALL");
     setPage(1);
   };
 
   const handleStatusChange = (value: string | null) => {
-    if (value) setStatusFilter(value as WorkerStatus | "ALL");
+    if (!value) return;
+    setStatusFilter(value as WorkerStatus | "ALL");
     setPage(1);
   };
 
   const handleInsuranceChange = (value: string | null) => {
-    if (value) setInsuranceFilter(value as InsuranceStatus | "ALL");
+    if (!value) return;
+    setInsuranceFilter(value as InsuranceStatus | "ALL");
     setPage(1);
   };
 
   const filteredWorkers = workers.filter((worker) => {
-    const nationalityLabel =
-      NATIONALITY_LABELS[worker.nationality as keyof typeof NATIONALITY_LABELS] ??
-      worker.nationality;
+    const nationalityLabel = NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
     const matchesSearch =
       search.trim() === "" ||
       worker.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -162,15 +168,10 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
             </TableHeader>
             <TableBody>
               {paginated.items.map((worker) => {
-                const nationalityLabel =
-                  NATIONALITY_LABELS[worker.nationality as keyof typeof NATIONALITY_LABELS] ??
-                  worker.nationality;
-                const visaLabel = VISA_TYPE_LABELS[worker.visaType as VisaType] ?? worker.visaType;
-                const statusLabel =
-                  WORKER_STATUS_LABELS[worker.status as WorkerStatus] ?? worker.status;
-                const statusClass =
-                  WORKER_STATUS_COLORS[worker.status as WorkerStatus] ??
-                  "text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full text-xs font-medium";
+                const nationalityLabel = NATIONALITY_LABELS[worker.nationality];
+                const visaLabel = VISA_TYPE_LABELS[worker.visaType];
+                const statusLabel = WORKER_STATUS_LABELS[worker.status];
+                const statusClass = WORKER_STATUS_COLORS[worker.status];
 
                 return (
                   <TableRow

@@ -14,22 +14,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "./status-badge";
 import { paginateItems } from "@/lib/pagination";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import type { PaginationControlsProps } from "@/components/ui/pagination-controls";
 import type { ComplianceDeadlineResponse } from "@/types/api";
-
-interface PaginationProps {
-  readonly currentPage: number;
-  readonly totalPages: number;
-  readonly totalItems: number;
-  readonly pageSize: number;
-  readonly onPageChange: (page: number) => void;
-}
 
 interface DeadlineTableProps {
   readonly title: string;
   readonly deadlines: readonly ComplianceDeadlineResponse[] | undefined;
   readonly isLoading: boolean;
+  readonly isError?: boolean;
   readonly limit?: number;
-  readonly pagination?: PaginationProps;
+  readonly pagination?: PaginationControlsProps;
   readonly hasUnfilteredData?: boolean;
 }
 
@@ -37,18 +31,18 @@ export function DeadlineTable({
   title,
   deadlines,
   isLoading,
+  isError,
   limit,
   pagination,
   hasUnfilteredData,
 }: DeadlineTableProps) {
   const [internalPage, setInternalPage] = useState(1);
 
-  // 3-way branching:
-  // 1. limit → slice only, no pagination
-  // 2. pagination prop → external control, data already paginated
-  // 3. neither → internal useState pagination
+  // 3-way branching to support different consumers:
+  // dashboard summary (limit), compliance page with filters (external pagination),
+  // and standalone usage (internal pagination)
   let items: readonly ComplianceDeadlineResponse[] | undefined;
-  let paginationControls: PaginationProps | null = null;
+  let paginationControls: PaginationControlsProps | null = null;
 
   if (limit) {
     items = deadlines?.slice(0, limit);
@@ -84,6 +78,10 @@ export function DeadlineTable({
               <Skeleton key={i} className="h-10 w-full" />
             ))}
           </div>
+        ) : isError ? (
+          <p className="text-destructive text-sm py-4 text-center">
+            데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.
+          </p>
         ) : !items?.length ? (
           <p className="text-muted-foreground text-sm py-4 text-center">{emptyMessage}</p>
         ) : (

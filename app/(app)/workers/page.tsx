@@ -7,7 +7,7 @@ import { WorkerTable } from "@/components/workers/worker-table";
 import { useWorkers } from "@/lib/queries/use-workers";
 
 export default function WorkersPage() {
-  const { data: workers = [], isLoading } = useWorkers();
+  const { data: workers = [], isLoading, isError } = useWorkers();
 
   return (
     <div className="space-y-6">
@@ -21,7 +21,13 @@ export default function WorkersPage() {
         </Link>
       </div>
 
-      <WorkerTable workers={workers} isLoading={isLoading} />
+      {isError ? (
+        <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-destructive">
+          근로자 목록을 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.
+        </div>
+      ) : (
+        <WorkerTable workers={workers} isLoading={isLoading} />
+      )}
     </div>
   );
 }

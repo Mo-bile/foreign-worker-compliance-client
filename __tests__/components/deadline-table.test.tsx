@@ -72,6 +72,25 @@ describe("DeadlineTable", () => {
     expect(screen.getByText("데이터가 없습니다")).toBeDefined();
   });
 
+  it("hasUnfilteredData가_true이고_빈_배열이면_필터_빈_상태_메시지를_표시한다", () => {
+    render(
+      <DeadlineTable title="테스트" deadlines={[]} isLoading={false} hasUnfilteredData={true} />,
+    );
+    expect(screen.getByText("조건에 맞는 결과가 없습니다")).toBeDefined();
+  });
+
+  it("hasUnfilteredData가_false이고_빈_배열이면_데이터_없음_메시지를_표시한다", () => {
+    render(
+      <DeadlineTable title="테스트" deadlines={[]} isLoading={false} hasUnfilteredData={false} />,
+    );
+    expect(screen.getByText("데이터가 없습니다")).toBeDefined();
+  });
+
+  it("isError가_true이면_오류_메시지를_표시한다", () => {
+    render(<DeadlineTable title="테스트" deadlines={undefined} isLoading={false} isError={true} />);
+    expect(screen.getByText(/오류가 발생했습니다/)).toBeDefined();
+  });
+
   it("로딩_중에_스켈레톤을_표시한다", () => {
     render(<DeadlineTable title="테스트" deadlines={undefined} isLoading={true} />);
     expect(document.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);

@@ -100,11 +100,8 @@ export const WORKER_STATUS_LABELS: Record<WorkerStatus, string> = {
   TERMINATED: "퇴사",
 };
 
-export const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
-  ACTIVE: "text-green-700 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium",
-  INACTIVE: "text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full text-xs font-medium",
-  TERMINATED: "text-red-700 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium",
-};
+// ─── Filter Utility Type ─────────────────────────────────────
+export type FilterOption<T extends string> = T | "ALL";
 
 // ─── InsuranceStatus ─────────────────────────────────────────
 export const INSURANCE_STATUSES = ["의무", "임의", "면제"] as const;
@@ -160,10 +157,10 @@ export interface InsuranceEligibilityDto {
 export interface WorkerResponse {
   readonly id: number;
   readonly name: string;
-  readonly nationality: string;
-  readonly visaType: string;
+  readonly nationality: Nationality;
+  readonly visaType: VisaType;
   readonly visaExpiryDate: string;
-  readonly status: string;
+  readonly status: WorkerStatus;
   readonly insuranceEligibilities: readonly InsuranceEligibilityDto[];
 }
 

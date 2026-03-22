@@ -74,6 +74,41 @@ describe("PaginationControls", () => {
     expect(ellipses).toHaveLength(2);
   });
 
+  it("총_페이지가_10이고_첫_페이지일_때_선행_말줄임이_없다", () => {
+    render(
+      <PaginationControls {...defaultProps} currentPage={1} totalPages={10} totalItems={200} />,
+    );
+    expect(screen.getByRole("button", { name: "1 페이지" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "2 페이지" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "10 페이지" })).toBeDefined();
+    const ellipses = screen.getAllByText("...");
+    expect(ellipses).toHaveLength(1);
+  });
+
+  it("총_페이지가_10이고_마지막_페이지일_때_후행_말줄임이_없다", () => {
+    render(
+      <PaginationControls {...defaultProps} currentPage={10} totalPages={10} totalItems={200} />,
+    );
+    expect(screen.getByRole("button", { name: "1 페이지" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "9 페이지" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "10 페이지" })).toBeDefined();
+    const ellipses = screen.getAllByText("...");
+    expect(ellipses).toHaveLength(1);
+  });
+
+  it("총_페이지가_10이고_3페이지일_때_선행_말줄임이_없다", () => {
+    render(
+      <PaginationControls {...defaultProps} currentPage={3} totalPages={10} totalItems={200} />,
+    );
+    expect(screen.getByRole("button", { name: "1 페이지" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "2 페이지" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "3 페이지" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "4 페이지" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "10 페이지" })).toBeDefined();
+    const ellipses = screen.getAllByText("...");
+    expect(ellipses).toHaveLength(1);
+  });
+
   it("totalPages가_0이면_렌더링하지_않는다", () => {
     const { container } = render(
       <PaginationControls {...defaultProps} totalPages={0} totalItems={0} />,
