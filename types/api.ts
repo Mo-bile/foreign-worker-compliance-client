@@ -205,7 +205,7 @@ export const registerWorkerRequestSchema = z.object({
     .regex(isoDateRegex, "날짜 형식: YYYY-MM-DD")
     .optional()
     .or(z.literal("")),
-  workplaceId: z.number().int().positive("사업장 ID를 입력해주세요"),
+  companyId: z.number().int().positive("사업장을 선택해주세요"),
   contactPhone: z.string().optional(),
   contactEmail: z.string().email("올바른 이메일 형식이 아닙니다").optional().or(z.literal("")),
 });

@@ -18,7 +18,7 @@ describe("registerWorkerRequestSchema", () => {
       visaExpiryDate: "2026-12-31",
       entryDate: "2024-01-15",
       contractStartDate: "2024-02-01",
-      workplaceId: 1,
+      companyId: 1,
     };
     const result = registerWorkerRequestSchema.safeParse(valid);
     expect(result.success).toBe(true);
@@ -32,7 +32,7 @@ describe("registerWorkerRequestSchema", () => {
       visaExpiryDate: "2026-12-31",
       entryDate: "2024-01-15",
       contractStartDate: "2024-02-01",
-      workplaceId: 1,
+      companyId: 1,
     };
     const result = registerWorkerRequestSchema.safeParse(invalid);
     expect(result.success).toBe(false);
@@ -46,7 +46,7 @@ describe("registerWorkerRequestSchema", () => {
       visaExpiryDate: "2026-12-31",
       entryDate: "2024-01-15",
       contractStartDate: "2024-02-01",
-      workplaceId: 1,
+      companyId: 1,
     };
     const result = registerWorkerRequestSchema.safeParse(invalid);
     expect(result.success).toBe(false);
@@ -60,7 +60,7 @@ describe("registerWorkerRequestSchema", () => {
       visaExpiryDate: "2027-06-30",
       entryDate: "2025-01-01",
       contractStartDate: "2025-02-01",
-      workplaceId: 2,
+      companyId: 2,
     };
     const result = registerWorkerRequestSchema.safeParse(valid);
     expect(result.success).toBe(true);
@@ -74,7 +74,7 @@ describe("registerWorkerRequestSchema", () => {
       visaExpiryDate: "31-12-2026",
       entryDate: "2024-01-15",
       contractStartDate: "2024-02-01",
-      workplaceId: 1,
+      companyId: 1,
     };
     const result = registerWorkerRequestSchema.safeParse(invalid);
     expect(result.success).toBe(false);

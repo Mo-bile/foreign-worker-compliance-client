@@ -13,6 +13,8 @@ import {
 } from "@/types/api";
 import type { RegisterWorkerRequest } from "@/types/api";
 import { useRegisterWorker } from "@/lib/queries/use-workers";
+import { useCompanies } from "@/lib/queries/use-companies";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,7 @@ import {
 export function WorkerForm() {
   const router = useRouter();
   const { mutate: registerWorker, isPending } = useRegisterWorker();
+  const { data: companies = [] } = useCompanies();
 
   const {
     register,
@@ -47,7 +50,7 @@ export function WorkerForm() {
       registrationNumber: "",
       contractStartDate: "",
       contractEndDate: "",
-      workplaceId: undefined,
+      companyId: undefined,
       contactPhone: "",
       contactEmail: "",
     },
@@ -88,19 +91,40 @@ export function WorkerForm() {
             {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
           </div>
 
-          {/* 사업장 ID */}
+          {/* 사업장 */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="workplaceId">사업장 ID</Label>
-            <Input
-              id="workplaceId"
-              type="number"
-              {...register("workplaceId", { valueAsNumber: true })}
-              aria-invalid={!!errors.workplaceId}
-              placeholder="1"
-            />
-            {errors.workplaceId && (
-              <p className="text-sm text-destructive">{errors.workplaceId.message}</p>
+            <Label htmlFor="companyId">사업장</Label>
+            {companies.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                등록된 사업장이 없습니다.{" "}
+                <Link href="/companies/new" className="text-primary hover:underline">
+                  사업장을 먼저 등록해주세요
+                </Link>
+              </p>
+            ) : (
+              <Controller
+                name="companyId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value != null ? String(field.value) : undefined}
+                    onValueChange={(val) => field.onChange(Number(val))}
+                  >
+                    <SelectTrigger id="companyId" aria-label="사업장" aria-invalid={!!errors.companyId} className="w-full">
+                      <SelectValue placeholder="사업장 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {companies.map((c) => (
+                        <SelectItem key={c.id} value={String(c.id)}>
+                          {c.name} ({c.businessNumber})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             )}
+            {errors.companyId && <p className="text-sm text-destructive">{errors.companyId.message}</p>}
           </div>
 
           {/* 국적 */}
