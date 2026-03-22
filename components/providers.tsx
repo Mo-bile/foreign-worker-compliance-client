@@ -29,7 +29,6 @@ export function Providers({ children }: { readonly children: ReactNode }) {
       attribute="class"
       defaultTheme="light"
       enableSystem={false}
-      disableTransitionOnChange={false}
     >
       <QueryClientProvider client={queryClient}>
         {children}
