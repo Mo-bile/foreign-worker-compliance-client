@@ -3,12 +3,23 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CompanyResponse, CreateCompanyRequest, UpdateCompanyRequest } from "@/types/api";
 
+async function throwResponseError(res: Response, fallbackMessage: string): Promise<never> {
+  let message = fallbackMessage;
+  try {
+    const body = await res.json();
+    if (body.message) message = body.message;
+  } catch {
+    // Non-JSON error response — use fallback message
+  }
+  throw Object.assign(new Error(message), { status: res.status });
+}
+
 export function useCompanies() {
   return useQuery<readonly CompanyResponse[]>({
     queryKey: ["companies"],
     queryFn: async () => {
       const res = await fetch("/api/companies");
-      if (!res.ok) throw new Error("사업장 목록을 불러올 수 없습니다");
+      if (!res.ok) await throwResponseError(res, "사업장 목록을 불러올 수 없습니다");
       return res.json();
     },
   });
@@ -19,7 +30,7 @@ export function useCompany(id: number) {
     queryKey: ["companies", id],
     queryFn: async () => {
       const res = await fetch(`/api/companies/${id}`);
-      if (!res.ok) throw new Error("사업장 정보를 불러올 수 없습니다");
+      if (!res.ok) await throwResponseError(res, "사업장 정보를 불러올 수 없습니다");
       return res.json();
     },
     enabled: id > 0,

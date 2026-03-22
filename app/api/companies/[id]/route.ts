@@ -1,13 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { apiClient, ApiError } from "@/lib/api-client";
+import { parseId } from "@/lib/parse-id";
 import { updateCompanyRequestSchema } from "@/types/api";
 import type { CompanyResponse } from "@/types/api";
-
-function parseId(id: string): number | null {
-  const num = Number(id);
-  if (Number.isNaN(num) || num <= 0 || !Number.isInteger(num)) return null;
-  return num;
-}
 
 export async function GET(
   _request: Request,

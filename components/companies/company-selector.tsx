@@ -11,10 +11,19 @@ import {
 import Link from "next/link";
 
 export function CompanySelector() {
-  const { companies, selectedCompanyId, setSelectedCompanyId, isLoading } = useCompanyContext();
+  const { companies, selectedCompanyId, setSelectedCompanyId, isLoading, isError } =
+    useCompanyContext();
 
   if (isLoading) {
     return <div className="h-9 w-48 animate-pulse rounded-md bg-muted" />;
+  }
+
+  if (isError) {
+    return (
+      <span className="text-sm text-destructive">
+        사업장 목록을 불러올 수 없습니다
+      </span>
+    );
   }
 
   if (companies.length === 0) {

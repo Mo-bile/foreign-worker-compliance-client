@@ -13,13 +13,24 @@ import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 import { NATIONALITY_LABELS } from "@/types/api";
 
+async function throwResponseError(res: Response, fallbackMessage: string): Promise<never> {
+  let message = fallbackMessage;
+  try {
+    const body = await res.json();
+    if (body.message) message = body.message;
+  } catch {
+    // Non-JSON error response — use fallback message
+  }
+  throw Object.assign(new Error(message), { status: res.status });
+}
+
 export function useWorkers(companyId?: number | null) {
   return useQuery<readonly WorkerResponse[]>({
     queryKey: ["workers", { companyId }],
     queryFn: async () => {
       const params = companyId ? `?companyId=${companyId}` : "";
       const res = await fetch(`/api/workers${params}`);
-      if (!res.ok) throw new Error("근로자 목록을 불러올 수 없습니다");
+      if (!res.ok) await throwResponseError(res, "근로자 목록을 불러올 수 없습니다");
       return res.json();
     },
     enabled: companyId != null && companyId > 0,
@@ -31,7 +42,7 @@ export function useWorker(id: number) {
     queryKey: ["workers", id],
     queryFn: async () => {
       const res = await fetch(`/api/workers/${id}`);
-      if (!res.ok) throw new Error("근로자 정보를 불러올 수 없습니다");
+      if (!res.ok) await throwResponseError(res, "근로자 정보를 불러올 수 없습니다");
       return res.json();
     },
     enabled: id > 0,
