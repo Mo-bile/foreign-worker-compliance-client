@@ -22,7 +22,7 @@ export function useWorkers(companyId?: number | null) {
       if (!res.ok) throw new Error("근로자 목록을 불러올 수 없습니다");
       return res.json();
     },
-    enabled: companyId === null || companyId === undefined || companyId > 0,
+    enabled: companyId != null && companyId > 0,
   });
 }
 
