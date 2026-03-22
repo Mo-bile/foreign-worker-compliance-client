@@ -44,9 +44,8 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
   const w = worker.data;
   if (!w) return null;
 
-  const nationalityLabel =
-    NATIONALITY_LABELS[w.nationality as keyof typeof NATIONALITY_LABELS] || w.nationality;
-  const visaTypeLabel = VISA_TYPE_LABELS[w.visaType as keyof typeof VISA_TYPE_LABELS] || w.visaType;
+  const nationalityLabel = NATIONALITY_LABELS[w.nationality];
+  const visaTypeLabel = VISA_TYPE_LABELS[w.visaType];
 
   return (
     <div className="space-y-6">
@@ -116,6 +115,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         title="컴플라이언스 데드라인"
         deadlines={deadlines.data}
         isLoading={deadlines.isLoading}
+        isError={deadlines.isError}
       />
     </div>
   );

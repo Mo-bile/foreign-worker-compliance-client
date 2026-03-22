@@ -26,18 +26,21 @@ export default function DashboardPage() {
           value={workers.data?.length}
           icon={Users}
           isLoading={workers.isLoading}
+          isError={workers.isError}
         />
         <StatCard
           title="기한초과"
           value={overdue.data?.length}
           icon={AlertTriangle}
           isLoading={overdue.isLoading}
+          isError={overdue.isError}
         />
         <StatCard
           title="임박 (30일)"
           value={approachingCount}
           icon={Clock}
           isLoading={upcoming.isLoading}
+          isError={upcoming.isError}
         />
       </div>
 
@@ -46,9 +49,14 @@ export default function DashboardPage() {
           title="기한초과 데드라인"
           deadlines={overdue.data}
           isLoading={overdue.isLoading}
+          isError={overdue.isError}
           limit={5}
         />
-        <DeadlineChart deadlines={upcoming.data} isLoading={upcoming.isLoading} />
+        <DeadlineChart
+          deadlines={upcoming.data}
+          isLoading={upcoming.isLoading}
+          isError={upcoming.isError}
+        />
       </div>
     </div>
   );
