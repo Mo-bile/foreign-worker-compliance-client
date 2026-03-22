@@ -1,29 +1,11 @@
 import { http, HttpResponse } from "msw";
-import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines } from "./data";
+import type { CompanyResponse } from "@/types/api";
+import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies } from "./data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
 export const handlers = [
-  http.get(`${BACKEND}/api/workers`, () => HttpResponse.json(mockWorkers)),
-  // Next.js Route Handler relative paths (used by React Query hooks in jsdom tests)
-  // Specific routes must come before wildcard list routes to avoid shadowing
-  http.get("*/api/workers/:id", ({ params }) => {
-    const worker = mockWorkers.find((w) => w.id === Number(params.id));
-    if (!worker) {
-      return HttpResponse.json(
-        {
-          status: 404,
-          error: "Not Found",
-          message: "근로자를 찾을 수 없습니다",
-          timestamp: new Date().toISOString(),
-        },
-        { status: 404 },
-      );
-    }
-    return HttpResponse.json(worker);
-  }),
-  http.get("*/api/workers", () => HttpResponse.json(mockWorkers)),
-
+  // 1. BACKEND workers/:id (must come before workers list)
   http.get(`${BACKEND}/api/workers/:id`, ({ params }) => {
     const worker = mockWorkers.find((w) => w.id === Number(params.id));
     if (!worker) {
@@ -40,6 +22,44 @@ export const handlers = [
     return HttpResponse.json(worker);
   }),
 
+  // 2. BACKEND workers (with companyId filter)
+  http.get(`${BACKEND}/api/workers`, ({ request }) => {
+    const url = new URL(request.url);
+    const companyId = url.searchParams.get("companyId");
+    if (companyId) {
+      return HttpResponse.json(mockWorkers.filter((w) => w.id % 3 === Number(companyId) % 3));
+    }
+    return HttpResponse.json(mockWorkers);
+  }),
+
+  // 3. */api/workers/:id (relative path for jsdom)
+  http.get("*/api/workers/:id", ({ params }) => {
+    const worker = mockWorkers.find((w) => w.id === Number(params.id));
+    if (!worker) {
+      return HttpResponse.json(
+        {
+          status: 404,
+          error: "Not Found",
+          message: "근로자를 찾을 수 없습니다",
+          timestamp: new Date().toISOString(),
+        },
+        { status: 404 },
+      );
+    }
+    return HttpResponse.json(worker);
+  }),
+
+  // 4. */api/workers (relative path for jsdom, with companyId filter)
+  http.get("*/api/workers", ({ request }) => {
+    const url = new URL(request.url);
+    const companyId = url.searchParams.get("companyId");
+    if (companyId) {
+      return HttpResponse.json(mockWorkers.filter((w) => w.id % 3 === Number(companyId) % 3));
+    }
+    return HttpResponse.json(mockWorkers);
+  }),
+
+  // 6. BACKEND workers POST
   http.post(`${BACKEND}/api/workers`, async ({ request }) => {
     const body = await request.json();
     return HttpResponse.json({
@@ -49,6 +69,70 @@ export const handlers = [
     });
   }),
 
+  // 7. Company handlers (BACKEND paths)
+  // ─── Company handlers (BACKEND) ──────────────────────
+  http.get(`${BACKEND}/api/companies`, () => HttpResponse.json(mockCompanies)),
+  http.get(`${BACKEND}/api/companies/:id`, ({ params }) => {
+    const company = mockCompanies.find((c) => c.id === Number(params.id));
+    if (!company) {
+      return HttpResponse.json(
+        { status: 404, error: "Not Found", message: "사업장을 찾을 수 없습니다", timestamp: new Date().toISOString() },
+        { status: 404 },
+      );
+    }
+    return HttpResponse.json(company);
+  }),
+  http.post(`${BACKEND}/api/companies`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    const newCompany: CompanyResponse = {
+      ...mockCompanies[0],
+      id: 99,
+      name: body.name as string,
+      businessNumber: body.businessNumber as string,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    return HttpResponse.json(newCompany, { status: 201 });
+  }),
+  http.put(`${BACKEND}/api/companies/:id`, async ({ params, request }) => {
+    const company = mockCompanies.find((c) => c.id === Number(params.id));
+    if (!company) {
+      return HttpResponse.json(
+        { status: 404, error: "Not Found", message: "사업장을 찾을 수 없습니다", timestamp: new Date().toISOString() },
+        { status: 404 },
+      );
+    }
+    const body = (await request.json()) as Record<string, unknown>;
+    return HttpResponse.json({ ...company, ...body, updatedAt: new Date().toISOString() });
+  }),
+
+  // 8. Company handlers (relative paths for jsdom)
+  // ─── Company handlers (relative paths) ───────────────
+  http.get("*/api/companies/:id", ({ params }) => {
+    const company = mockCompanies.find((c) => c.id === Number(params.id));
+    if (!company) {
+      return HttpResponse.json(
+        { status: 404, error: "Not Found", message: "사업장을 찾을 수 없습니다", timestamp: new Date().toISOString() },
+        { status: 404 },
+      );
+    }
+    return HttpResponse.json(company);
+  }),
+  http.get("*/api/companies", () => HttpResponse.json(mockCompanies)),
+  http.post("*/api/companies", async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    const newCompany: CompanyResponse = {
+      ...mockCompanies[0],
+      id: 99,
+      name: body.name as string,
+      businessNumber: body.businessNumber as string,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    return HttpResponse.json(newCompany, { status: 201 });
+  }),
+
+  // 9. Compliance handlers
   http.get(`${BACKEND}/api/compliance/overdue`, () => HttpResponse.json(mockOverdueDeadlines)),
   http.get(`${BACKEND}/api/compliance/upcoming`, () => HttpResponse.json(mockUpcomingDeadlines)),
   // Next.js Route Handler relative paths (used by React Query hooks in jsdom tests)
@@ -68,7 +152,7 @@ export const handlers = [
     return HttpResponse.json(deadlines);
   }),
 
-  // Test endpoints (for api-client tests)
+  // 10. Test endpoints (for api-client tests)
   http.get(`${BACKEND}/test`, () => HttpResponse.json({ message: "ok" })),
   http.post(`${BACKEND}/test`, () => HttpResponse.json({ id: 1 })),
   http.put(`${BACKEND}/test/put`, () => HttpResponse.json({ id: 1 })),
