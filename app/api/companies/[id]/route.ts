@@ -1,14 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { apiClient, ApiError } from "@/lib/api-client";
-import type { WorkerResponse } from "@/types/api";
+import type { CompanyResponse } from "@/types/api";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
   try {
-    const { searchParams } = new URL(request.url);
-    const companyId = searchParams.get("companyId");
-    const path = companyId ? `/api/workers?companyId=${companyId}` : "/api/workers";
-    const workers = await apiClient.get<WorkerResponse[]>(path);
-    return NextResponse.json(workers);
+    const company = await apiClient.get<CompanyResponse>(`/api/companies/${id}`);
+    return NextResponse.json(company);
   } catch (error) {
     if (error instanceof ApiError) {
       return NextResponse.json({ message: error.message }, { status: error.status });
@@ -17,11 +18,15 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
   try {
     const body = await request.json();
-    const worker = await apiClient.post<WorkerResponse>("/api/workers", body);
-    return NextResponse.json(worker);
+    const company = await apiClient.put<CompanyResponse>(`/api/companies/${id}`, body);
+    return NextResponse.json(company);
   } catch (error) {
     if (error instanceof ApiError) {
       return NextResponse.json({ message: error.message }, { status: error.status });

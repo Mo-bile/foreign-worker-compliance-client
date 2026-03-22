@@ -1,14 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { apiClient, ApiError } from "@/lib/api-client";
-import type { WorkerResponse } from "@/types/api";
+import type { CompanyResponse } from "@/types/api";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const companyId = searchParams.get("companyId");
-    const path = companyId ? `/api/workers?companyId=${companyId}` : "/api/workers";
-    const workers = await apiClient.get<WorkerResponse[]>(path);
-    return NextResponse.json(workers);
+    const companies = await apiClient.get<CompanyResponse[]>("/api/companies");
+    return NextResponse.json(companies);
   } catch (error) {
     if (error instanceof ApiError) {
       return NextResponse.json({ message: error.message }, { status: error.status });
@@ -20,8 +17,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const worker = await apiClient.post<WorkerResponse>("/api/workers", body);
-    return NextResponse.json(worker);
+    const company = await apiClient.post<CompanyResponse>("/api/companies", body);
+    return NextResponse.json(company, { status: 201 });
   } catch (error) {
     if (error instanceof ApiError) {
       return NextResponse.json({ message: error.message }, { status: error.status });
