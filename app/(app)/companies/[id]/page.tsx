@@ -1,0 +1,67 @@
+"use client";
+
+import { use } from "react";
+import Link from "next/link";
+import { Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CompanyDetailCard } from "@/components/companies/company-detail-card";
+import { WorkerTable } from "@/components/workers/worker-table";
+import { useCompany } from "@/lib/queries/use-companies";
+import { useWorkers } from "@/lib/queries/use-workers";
+
+export default function CompanyDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const companyId = Number(id);
+  const company = useCompany(companyId);
+  const workers = useWorkers(companyId);
+
+  if (company.isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
+  }
+
+  if (company.error || !company.data) {
+    return (
+      <div className="py-12 text-center">
+        <p className="text-destructive">사업장을 찾을 수 없습니다</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{company.data.name}</h1>
+        <div className="flex gap-2">
+          <Link href={`/companies/${companyId}/edit`}>
+            <Button variant="outline">
+              <Pencil className="h-4 w-4" />
+              수정
+            </Button>
+          </Link>
+          <Link href="/workers/new">
+            <Button>근로자 등록</Button>
+          </Link>
+        </div>
+      </div>
+
+      <CompanyDetailCard company={company.data} />
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">소속 근로자</h2>
+        {workers.isError ? (
+          <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-destructive">
+            근로자 목록을 불러오는 중 오류가 발생했습니다.
+          </div>
+        ) : (
+          <WorkerTable workers={[...(workers.data ?? [])]} isLoading={workers.isLoading} />
+        )}
+      </div>
+    </div>
+  );
+}
