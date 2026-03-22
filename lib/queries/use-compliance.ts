@@ -1,7 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { ComplianceDeadlineResponse, DeadlineType, DeadlineStatus, FilterOption } from "@/types/api";
+import type {
+  ComplianceDeadlineResponse,
+  DeadlineType,
+  DeadlineStatus,
+  FilterOption,
+} from "@/types/api";
 import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 
