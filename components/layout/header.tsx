@@ -3,16 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, LayoutDashboard, Users, AlertTriangle } from "lucide-react";
+import { Menu, LayoutDashboard, Users, AlertTriangle, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { CompanySelector } from "@/components/companies/company-selector";
 
 const NAV_ITEMS = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
-  { href: "/workers", label: "근로자", icon: Users },
+  { href: "/companies", label: "사업장 관리", icon: Building2 },
+  { href: "/workers", label: "근로자 관리", icon: Users },
   { href: "/compliance", label: "컴플라이언스", icon: AlertTriangle },
 ] as const;
 
@@ -55,6 +57,10 @@ export function Header() {
       </Sheet>
 
       <span className="ml-2 text-lg font-bold md:ml-0">FWC</span>
+
+      <div className="ml-4 hidden md:block">
+        <CompanySelector />
+      </div>
 
       <div className="ml-auto flex items-center gap-2">
         <ThemeToggle />

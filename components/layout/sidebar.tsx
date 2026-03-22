@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, Users, AlertTriangle, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
-  { href: "/workers", label: "근로자", icon: Users },
+  { href: "/companies", label: "사업장 관리", icon: Building2 },
+  { href: "/workers", label: "근로자 관리", icon: Users },
   { href: "/compliance", label: "컴플라이언스", icon: AlertTriangle },
 ] as const;
 
