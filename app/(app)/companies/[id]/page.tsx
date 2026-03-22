@@ -13,8 +13,17 @@ import { useWorkers } from "@/lib/queries/use-workers";
 export default function CompanyDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const companyId = Number(id);
-  const company = useCompany(companyId);
-  const workers = useWorkers(companyId);
+  const isValidId = !Number.isNaN(companyId) && companyId > 0;
+  const company = useCompany(isValidId ? companyId : 0);
+  const workers = useWorkers(isValidId ? companyId : undefined);
+
+  if (!isValidId) {
+    return (
+      <div className="py-12 text-center">
+        <p className="text-destructive">잘못된 사업장 ID입니다</p>
+      </div>
+    );
+  }
 
   if (company.isLoading) {
     return (
@@ -59,7 +68,7 @@ export default function CompanyDetailPage({ params }: { readonly params: Promise
             근로자 목록을 불러오는 중 오류가 발생했습니다.
           </div>
         ) : (
-          <WorkerTable workers={[...(workers.data ?? [])]} isLoading={workers.isLoading} />
+          <WorkerTable workers={workers.data ?? []} isLoading={workers.isLoading} />
         )}
       </div>
     </div>

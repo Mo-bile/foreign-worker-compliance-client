@@ -9,7 +9,7 @@ import {
   INDUSTRY_CATEGORIES,
   INDUSTRY_CATEGORY_LABELS,
 } from "@/types/api";
-import type { CompanyResponse, Region, IndustryCategory } from "@/types/api";
+import type { CompanyResponse, Region, IndustryCategory, FilterOption } from "@/types/api";
 import {
   Table,
   TableBody,
@@ -39,10 +39,8 @@ interface CompanyTableProps {
 export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [regionFilter, setRegionFilter] = useState<Region | "ALL">("ALL");
-  const [industryFilter, setIndustryFilter] = useState<
-    IndustryCategory | "ALL"
-  >("ALL");
+  const [regionFilter, setRegionFilter] = useState<FilterOption<Region>>("ALL");
+  const [industryFilter, setIndustryFilter] = useState<FilterOption<IndustryCategory>>("ALL");
   const [page, setPage] = useState(1);
 
   const handleSearchChange = (value: string) => {
@@ -99,7 +97,7 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
         <Select
           value={regionFilter}
           onValueChange={(v) => {
-            setRegionFilter(v as Region | "ALL");
+            setRegionFilter(v as FilterOption<Region>);
             setPage(1);
           }}
         >
@@ -118,7 +116,7 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
         <Select
           value={industryFilter}
           onValueChange={(v) => {
-            setIndustryFilter(v as IndustryCategory | "ALL");
+            setIndustryFilter(v as FilterOption<IndustryCategory>);
             setPage(1);
           }}
         >

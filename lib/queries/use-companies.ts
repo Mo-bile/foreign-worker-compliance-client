@@ -41,8 +41,8 @@ export function useCreateCompany() {
         try {
           const body = await res.json();
           if (body.message) message = body.message;
-        } catch {
-          // non-JSON error
+        } catch (e) {
+          console.warn("Failed to parse error response body:", e);
         }
         throw new Error(message);
       }
@@ -69,8 +69,8 @@ export function useUpdateCompany() {
         try {
           const body = await res.json();
           if (body.message) message = body.message;
-        } catch {
-          // non-JSON error
+        } catch (e) {
+          console.warn("Failed to parse error response body:", e);
         }
         throw new Error(message);
       }

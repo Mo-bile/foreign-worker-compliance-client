@@ -3,6 +3,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   registerWorkerRequestSchema,
@@ -67,7 +68,11 @@ export function WorkerForm() {
     };
     registerWorker(sanitized, {
       onSuccess: (worker) => {
+        toast.success("근로자가 등록되었습니다");
         router.push(`/workers/${worker.id}`);
+      },
+      onError: (error) => {
+        toast.error(error.message);
       },
     });
   };

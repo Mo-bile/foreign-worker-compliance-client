@@ -8,7 +8,16 @@ import { useCompany } from "@/lib/queries/use-companies";
 export default function EditCompanyPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const companyId = Number(id);
-  const { data: company, isLoading, error } = useCompany(companyId);
+  const isValidId = !Number.isNaN(companyId) && companyId > 0;
+  const { data: company, isLoading, error } = useCompany(isValidId ? companyId : 0);
+
+  if (!isValidId) {
+    return (
+      <div className="py-12 text-center">
+        <p className="text-destructive">잘못된 사업장 ID입니다</p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

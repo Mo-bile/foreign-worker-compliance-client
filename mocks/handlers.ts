@@ -5,7 +5,7 @@ import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
 export const handlers = [
-  // 1. BACKEND workers/:id (must come before workers list)
+  // ─── Worker handlers (BACKEND) ────────────────────────
   http.get(`${BACKEND}/api/workers/:id`, ({ params }) => {
     const worker = mockWorkers.find((w) => w.id === Number(params.id));
     if (!worker) {
@@ -22,7 +22,6 @@ export const handlers = [
     return HttpResponse.json(worker);
   }),
 
-  // 2. BACKEND workers (with companyId filter)
   http.get(`${BACKEND}/api/workers`, ({ request }) => {
     const url = new URL(request.url);
     const companyId = url.searchParams.get("companyId");
@@ -32,7 +31,7 @@ export const handlers = [
     return HttpResponse.json(mockWorkers);
   }),
 
-  // 3. */api/workers/:id (relative path for jsdom)
+  // ─── Worker handlers (relative paths for jsdom) ────────
   http.get("*/api/workers/:id", ({ params }) => {
     const worker = mockWorkers.find((w) => w.id === Number(params.id));
     if (!worker) {
@@ -49,7 +48,6 @@ export const handlers = [
     return HttpResponse.json(worker);
   }),
 
-  // 4. */api/workers (relative path for jsdom, with companyId filter)
   http.get("*/api/workers", ({ request }) => {
     const url = new URL(request.url);
     const companyId = url.searchParams.get("companyId");
@@ -59,7 +57,6 @@ export const handlers = [
     return HttpResponse.json(mockWorkers);
   }),
 
-  // 6. BACKEND workers POST
   http.post(`${BACKEND}/api/workers`, async ({ request }) => {
     const body = await request.json();
     return HttpResponse.json({
@@ -69,7 +66,6 @@ export const handlers = [
     });
   }),
 
-  // 7. Company handlers (BACKEND paths)
   // ─── Company handlers (BACKEND) ──────────────────────
   http.get(`${BACKEND}/api/companies`, () => HttpResponse.json(mockCompanies)),
   http.get(`${BACKEND}/api/companies/:id`, ({ params }) => {
@@ -106,8 +102,7 @@ export const handlers = [
     return HttpResponse.json({ ...company, ...body, updatedAt: new Date().toISOString() });
   }),
 
-  // 8. Company handlers (relative paths for jsdom)
-  // ─── Company handlers (relative paths) ───────────────
+  // ─── Company handlers (relative paths for jsdom) ──────
   http.get("*/api/companies/:id", ({ params }) => {
     const company = mockCompanies.find((c) => c.id === Number(params.id));
     if (!company) {
@@ -132,7 +127,7 @@ export const handlers = [
     return HttpResponse.json(newCompany, { status: 201 });
   }),
 
-  // 9. Compliance handlers
+  // ─── Compliance handlers ───────────────────────────────
   http.get(`${BACKEND}/api/compliance/overdue`, () => HttpResponse.json(mockOverdueDeadlines)),
   http.get(`${BACKEND}/api/compliance/upcoming`, () => HttpResponse.json(mockUpcomingDeadlines)),
   // Next.js Route Handler relative paths (used by React Query hooks in jsdom tests)
@@ -152,7 +147,7 @@ export const handlers = [
     return HttpResponse.json(deadlines);
   }),
 
-  // 10. Test endpoints (for api-client tests)
+  // ─── Test endpoints (for api-client tests) ────────────
   http.get(`${BACKEND}/test`, () => HttpResponse.json({ message: "ok" })),
   http.post(`${BACKEND}/test`, () => HttpResponse.json({ id: 1 })),
   http.put(`${BACKEND}/test/put`, () => HttpResponse.json({ id: 1 })),

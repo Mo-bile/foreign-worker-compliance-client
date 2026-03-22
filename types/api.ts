@@ -156,9 +156,8 @@ export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 // ─── Company Schemas ─────────────────────────────────────
-export const createCompanyRequestSchema = z.object({
+const companyBaseFields = z.object({
   name: z.string().min(1, "회사명을 입력해주세요"),
-  businessNumber: z.string().regex(/^\d{3}-\d{2}-\d{5}$/, "사업자번호 형식: xxx-xx-xxxxx"),
   region: z.enum(REGIONS, { error: "지역을 선택해주세요" }),
   subRegion: z.string().optional(),
   industryCategory: z.enum(INDUSTRY_CATEGORIES, { error: "업종을 선택해주세요" }),
@@ -167,27 +166,27 @@ export const createCompanyRequestSchema = z.object({
   foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
   address: z.string().min(1, "주소를 입력해주세요"),
   contactPhone: z.string().min(1, "연락처를 입력해주세요"),
-}).refine((d) => d.foreignWorkerCount <= d.employeeCount, {
-  message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
-  path: ["foreignWorkerCount"],
 });
+
+function refineWorkerCount<T extends z.ZodType<{ foreignWorkerCount: number; employeeCount: number }>>(schema: T) {
+  return schema.refine(
+    (d) => d.foreignWorkerCount <= d.employeeCount,
+    {
+      message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
+      path: ["foreignWorkerCount"],
+    },
+  );
+}
+
+export const createCompanyRequestSchema = refineWorkerCount(
+  companyBaseFields.extend({
+    businessNumber: z.string().regex(/^\d{3}-\d{2}-\d{5}$/, "사업자번호 형식: xxx-xx-xxxxx"),
+  }),
+);
 
 export type CreateCompanyRequest = z.infer<typeof createCompanyRequestSchema>;
 
-export const updateCompanyRequestSchema = z.object({
-  name: z.string().min(1, "회사명을 입력해주세요"),
-  region: z.enum(REGIONS, { error: "지역을 선택해주세요" }),
-  subRegion: z.string().optional(),
-  industryCategory: z.enum(INDUSTRY_CATEGORIES, { error: "업종을 선택해주세요" }),
-  industrySubCategory: z.string().optional(),
-  employeeCount: z.number().int().min(1, "1명 이상이어야 합니다"),
-  foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
-  address: z.string().min(1, "주소를 입력해주세요"),
-  contactPhone: z.string().min(1, "연락처를 입력해주세요"),
-}).refine((d) => d.foreignWorkerCount <= d.employeeCount, {
-  message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
-  path: ["foreignWorkerCount"],
-});
+export const updateCompanyRequestSchema = refineWorkerCount(companyBaseFields);
 
 export type UpdateCompanyRequest = z.infer<typeof updateCompanyRequestSchema>;
 

@@ -83,6 +83,9 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
           toast.success("사업장이 등록되었습니다");
           router.push(`/companies/${company.id}`);
         },
+        onError: (error) => {
+          toast.error(error.message);
+        },
       });
     } else {
       updateMutation.mutate(
@@ -91,6 +94,9 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
           onSuccess: () => {
             toast.success("사업장이 수정되었습니다");
             router.push(`/companies/${companyId}`);
+          },
+          onError: (error) => {
+            toast.error(error.message);
           },
         },
       );
@@ -104,7 +110,6 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {/* 회사명 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="name">회사명</Label>
             <Input
@@ -118,27 +123,27 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
             )}
           </div>
 
-          {/* 사업자번호 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="businessNumber">사업자번호</Label>
             {mode === "create" ? (
-              <Input
-                id="businessNumber"
-                {...register("businessNumber" as "name")}
-                aria-invalid={!!(errors as Record<string, unknown>).businessNumber}
-                placeholder="xxx-xx-xxxxx"
-              />
+              <>
+                <Input
+                  id="businessNumber"
+                  {...register("businessNumber" as "name")}
+                  aria-invalid={!!errors.root || !!("businessNumber" in errors && errors.businessNumber)}
+                  placeholder="xxx-xx-xxxxx"
+                />
+                {mode === "create" && "businessNumber" in errors && errors.businessNumber && (
+                  <p className="text-sm text-destructive">
+                    {(errors.businessNumber as { message?: string }).message}
+                  </p>
+                )}
+              </>
             ) : (
               <Input id="businessNumber" value={businessNumber} disabled />
             )}
-            {(errors as Record<string, { message?: string }>).businessNumber && (
-              <p className="text-sm text-destructive">
-                {(errors as Record<string, { message?: string }>).businessNumber?.message}
-              </p>
-            )}
           </div>
 
-          {/* 지역 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="region">지역</Label>
             <Controller
@@ -169,13 +174,11 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
             )}
           </div>
 
-          {/* 세부 지역 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="subRegion">세부 지역 (선택)</Label>
             <Input id="subRegion" {...register("subRegion")} placeholder="강남구" />
           </div>
 
-          {/* 업종 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="industryCategory">업종</Label>
             <Controller
@@ -206,7 +209,6 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
             )}
           </div>
 
-          {/* 세부 업종 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="industrySubCategory">세부 업종 (선택)</Label>
             <Input
@@ -216,7 +218,6 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
             />
           </div>
 
-          {/* 총 직원 수 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="employeeCount">총 직원 수</Label>
             <Input
@@ -231,7 +232,6 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
             )}
           </div>
 
-          {/* 외국인 근로자 수 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="foreignWorkerCount">외국인 근로자 수</Label>
             <Input
@@ -246,7 +246,6 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
             )}
           </div>
 
-          {/* 주소 */}
           <div className="flex flex-col gap-1.5 md:col-span-2">
             <Label htmlFor="address">주소</Label>
             <Input
@@ -260,7 +259,6 @@ export function CompanyForm({ mode, defaultValues, businessNumber, companyId }: 
             )}
           </div>
 
-          {/* 연락처 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="contactPhone">연락처</Label>
             <Input
