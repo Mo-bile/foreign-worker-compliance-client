@@ -107,6 +107,35 @@ export type FilterOption<T extends string> = T | "ALL";
 export const INSURANCE_STATUSES = ["의무", "임의", "면제"] as const;
 export type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
 
+// ─── Region ─────────────────────────────────────────────
+export const REGIONS = [
+  "SEOUL", "BUSAN", "DAEGU", "INCHEON", "GWANGJU", "DAEJEON", "ULSAN", "SEJONG",
+  "GYEONGGI", "GANGWON", "CHUNGBUK", "CHUNGNAM", "JEONBUK", "JEONNAM",
+  "GYEONGBUK", "GYEONGNAM", "JEJU",
+] as const;
+export type Region = (typeof REGIONS)[number];
+
+export const REGION_LABELS: Record<Region, string> = {
+  SEOUL: "서울", BUSAN: "부산", DAEGU: "대구", INCHEON: "인천",
+  GWANGJU: "광주", DAEJEON: "대전", ULSAN: "울산", SEJONG: "세종",
+  GYEONGGI: "경기", GANGWON: "강원", CHUNGBUK: "충북", CHUNGNAM: "충남",
+  JEONBUK: "전북", JEONNAM: "전남", GYEONGBUK: "경북", GYEONGNAM: "경남",
+  JEJU: "제주",
+};
+
+// ─── IndustryCategory ───────────────────────────────────
+export const INDUSTRY_CATEGORIES = [
+  "MANUFACTURING", "CONSTRUCTION", "AGRICULTURE", "FISHING",
+  "SERVICE", "MINING", "ACCOMMODATION", "OTHER",
+] as const;
+export type IndustryCategory = (typeof INDUSTRY_CATEGORIES)[number];
+
+export const INDUSTRY_CATEGORY_LABELS: Record<IndustryCategory, string> = {
+  MANUFACTURING: "제조업", CONSTRUCTION: "건설업", AGRICULTURE: "농업",
+  FISHING: "어업", SERVICE: "서비스업", MINING: "광업",
+  ACCOMMODATION: "숙박업", OTHER: "기타",
+};
+
 // ─── Label Maps ──────────────────────────────────────────────
 export const DEADLINE_TYPE_LABELS: Record<DeadlineType, string> = {
   VISA_EXPIRY: "비자 만료",
@@ -125,6 +154,42 @@ export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
 
 // ─── Zod Schemas ──────────────────────────────────────────
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+// ─── Company Schemas ─────────────────────────────────────
+export const createCompanyRequestSchema = z.object({
+  name: z.string().min(1, "회사명을 입력해주세요"),
+  businessNumber: z.string().regex(/^\d{3}-\d{2}-\d{5}$/, "사업자번호 형식: xxx-xx-xxxxx"),
+  region: z.enum(REGIONS, { error: "지역을 선택해주세요" }),
+  subRegion: z.string().optional(),
+  industryCategory: z.enum(INDUSTRY_CATEGORIES, { error: "업종을 선택해주세요" }),
+  industrySubCategory: z.string().optional(),
+  employeeCount: z.number().int().min(1, "1명 이상이어야 합니다"),
+  foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
+  address: z.string().min(1, "주소를 입력해주세요"),
+  contactPhone: z.string().min(1, "연락처를 입력해주세요"),
+}).refine((d) => d.foreignWorkerCount <= d.employeeCount, {
+  message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
+  path: ["foreignWorkerCount"],
+});
+
+export type CreateCompanyRequest = z.infer<typeof createCompanyRequestSchema>;
+
+export const updateCompanyRequestSchema = z.object({
+  name: z.string().min(1, "회사명을 입력해주세요"),
+  region: z.enum(REGIONS, { error: "지역을 선택해주세요" }),
+  subRegion: z.string().optional(),
+  industryCategory: z.enum(INDUSTRY_CATEGORIES, { error: "업종을 선택해주세요" }),
+  industrySubCategory: z.string().optional(),
+  employeeCount: z.number().int().min(1, "1명 이상이어야 합니다"),
+  foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
+  address: z.string().min(1, "주소를 입력해주세요"),
+  contactPhone: z.string().min(1, "연락처를 입력해주세요"),
+}).refine((d) => d.foreignWorkerCount <= d.employeeCount, {
+  message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
+  path: ["foreignWorkerCount"],
+});
+
+export type UpdateCompanyRequest = z.infer<typeof updateCompanyRequestSchema>;
 
 export const registerWorkerRequestSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
@@ -148,6 +213,24 @@ export const registerWorkerRequestSchema = z.object({
 export type RegisterWorkerRequest = z.infer<typeof registerWorkerRequestSchema>;
 
 // ─── Response Types ───────────────────────────────────────
+export interface CompanyResponse {
+  readonly id: number;
+  readonly name: string;
+  readonly businessNumber: string;
+  readonly region: Region;
+  readonly regionName: string;
+  readonly subRegion: string | null;
+  readonly industryCategory: IndustryCategory;
+  readonly industryCategoryName: string;
+  readonly industrySubCategory: string | null;
+  readonly employeeCount: number;
+  readonly foreignWorkerCount: number;
+  readonly address: string;
+  readonly contactPhone: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
 export interface InsuranceEligibilityDto {
   readonly insuranceType: string;
   readonly status: InsuranceStatus;

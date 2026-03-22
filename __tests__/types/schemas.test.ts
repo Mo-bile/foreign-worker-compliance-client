@@ -5,6 +5,8 @@ import {
   type VisaType,
   NATIONALITIES,
   VISA_TYPES,
+  REGIONS,
+  INDUSTRY_CATEGORIES,
 } from "@/types/api";
 
 describe("registerWorkerRequestSchema", () => {
@@ -86,5 +88,13 @@ describe("enum 상수", () => {
 
   it("VISA_TYPES는_8개_값을_가진다", () => {
     expect(VISA_TYPES).toHaveLength(8);
+  });
+
+  it("REGIONS는_17개_값을_가진다", () => {
+    expect(REGIONS).toHaveLength(17);
+  });
+
+  it("INDUSTRY_CATEGORIES는_8개_값을_가진다", () => {
+    expect(INDUSTRY_CATEGORIES).toHaveLength(8);
   });
 });
