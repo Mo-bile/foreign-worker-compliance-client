@@ -2,17 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CompanyResponse, CreateCompanyRequest, UpdateCompanyRequest } from "@/types/api";
-
-async function throwResponseError(res: Response, fallbackMessage: string): Promise<never> {
-  let message = fallbackMessage;
-  try {
-    const body = await res.json();
-    if (body.message) message = body.message;
-  } catch {
-    // Non-JSON error response — use fallback message
-  }
-  throw Object.assign(new Error(message), { status: res.status });
-}
+import { throwResponseError } from "./query-utils";
 
 export function useCompanies() {
   return useQuery<readonly CompanyResponse[]>({
@@ -47,16 +37,7 @@ export function useCreateCompany() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) {
-        let message = "사업장 등록에 실패했습니다";
-        try {
-          const body = await res.json();
-          if (body.message) message = body.message;
-        } catch (e) {
-          console.warn("Failed to parse error response body:", e);
-        }
-        throw new Error(message);
-      }
+      if (!res.ok) await throwResponseError(res, "사업장 등록에 실패했습니다");
       return res.json();
     },
     onSuccess: () => {
@@ -75,16 +56,7 @@ export function useUpdateCompany() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) {
-        let message = "사업장 수정에 실패했습니다";
-        try {
-          const body = await res.json();
-          if (body.message) message = body.message;
-        } catch (e) {
-          console.warn("Failed to parse error response body:", e);
-        }
-        throw new Error(message);
-      }
+      if (!res.ok) await throwResponseError(res, "사업장 수정에 실패했습니다");
       return res.json();
     },
     onSuccess: (_data, variables) => {

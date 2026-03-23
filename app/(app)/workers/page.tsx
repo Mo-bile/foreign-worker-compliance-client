@@ -8,7 +8,7 @@ import { useWorkers } from "@/lib/queries/use-workers";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 
 export default function WorkersPage() {
-  const { selectedCompanyId } = useCompanyContext();
+  const { selectedCompanyId, isLoading: companiesLoading } = useCompanyContext();
   const { data: workers = [], isLoading, isError } = useWorkers(selectedCompanyId);
 
   return (
@@ -23,7 +23,9 @@ export default function WorkersPage() {
         </Link>
       </div>
 
-      {selectedCompanyId == null ? (
+      {companiesLoading ? (
+        <WorkerTable workers={[]} isLoading />
+      ) : selectedCompanyId == null ? (
         <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
           사업장을 선택해주세요
         </div>

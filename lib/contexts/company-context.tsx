@@ -12,7 +12,7 @@ function readStoredId(): number | null {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = Number(stored);
-      if (!Number.isNaN(parsed) && parsed > 0) return parsed;
+      if (!Number.isNaN(parsed) && parsed > 0 && Number.isInteger(parsed)) return parsed;
     }
   } catch (e) {
     console.warn("localStorage read failed, company selection will not persist:", e);

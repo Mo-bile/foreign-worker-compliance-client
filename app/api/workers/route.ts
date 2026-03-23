@@ -27,14 +27,21 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let body: unknown;
   try {
-    const body = await request.json();
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ message: "잘못된 요청 형식입니다" }, { status: 400 });
+  }
+
+  try {
     const worker = await apiClient.post<WorkerResponse>("/api/workers", body);
     return NextResponse.json(worker);
   } catch (error) {
     if (error instanceof ApiError) {
       return NextResponse.json({ message: error.message }, { status: error.status });
     }
+    console.error("[POST /api/workers] Unexpected error:", error);
     return NextResponse.json({ message: "서버 오류가 발생했습니다" }, { status: 500 });
   }
 }

@@ -4,12 +4,13 @@ import { use } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyForm } from "@/components/companies/company-form";
 import { useCompany } from "@/lib/queries/use-companies";
+import { parseId } from "@/lib/parse-id";
 
 export default function EditCompanyPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const companyId = Number(id);
-  const isValidId = !Number.isNaN(companyId) && companyId > 0;
-  const { data: company, isLoading, error } = useCompany(isValidId ? companyId : 0);
+  const companyId = parseId(id);
+  const isValidId = companyId !== null;
+  const { data: company, isLoading, error } = useCompany(companyId ?? 0);
 
   if (!isValidId) {
     return (
@@ -46,7 +47,7 @@ export default function EditCompanyPage({ params }: { readonly params: Promise<{
       <h1 className="text-2xl font-semibold tracking-tight">사업장 수정</h1>
       <CompanyForm
         mode="edit"
-        companyId={companyId}
+        companyId={companyId!}
         businessNumber={company.businessNumber}
         defaultValues={{
           name: company.name,

@@ -9,13 +9,14 @@ import { CompanyDetailCard } from "@/components/companies/company-detail-card";
 import { WorkerTable } from "@/components/workers/worker-table";
 import { useCompany } from "@/lib/queries/use-companies";
 import { useWorkers } from "@/lib/queries/use-workers";
+import { parseId } from "@/lib/parse-id";
 
 export default function CompanyDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const companyId = Number(id);
-  const isValidId = !Number.isNaN(companyId) && companyId > 0;
-  const company = useCompany(isValidId ? companyId : 0);
-  const workers = useWorkers(isValidId ? companyId : undefined);
+  const companyId = parseId(id);
+  const isValidId = companyId !== null;
+  const company = useCompany(companyId ?? 0);
+  const workers = useWorkers(companyId ?? undefined);
 
   if (!isValidId) {
     return (
@@ -52,7 +53,7 @@ export default function CompanyDetailPage({ params }: { readonly params: Promise
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{company.data.name}</h1>
         <div className="flex gap-2">
-          <Link href={`/companies/${companyId}/edit`}>
+          <Link href={`/companies/${companyId!}/edit`}>
             <Button variant="outline">
               <Pencil className="h-4 w-4" />
               수정
