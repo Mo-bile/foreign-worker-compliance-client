@@ -16,6 +16,7 @@ import { paginateItems } from "@/lib/pagination";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import type { PaginationControlsProps } from "@/components/ui/pagination-controls";
 import type { ComplianceDeadlineResponse } from "@/types/api";
+import { EmptyState } from "@/components/common/empty-state";
 
 interface DeadlineTableProps {
   readonly title: string;
@@ -79,11 +80,9 @@ export function DeadlineTable({
             ))}
           </div>
         ) : isError ? (
-          <p className="text-destructive text-sm py-4 text-center">
-            데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.
-          </p>
+          <EmptyState message="데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요." variant="error" />
         ) : !items?.length ? (
-          <p className="text-muted-foreground text-sm py-4 text-center">{emptyMessage}</p>
+          <EmptyState message={emptyMessage} />
         ) : (
           <>
             <Table>

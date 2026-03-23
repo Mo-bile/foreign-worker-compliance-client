@@ -27,7 +27,7 @@ describe("WorkerTable", () => {
 
   it("상태_필터에서_ACTIVE를_선택하면_ACTIVE만_표시한다", async () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
-    const statusTrigger = screen.getByRole("combobox", { name: "상태 필터" });
+    const statusTrigger = screen.getByRole("combobox", { name: "상태 전체" });
     await userEvent.click(statusTrigger);
     const option = screen.getByRole("option", { name: "활성" });
     await userEvent.click(option);
@@ -39,7 +39,7 @@ describe("WorkerTable", () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     await userEvent.click(screen.getByRole("button", { name: "다음 페이지" }));
     expect(screen.getByText(/총 25건 중 21-25/)).toBeDefined();
-    const visaTrigger = screen.getByRole("combobox", { name: "비자 유형 필터" });
+    const visaTrigger = screen.getByRole("combobox", { name: "비자 유형 전체" });
     await userEvent.click(visaTrigger);
     const e9Option = screen.getByRole("option", { name: /E9/ });
     await userEvent.click(e9Option);
@@ -53,7 +53,7 @@ describe("WorkerTable", () => {
 
   it("보험_상태_필터에서_면제를_선택하면_면제_보험이_있는_근로자만_표시한다", async () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
-    const insuranceTrigger = screen.getByRole("combobox", { name: "보험 상태 필터" });
+    const insuranceTrigger = screen.getByRole("combobox", { name: "보험 상태 전체" });
     await userEvent.click(insuranceTrigger);
     const option = screen.getByRole("option", { name: "면제" });
     await userEvent.click(option);

@@ -148,7 +148,7 @@ export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
   PENDING: "대기",
   APPROACHING: "임박",
   URGENT: "긴급",
-  OVERDUE: "초과",
+  OVERDUE: "기한초과",
   COMPLETED: "완료",
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { fetchApi } from "./query-utils";
 import type {
   ComplianceDeadlineResponse,
   DeadlineType,
@@ -13,11 +14,9 @@ import type { PaginatedResult } from "@/lib/pagination";
 export function useOverdueDeadlines() {
   return useQuery<readonly ComplianceDeadlineResponse[]>({
     queryKey: ["compliance", "overdue"],
-    queryFn: async () => {
-      const res = await fetch("/api/compliance/overdue");
-      if (!res.ok) throw new Error("기한초과 데이터를 불러올 수 없습니다");
-      return res.json();
-    },
+    queryFn: () => fetchApi<readonly ComplianceDeadlineResponse[]>(
+      "/api/compliance/overdue", "기한초과 데이터를 불러올 수 없습니다",
+    ),
     refetchInterval: 30_000,
   });
 }
@@ -25,11 +24,9 @@ export function useOverdueDeadlines() {
 export function useUpcomingDeadlines(days: number = 30) {
   return useQuery<readonly ComplianceDeadlineResponse[]>({
     queryKey: ["compliance", "upcoming", days],
-    queryFn: async () => {
-      const res = await fetch(`/api/compliance/upcoming?days=${days}`);
-      if (!res.ok) throw new Error("임박 데드라인을 불러올 수 없습니다");
-      return res.json();
-    },
+    queryFn: () => fetchApi<readonly ComplianceDeadlineResponse[]>(
+      `/api/compliance/upcoming?days=${days}`, "임박 데드라인을 불러올 수 없습니다",
+    ),
     refetchInterval: 30_000,
   });
 }
@@ -37,11 +34,9 @@ export function useUpcomingDeadlines(days: number = 30) {
 export function useWorkerDeadlines(workerId: number) {
   return useQuery<readonly ComplianceDeadlineResponse[]>({
     queryKey: ["compliance", "worker", workerId],
-    queryFn: async () => {
-      const res = await fetch(`/api/compliance/worker/${workerId}`);
-      if (!res.ok) throw new Error("데드라인 정보를 불러올 수 없습니다");
-      return res.json();
-    },
+    queryFn: () => fetchApi<readonly ComplianceDeadlineResponse[]>(
+      `/api/compliance/worker/${workerId}`, "데드라인 정보를 불러올 수 없습니다",
+    ),
     enabled: workerId > 0,
   });
 }

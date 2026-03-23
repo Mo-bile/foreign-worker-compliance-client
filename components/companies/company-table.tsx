@@ -19,17 +19,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { paginateItems } from "@/lib/pagination";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { EmptyState } from "@/components/common/empty-state";
+import { FilterSelect } from "@/components/common/filter-select";
 
 interface CompanyTableProps {
   readonly companies: readonly CompanyResponse[];
@@ -94,59 +89,35 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
           onChange={(e) => handleSearchChange(e.target.value)}
           className="sm:max-w-xs"
         />
-        <Select
+        <FilterSelect
           value={regionFilter}
-          onValueChange={(v) => {
-            setRegionFilter(v as FilterOption<Region>);
-            setPage(1);
-          }}
-        >
-          <SelectTrigger className="w-40" aria-label="지역 필터">
-            <SelectValue placeholder="지역 전체" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">전체</SelectItem>
-            {REGIONS.map((r) => (
-              <SelectItem key={r} value={r}>
-                {REGION_LABELS[r]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
+          onValueChange={(v) => { setRegionFilter(v as FilterOption<Region>); setPage(1); }}
+          placeholder="지역 전체"
+          options={[...REGIONS]}
+          labelMap={REGION_LABELS}
+          className="w-40"
+        />
+        <FilterSelect
           value={industryFilter}
-          onValueChange={(v) => {
-            setIndustryFilter(v as FilterOption<IndustryCategory>);
-            setPage(1);
-          }}
-        >
-          <SelectTrigger className="w-40" aria-label="업종 필터">
-            <SelectValue placeholder="업종 전체" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">전체</SelectItem>
-            {INDUSTRY_CATEGORIES.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {INDUSTRY_CATEGORY_LABELS[cat]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          onValueChange={(v) => { setIndustryFilter(v as FilterOption<IndustryCategory>); setPage(1); }}
+          placeholder="업종 전체"
+          options={[...INDUSTRY_CATEGORIES]}
+          labelMap={INDUSTRY_CATEGORY_LABELS}
+          className="w-40"
+        />
       </div>
 
       {companies.length === 0 ? (
-        <div className="flex h-40 flex-col items-center justify-center gap-3 rounded-lg border border-dashed text-sm text-muted-foreground">
-          <p>등록된 사업장이 없습니다</p>
-          <Link href="/companies/new">
-            <Button variant="outline" size="sm">
-              첫 사업장을 등록해보세요
-            </Button>
-          </Link>
-        </div>
+        <EmptyState
+          message="등록된 사업장이 없습니다"
+          action={
+            <Link href="/companies/new">
+              <Button variant="outline" size="sm">첫 사업장을 등록해보세요</Button>
+            </Link>
+          }
+        />
       ) : filtered.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
-          조건에 맞는 사업장이 없습니다
-        </div>
+        <EmptyState message="조건에 맞는 사업장이 없습니다" />
       ) : (
         <>
           <Table>

@@ -12,6 +12,10 @@ import {
 } from "@/types/api";
 import type { VisaType, WorkerStatus, InsuranceStatus, WorkerResponse } from "@/types/api";
 
+const VISA_FILTER_LABELS: Record<VisaType, string> = Object.fromEntries(
+  VISA_TYPES.map((v) => [v, `${v} — ${VISA_TYPE_LABELS[v]}`]),
+) as Record<VisaType, string>;
+
 const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
   ACTIVE: "text-green-700 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium",
   INACTIVE: "text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full text-xs font-medium",
@@ -26,14 +30,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/common/empty-state";
+import { FilterSelect } from "@/components/common/filter-select";
 import { paginateItems } from "@/lib/pagination";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 
@@ -105,55 +104,34 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
           onChange={(e) => handleSearchChange(e.target.value)}
           className="sm:max-w-xs"
         />
-        <Select value={visaFilter} onValueChange={handleVisaChange}>
-          <SelectTrigger className="w-48" aria-label="비자 유형 필터">
-            <SelectValue placeholder="비자 유형 전체" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">전체</SelectItem>
-            {VISA_TYPES.map((visa) => (
-              <SelectItem key={visa} value={visa}>
-                {visa} — {VISA_TYPE_LABELS[visa]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={statusFilter} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-40" aria-label="상태 필터">
-            <SelectValue placeholder="상태 전체" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">전체</SelectItem>
-            {WORKER_STATUSES.map((status) => (
-              <SelectItem key={status} value={status}>
-                {WORKER_STATUS_LABELS[status]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={insuranceFilter} onValueChange={handleInsuranceChange}>
-          <SelectTrigger className="w-44" aria-label="보험 상태 필터">
-            <SelectValue placeholder="보험 상태 전체" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">전체</SelectItem>
-            {INSURANCE_STATUSES.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <FilterSelect
+          value={visaFilter}
+          onValueChange={handleVisaChange}
+          placeholder="비자 유형 전체"
+          options={[...VISA_TYPES]}
+          labelMap={VISA_FILTER_LABELS}
+        />
+        <FilterSelect
+          value={statusFilter}
+          onValueChange={handleStatusChange}
+          placeholder="상태 전체"
+          options={[...WORKER_STATUSES]}
+          labelMap={WORKER_STATUS_LABELS}
+          className="w-40"
+        />
+        <FilterSelect
+          value={insuranceFilter}
+          onValueChange={handleInsuranceChange}
+          placeholder="보험 상태 전체"
+          options={[...INSURANCE_STATUSES]}
+          className="w-44"
+        />
       </div>
 
       {workers.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
-          등록된 근로자가 없습니다
-        </div>
+        <EmptyState message="등록된 근로자가 없습니다" />
       ) : filteredWorkers.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
-          조건에 맞는 근로자가 없습니다
-        </div>
+        <EmptyState message="조건에 맞는 근로자가 없습니다" />
       ) : (
         <>
           <Table>

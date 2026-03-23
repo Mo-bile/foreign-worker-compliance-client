@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import {
   BarChart,
   Bar,
@@ -10,22 +10,15 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { TooltipProps } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ComplianceDeadlineResponse } from "@/types/api";
+import { DEADLINE_STATUS_LABELS } from "@/types/api";
+import { DEADLINE_STATUS_CHART_COLORS } from "@/lib/constants/status";
 
 // ─── Constants ───────────────────────────────────────────
 const CHART_STATUSES = ["PENDING", "APPROACHING", "URGENT"] as const;
 type ChartStatus = (typeof CHART_STATUSES)[number];
-
-// 차트 전용 색상: OVERDUE가 제외되므로 URGENT를 빨강으로 승격하여 시각적 경고 극대화.
-// SPEC 기준 URGENT=주황이지만, 이 차트에서는 의도적 편차. 테이블 등 다른 UI에는 적용하지 않음.
-const STATUS_CONFIG: Record<ChartStatus, { color: string; label: string }> = {
-  URGENT: { color: "#ef4444", label: "긴급" },
-  APPROACHING: { color: "#f59e0b", label: "임박" },
-  PENDING: { color: "#22c55e", label: "대기" },
-};
 
 // Stack order bottom → top: 낮은 긴급도가 바닥, 높은 긴급도가 꼭대기.
 // 마지막 요소(URGENT)에만 radius=[4,4,0,0] 적용됨 — 순서 변경 시 radius 로직도 확인할 것.
@@ -92,7 +85,12 @@ export function groupDeadlinesByDateAndStatus(
 }
 
 // ─── Custom Tooltip ──────────────────────────────────────
-function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
+interface ChartTooltipProps {
+  readonly active?: boolean;
+  readonly payload?: ReadonlyArray<{ readonly payload: ChartDatum }>;
+}
+
+function ChartTooltip({ active, payload }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
 
   const datum = payload[0]?.payload as ChartDatum | undefined;
@@ -101,9 +99,9 @@ function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
   const total = datum.urgent + datum.approaching + datum.pending;
 
   const rows: { label: string; color: string; value: number }[] = [
-    { ...STATUS_CONFIG.URGENT, value: datum.urgent },
-    { ...STATUS_CONFIG.APPROACHING, value: datum.approaching },
-    { ...STATUS_CONFIG.PENDING, value: datum.pending },
+    { label: DEADLINE_STATUS_LABELS.URGENT, color: DEADLINE_STATUS_CHART_COLORS.URGENT, value: datum.urgent },
+    { label: DEADLINE_STATUS_LABELS.APPROACHING, color: DEADLINE_STATUS_CHART_COLORS.APPROACHING, value: datum.approaching },
+    { label: DEADLINE_STATUS_LABELS.PENDING, color: DEADLINE_STATUS_CHART_COLORS.PENDING, value: datum.pending },
   ].filter((r) => r.value > 0);
 
   return (
@@ -154,9 +152,9 @@ function ChartLegend() {
         <span key={status} className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span
             className="inline-block h-2.5 w-2.5 rounded-full"
-            style={{ backgroundColor: STATUS_CONFIG[status].color }}
+            style={{ backgroundColor: DEADLINE_STATUS_CHART_COLORS[status] }}
           />
-          {STATUS_CONFIG[status].label}
+          {DEADLINE_STATUS_LABELS[status]}
         </span>
       ))}
     </div>
@@ -170,17 +168,26 @@ interface DeadlineChartProps {
   readonly isError: boolean;
 }
 
+// ─── Reduced Motion (useSyncExternalStore) ──────────────
+function subscribeReducedMotion(callback: () => void) {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
+
+function getReducedMotion() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 // ─── Component ───────────────────────────────────────────
 export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartProps) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  useEffect(() => {
-    if (typeof window.matchMedia !== "function") return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotion,
+    () => false,
+  );
 
   const chartData = useMemo(() => {
     if (!deadlines) return [];
@@ -215,7 +222,7 @@ export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartPr
                     key={status}
                     dataKey={status.toLowerCase()}
                     stackId="status"
-                    fill={STATUS_CONFIG[status].color}
+                    fill={DEADLINE_STATUS_CHART_COLORS[status]}
                     radius={i === STACK_ORDER.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
                     animationDuration={prefersReducedMotion ? 0 : 800}
                     isAnimationActive={!prefersReducedMotion}

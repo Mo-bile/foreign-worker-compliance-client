@@ -19,9 +19,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormField } from "@/components/form/form-field";
 import {
   Select,
   SelectContent,
@@ -86,16 +86,7 @@ export function WorkerForm() {
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* 이름 */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="name">이름</Label>
-            <Input
-              id="name"
-              {...register("name")}
-              aria-invalid={!!errors.name}
-              placeholder="홍길동"
-            />
-            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
-          </div>
+          <FormField<RegisterWorkerRequest> label="이름" name="name" register={register} errors={errors} placeholder="홍길동" />
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="companyId">사업장</Label>
@@ -201,102 +192,28 @@ export function WorkerForm() {
           </div>
 
           {/* 비자 만료일 */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="visaExpiryDate">비자 만료일</Label>
-            <Input
-              id="visaExpiryDate"
-              type="date"
-              {...register("visaExpiryDate")}
-              aria-invalid={!!errors.visaExpiryDate}
-            />
-            {errors.visaExpiryDate && (
-              <p className="text-sm text-destructive">{errors.visaExpiryDate.message}</p>
-            )}
-          </div>
+          <FormField<RegisterWorkerRequest> label="비자 만료일" name="visaExpiryDate" register={register} errors={errors} type="date" />
 
           {/* 입국일 */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="entryDate">입국일</Label>
-            <Input
-              id="entryDate"
-              type="date"
-              {...register("entryDate")}
-              aria-invalid={!!errors.entryDate}
-            />
-            {errors.entryDate && (
-              <p className="text-sm text-destructive">{errors.entryDate.message}</p>
-            )}
-          </div>
+          <FormField<RegisterWorkerRequest> label="입국일" name="entryDate" register={register} errors={errors} type="date" />
 
           {/* 계약 시작일 */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="contractStartDate">계약 시작일</Label>
-            <Input
-              id="contractStartDate"
-              type="date"
-              {...register("contractStartDate")}
-              aria-invalid={!!errors.contractStartDate}
-            />
-            {errors.contractStartDate && (
-              <p className="text-sm text-destructive">{errors.contractStartDate.message}</p>
-            )}
-          </div>
+          <FormField<RegisterWorkerRequest> label="계약 시작일" name="contractStartDate" register={register} errors={errors} type="date" />
 
           {/* 계약 종료일 (선택) */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="contractEndDate">계약 종료일 (선택)</Label>
-            <Input
-              id="contractEndDate"
-              type="date"
-              {...register("contractEndDate")}
-              aria-invalid={!!errors.contractEndDate}
-            />
-            {errors.contractEndDate && (
-              <p className="text-sm text-destructive">{errors.contractEndDate.message}</p>
-            )}
-          </div>
+          <FormField<RegisterWorkerRequest> label="계약 종료일 (선택)" name="contractEndDate" register={register} errors={errors} type="date" />
 
           {/* 여권번호 (선택) */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="passportNumber">여권번호 (선택)</Label>
-            <Input id="passportNumber" {...register("passportNumber")} placeholder="M12345678" />
-          </div>
+          <FormField<RegisterWorkerRequest> label="여권번호 (선택)" name="passportNumber" register={register} errors={errors} placeholder="M12345678" />
 
           {/* 외국인등록번호 (선택) */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="registrationNumber">외국인등록번호 (선택)</Label>
-            <Input
-              id="registrationNumber"
-              {...register("registrationNumber")}
-              placeholder="000000-0000000"
-            />
-          </div>
+          <FormField<RegisterWorkerRequest> label="외국인등록번호 (선택)" name="registrationNumber" register={register} errors={errors} placeholder="000000-0000000" />
 
           {/* 연락처 (선택) */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="contactPhone">연락처 (선택)</Label>
-            <Input
-              id="contactPhone"
-              type="tel"
-              {...register("contactPhone")}
-              placeholder="010-0000-0000"
-            />
-          </div>
+          <FormField<RegisterWorkerRequest> label="연락처 (선택)" name="contactPhone" register={register} errors={errors} type="tel" placeholder="010-0000-0000" />
 
           {/* 이메일 (선택) */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="contactEmail">이메일 (선택)</Label>
-            <Input
-              id="contactEmail"
-              type="email"
-              {...register("contactEmail")}
-              aria-invalid={!!errors.contactEmail}
-              placeholder="example@email.com"
-            />
-            {errors.contactEmail && (
-              <p className="text-sm text-destructive">{errors.contactEmail.message}</p>
-            )}
-          </div>
+          <FormField<RegisterWorkerRequest> label="이메일 (선택)" name="contactEmail" register={register} errors={errors} type="email" placeholder="example@email.com" />
         </CardContent>
 
         <CardFooter className="flex justify-end gap-2">
