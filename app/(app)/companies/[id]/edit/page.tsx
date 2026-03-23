@@ -9,10 +9,9 @@ import { parseId } from "@/lib/parse-id";
 export default function EditCompanyPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const companyId = parseId(id);
-  const isValidId = companyId !== null;
   const { data: company, isLoading, error } = useCompany(companyId ?? 0);
 
-  if (!isValidId) {
+  if (companyId === null) {
     return (
       <div className="py-12 text-center">
         <p className="text-destructive">잘못된 사업장 ID입니다</p>
@@ -47,7 +46,7 @@ export default function EditCompanyPage({ params }: { readonly params: Promise<{
       <h1 className="text-2xl font-semibold tracking-tight">사업장 수정</h1>
       <CompanyForm
         mode="edit"
-        companyId={companyId!}
+        companyId={companyId}
         businessNumber={company.businessNumber}
         defaultValues={{
           name: company.name,

@@ -24,8 +24,11 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe("CompanySelector", () => {
-  it("사업장_선택_드롭다운을_렌더링한다", async () => {
+  it("로딩_완료_후_사업장_선택_드롭다운을_렌더링한다", async () => {
     renderWithProviders(<CompanySelector />);
-    expect(await screen.findByRole("combobox", { name: "사업장 선택" })).toBeDefined();
+
+    // findByRole retries until the async company fetch completes and Select renders
+    const combobox = await screen.findByRole("combobox", { name: "사업장 선택" });
+    expect(combobox).toBeDefined();
   });
 });
