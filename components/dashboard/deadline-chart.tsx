@@ -1,30 +1,190 @@
 "use client";
 
-import { useMemo } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useMemo, useState, useEffect } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import type { TooltipProps } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ComplianceDeadlineResponse } from "@/types/api";
 
+// ─── Constants ───────────────────────────────────────────
+const CHART_STATUSES = ["PENDING", "APPROACHING", "URGENT"] as const;
+type ChartStatus = (typeof CHART_STATUSES)[number];
+
+// 차트 전용 색상: OVERDUE가 제외되므로 URGENT를 빨강으로 승격하여 시각적 경고 극대화.
+// SPEC 기준 URGENT=주황이지만, 이 차트에서는 의도적 편차. 테이블 등 다른 UI에는 적용하지 않음.
+const STATUS_CONFIG: Record<ChartStatus, { color: string; label: string }> = {
+  URGENT: { color: "#ef4444", label: "긴급" },
+  APPROACHING: { color: "#f59e0b", label: "임박" },
+  PENDING: { color: "#22c55e", label: "대기" },
+};
+
+// Stack order bottom → top: 낮은 긴급도가 바닥, 높은 긴급도가 꼭대기.
+// 마지막 요소(URGENT)에만 radius=[4,4,0,0] 적용됨 — 순서 변경 시 radius 로직도 확인할 것.
+const STACK_ORDER: ChartStatus[] = ["PENDING", "APPROACHING", "URGENT"];
+
+export interface ChartDatum {
+  readonly sortKey: string;
+  readonly date: string;
+  readonly displayDate: string;
+  readonly urgent: number;
+  readonly approaching: number;
+  readonly pending: number;
+}
+
+// ─── Helpers ─────────────────────────────────────────────
+const weekdayFormatter = new Intl.DateTimeFormat("ko-KR", { weekday: "short" });
+
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function formatDate(iso: string): string {
+  const parts = iso.split("-");
+  if (parts.length !== 3) return iso;
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+  return Number.isNaN(m) || Number.isNaN(d) ? iso : `${m}/${d}`;
+}
+
+function formatDateWithDay(iso: string): string {
+  const date = new Date(iso + "T00:00:00");
+  if (Number.isNaN(date.getTime())) return formatDate(iso);
+  const weekday = weekdayFormatter.format(date);
+  return `${formatDate(iso)} (${weekday})`;
+}
+
+function isChartStatus(status: string): status is ChartStatus {
+  return CHART_STATUSES.includes(status as ChartStatus);
+}
+
+// ─── Grouping Logic (exported for unit testing only — not part of public API) ──
+export function groupDeadlinesByDateAndStatus(
+  deadlines: readonly ComplianceDeadlineResponse[],
+): ChartDatum[] {
+  const grouped = new Map<string, { urgent: number; approaching: number; pending: number }>();
+
+  for (const d of deadlines) {
+    if (!d.dueDate || !ISO_DATE_RE.test(d.dueDate)) continue;
+    if (!isChartStatus(d.status)) continue;
+
+    const entry = grouped.get(d.dueDate) ?? { urgent: 0, approaching: 0, pending: 0 };
+    const key = d.status.toLowerCase() as "urgent" | "approaching" | "pending";
+    grouped.set(d.dueDate, { ...entry, [key]: entry[key] + 1 });
+  }
+
+  return Array.from(grouped.entries())
+    .map(
+      ([date, counts]): ChartDatum => ({
+        sortKey: date,
+        date: formatDate(date),
+        displayDate: formatDateWithDay(date),
+        ...counts,
+      }),
+    )
+    .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+}
+
+// ─── Custom Tooltip ──────────────────────────────────────
+function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
+  if (!active || !payload?.length) return null;
+
+  const datum = payload[0]?.payload as ChartDatum | undefined;
+  if (!datum) return null;
+
+  const total = datum.urgent + datum.approaching + datum.pending;
+
+  const rows: { label: string; color: string; value: number }[] = [
+    { ...STATUS_CONFIG.URGENT, value: datum.urgent },
+    { ...STATUS_CONFIG.APPROACHING, value: datum.approaching },
+    { ...STATUS_CONFIG.PENDING, value: datum.pending },
+  ].filter((r) => r.value > 0);
+
+  return (
+    <div
+      className="rounded-lg border px-3 py-2 text-sm shadow-md"
+      style={{
+        backgroundColor: "var(--popover)",
+        borderColor: "var(--border)",
+        color: "var(--popover-foreground)",
+      }}
+    >
+      <p className="mb-1.5 font-medium">{datum.displayDate}</p>
+      <div className="space-y-0.5">
+        {rows.map((r) => (
+          <div key={r.label} className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-1.5">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: r.color }}
+              />
+              {r.label}
+            </span>
+            <span className="font-medium tabular-nums">{r.value}건</span>
+          </div>
+        ))}
+      </div>
+      {rows.length > 1 && (
+        <>
+          <div className="my-1.5 border-t" style={{ borderColor: "var(--border)" }} />
+          <div className="flex items-center justify-between font-medium">
+            <span>합계</span>
+            <span className="tabular-nums">{total}건</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── Custom Legend ────────────────────────────────────────
+// Legend shows highest-severity first (URGENT → PENDING), opposite of STACK_ORDER.
+const LEGEND_ORDER: readonly ChartStatus[] = [...STACK_ORDER].reverse();
+
+function ChartLegend() {
+  return (
+    <div className="flex items-center justify-center gap-4 pb-2">
+      {LEGEND_ORDER.map((status) => (
+        <span key={status} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span
+            className="inline-block h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: STATUS_CONFIG[status].color }}
+          />
+          {STATUS_CONFIG[status].label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// ─── Props ───────────────────────────────────────────────
 interface DeadlineChartProps {
   readonly deadlines: readonly ComplianceDeadlineResponse[] | undefined;
   readonly isLoading: boolean;
-  readonly isError?: boolean;
+  readonly isError: boolean;
 }
 
+// ─── Component ───────────────────────────────────────────
 export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartProps) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   const chartData = useMemo(() => {
     if (!deadlines) return [];
-
-    const grouped = new Map<string, number>();
-    for (const d of deadlines) {
-      const count = grouped.get(d.dueDate) ?? 0;
-      grouped.set(d.dueDate, count + 1);
-    }
-
-    return Array.from(grouped.entries())
-      .map(([date, count]) => ({ date, count }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    return groupDeadlinesByDateAndStatus(deadlines);
   }, [deadlines]);
 
   return (
@@ -42,15 +202,28 @@ export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartPr
         ) : chartData.length === 0 ? (
           <p className="text-muted-foreground text-sm py-8 text-center">데이터가 없습니다</p>
         ) : (
-          <ResponsiveContainer width="100%" height={256}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" fontSize={12} />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="count" fill="hsl(var(--primary))" name="건수" />
-            </BarChart>
-          </ResponsiveContainer>
+          <>
+            <ChartLegend />
+            <ResponsiveContainer width="100%" height={256}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis allowDecimals={false} fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--muted)" }} />
+                {STACK_ORDER.map((status, i) => (
+                  <Bar
+                    key={status}
+                    dataKey={status.toLowerCase()}
+                    stackId="status"
+                    fill={STATUS_CONFIG[status].color}
+                    radius={i === STACK_ORDER.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                    animationDuration={prefersReducedMotion ? 0 : 800}
+                    isAnimationActive={!prefersReducedMotion}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </>
         )}
       </CardContent>
     </Card>

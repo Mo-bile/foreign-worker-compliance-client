@@ -82,9 +82,9 @@ SPEC의 데드라인 색상 체계(OVERDUE 빨강 → URGENT 주황 → APPROACH
 | 파일 | 변경 내용 |
 |------|----------|
 | `components/dashboard/deadline-chart.tsx` | useMemo 그룹핑 로직 변경, StackedBar + 커스텀 Tooltip/Legend |
+| `app/(app)/compliance/page.tsx` | `isError` prop 추가 |
 
-- 외부 인터페이스(props) 변경 없음
-- `app/(app)/page.tsx`, `app/(app)/compliance/page.tsx` 수정 불필요
+- **인터페이스 변경**: `isError` prop이 optional → required로 변경됨 (API 에러 silent masking 방지). 호출부 2곳 모두 업데이트 완료.
 
 ## 테스트
 
