@@ -5,6 +5,11 @@ import { ERROR_MESSAGES } from "@/lib/constants/error-messages";
 
 export function handleRouteError(error: unknown, context: string): NextResponse {
   if (error instanceof ApiError) {
+    if (error.status >= 500) {
+      console.error(`[${context}] Backend error: ${error.status} ${error.message}`);
+    } else {
+      console.warn(`[${context}] Backend returned ${error.status}: ${error.message}`);
+    }
     return NextResponse.json({ message: error.message }, { status: error.status });
   }
   console.error(`[${context}] Unexpected error:`, error);
@@ -20,10 +25,17 @@ export async function parseRequestBody(
   try {
     const data: unknown = await request.json();
     return { data };
-  } catch {
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { message: ERROR_MESSAGES.INVALID_REQUEST_FORMAT },
+        { status: 400 },
+      );
+    }
+    console.error("[parseRequestBody] Unexpected error reading request body:", error);
     return NextResponse.json(
-      { message: ERROR_MESSAGES.INVALID_REQUEST_FORMAT },
-      { status: 400 },
+      { message: ERROR_MESSAGES.SERVER_ERROR },
+      { status: 500 },
     );
   }
 }

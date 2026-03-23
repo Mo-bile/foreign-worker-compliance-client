@@ -170,14 +170,14 @@ interface DeadlineChartProps {
 
 // ─── Reduced Motion (useSyncExternalStore) ──────────────
 function subscribeReducedMotion(callback: () => void) {
-  if (typeof window.matchMedia !== "function") return () => {};
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
   mq.addEventListener("change", callback);
   return () => mq.removeEventListener("change", callback);
 }
 
 function getReducedMotion() {
-  if (typeof window.matchMedia !== "function") return false;
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FilterSelect } from "@/components/common/filter-select";
@@ -47,5 +47,22 @@ describe("FilterSelect", () => {
     );
     await user.click(screen.getByRole("combobox"));
     expect(screen.getByText("전체")).toBeInTheDocument();
+  });
+
+  it("옵션_선택시_onValueChange를_호출한다", async () => {
+    const onValueChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <FilterSelect
+        value="ALL"
+        onValueChange={onValueChange}
+        placeholder="필터"
+        options={[...options]}
+        labelMap={labelMap}
+      />,
+    );
+    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByText("옵션 B"));
+    expect(onValueChange).toHaveBeenCalledWith("B");
   });
 });

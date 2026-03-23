@@ -14,6 +14,7 @@ import {
   INDUSTRY_CATEGORY_LABELS,
 } from "@/types/api";
 import type { CreateCompanyRequest, UpdateCompanyRequest } from "@/types/api";
+import type { Resolver } from "react-hook-form";
 import { useCreateCompany, useUpdateCompany } from "@/lib/queries/use-companies";
 
 import { Button } from "@/components/ui/button";
@@ -58,13 +59,12 @@ export function CompanyForm(props: CompanyFormProps) {
     handleSubmit,
     control,
     formState: { errors },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } = useForm<any>({
+  } = useForm<CreateCompanyRequest>({
     resolver: standardSchemaResolver(
       isEdit ? updateCompanyRequestSchema : createCompanyRequestSchema,
-    ),
+    ) as unknown as Resolver<CreateCompanyRequest>,
     defaultValues: isEdit
-      ? props.defaultValues
+      ? { ...props.defaultValues, businessNumber: "" }
       : {
           name: "",
           businessNumber: "",
@@ -79,10 +79,11 @@ export function CompanyForm(props: CompanyFormProps) {
         },
   });
 
-  const onSubmit = (data: Record<string, unknown>) => {
+  const onSubmit = (data: CreateCompanyRequest) => {
     if (isEdit) {
+      const { businessNumber: _, ...updateData } = data;
       updateMutation.mutate(
-        { id: props.companyId, data: data as UpdateCompanyRequest },
+        { id: props.companyId, data: updateData as UpdateCompanyRequest },
         {
           onSuccess: () => {
             toast.success("사업장이 수정되었습니다");
@@ -94,7 +95,7 @@ export function CompanyForm(props: CompanyFormProps) {
         },
       );
     } else {
-      createMutation.mutate(data as CreateCompanyRequest, {
+      createMutation.mutate(data, {
         onSuccess: (company) => {
           toast.success("사업장이 등록되었습니다");
           router.push(`/companies/${company.id}`);
@@ -162,7 +163,7 @@ export function CompanyForm(props: CompanyFormProps) {
               )}
             />
             {errors.region && (
-              <p className="text-sm text-destructive">{String(errors.region.message ?? "")}</p>
+              <p className="text-sm text-destructive">{errors.region.message}</p>
             )}
           </div>
 
@@ -200,7 +201,7 @@ export function CompanyForm(props: CompanyFormProps) {
               )}
             />
             {errors.industryCategory && (
-              <p className="text-sm text-destructive">{String(errors.industryCategory.message ?? "")}</p>
+              <p className="text-sm text-destructive">{errors.industryCategory.message}</p>
             )}
           </div>
 
