@@ -1,9 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 
 const STATUS_STYLES: Record<string, string> = {
-  의무: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-  임의: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-  면제: "bg-green-100 text-green-800 hover:bg-green-200",
+  의무: "bg-[var(--signal-blue-bg)] text-[var(--signal-blue)] hover:bg-[var(--signal-blue-bg)]",
+  임의: "bg-[var(--signal-gray-bg)] text-[var(--signal-gray)] hover:bg-[var(--signal-gray-bg)]",
+  면제: "bg-[var(--signal-green-bg)] text-[var(--signal-green)] hover:bg-[var(--signal-green-bg)]",
 };
 
 export function InsuranceBadge({ status }: { readonly status: string }) {

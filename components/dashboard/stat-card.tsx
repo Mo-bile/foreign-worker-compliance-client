@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
@@ -8,11 +9,12 @@ interface StatCardProps {
   readonly icon: LucideIcon;
   readonly isLoading: boolean;
   readonly isError?: boolean;
+  readonly className?: string;
 }
 
-export function StatCard({ title, value, icon: Icon, isLoading, isError }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, isLoading, isError, className }: StatCardProps) {
   return (
-    <Card>
+    <Card className={cn("border-t-[3px]", className)}>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
         <Icon className="h-4 w-4 text-muted-foreground" />

@@ -43,5 +43,8 @@ next-env.d.ts
 # local docs
 /docs/
 
+# generated fonts (copied via postinstall)
+/public/fonts/
+
 # superpowers brainstorm
 .superpowers/

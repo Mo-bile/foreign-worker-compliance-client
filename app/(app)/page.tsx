@@ -27,6 +27,7 @@ export default function DashboardPage() {
           icon={Users}
           isLoading={workers.isLoading}
           isError={workers.isError}
+          className="border-t-[color:var(--accent-decorative)]"
         />
         <StatCard
           title="기한초과"
@@ -34,6 +35,7 @@ export default function DashboardPage() {
           icon={AlertTriangle}
           isLoading={overdue.isLoading}
           isError={overdue.isError}
+          className="border-t-[color:var(--signal-red)]"
         />
         <StatCard
           title="임박 (30일)"
@@ -41,6 +43,7 @@ export default function DashboardPage() {
           icon={Clock}
           isLoading={upcoming.isLoading}
           isError={upcoming.isError}
+          className="border-t-[color:var(--signal-orange)]"
         />
       </div>
 
