@@ -13,16 +13,16 @@ import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 import { NATIONALITY_LABELS } from "@/types/api";
 
-import { throwResponseError } from "./query-utils";
+import { fetchApi, mutateApi } from "./query-utils";
 
 export function useWorkers(companyId?: number | null) {
   return useQuery<readonly WorkerResponse[]>({
     queryKey: ["workers", { companyId }],
-    queryFn: async () => {
+    queryFn: () => {
       const params = companyId ? `?companyId=${companyId}` : "";
-      const res = await fetch(`/api/workers${params}`);
-      if (!res.ok) await throwResponseError(res, "근로자 목록을 불러올 수 없습니다");
-      return res.json();
+      return fetchApi<readonly WorkerResponse[]>(
+        `/api/workers${params}`, "근로자 목록을 불러올 수 없습니다",
+      );
     },
     enabled: companyId != null && companyId > 0,
   });
@@ -31,11 +31,9 @@ export function useWorkers(companyId?: number | null) {
 export function useWorker(id: number) {
   return useQuery<WorkerResponse>({
     queryKey: ["workers", id],
-    queryFn: async () => {
-      const res = await fetch(`/api/workers/${id}`);
-      if (!res.ok) await throwResponseError(res, "근로자 정보를 불러올 수 없습니다");
-      return res.json();
-    },
+    queryFn: () => fetchApi<WorkerResponse>(
+      `/api/workers/${id}`, "근로자 정보를 불러올 수 없습니다",
+    ),
     enabled: id > 0,
   });
 }
@@ -44,15 +42,9 @@ export function useRegisterWorker() {
   const queryClient = useQueryClient();
 
   return useMutation<WorkerResponse, Error, RegisterWorkerRequest>({
-    mutationFn: async (data) => {
-      const res = await fetch("/api/workers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) await throwResponseError(res, "등록에 실패했습니다");
-      return res.json();
-    },
+    mutationFn: (data) => mutateApi<WorkerResponse>(
+      "/api/workers", "POST", data, "등록에 실패했습니다",
+    ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workers"] });
     },
