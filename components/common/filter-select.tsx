@@ -24,7 +24,7 @@ export function FilterSelect<T extends string>({
   className = "w-48",
 }: FilterSelectProps<T>) {
   return (
-    <Select value={value} onValueChange={onValueChange}>
+    <Select value={value as string} onValueChange={(v) => onValueChange(v as T | "ALL")}>
       <SelectTrigger className={className} aria-label={placeholder}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

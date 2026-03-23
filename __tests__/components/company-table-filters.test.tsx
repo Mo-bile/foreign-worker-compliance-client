@@ -47,7 +47,7 @@ describe("CompanyTable 필터/검색", () => {
     const user = userEvent.setup();
     render(<CompanyTable companies={mockCompanies} isLoading={false} />);
 
-    const regionTrigger = screen.getByRole("combobox", { name: "지역 필터" });
+    const regionTrigger = screen.getByRole("combobox", { name: "지역 전체" });
     await user.click(regionTrigger);
     const busanOption = await screen.findByRole("option", { name: "부산" });
     await user.click(busanOption);
@@ -61,7 +61,7 @@ describe("CompanyTable 필터/검색", () => {
     const user = userEvent.setup();
     render(<CompanyTable companies={mockCompanies} isLoading={false} />);
 
-    const industryTrigger = screen.getByRole("combobox", { name: "업종 필터" });
+    const industryTrigger = screen.getByRole("combobox", { name: "업종 전체" });
     await user.click(industryTrigger);
     const agriOption = await screen.findByRole("option", { name: "농업" });
     await user.click(agriOption);

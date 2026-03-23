@@ -58,7 +58,8 @@ export function CompanyForm(props: CompanyFormProps) {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } = useForm<any>({
     resolver: standardSchemaResolver(
       isEdit ? updateCompanyRequestSchema : createCompanyRequestSchema,
     ),
@@ -161,7 +162,7 @@ export function CompanyForm(props: CompanyFormProps) {
               )}
             />
             {errors.region && (
-              <p className="text-sm text-destructive">{errors.region.message}</p>
+              <p className="text-sm text-destructive">{String(errors.region.message ?? "")}</p>
             )}
           </div>
 
@@ -199,7 +200,7 @@ export function CompanyForm(props: CompanyFormProps) {
               )}
             />
             {errors.industryCategory && (
-              <p className="text-sm text-destructive">{errors.industryCategory.message}</p>
+              <p className="text-sm text-destructive">{String(errors.industryCategory.message ?? "")}</p>
             )}
           </div>
 
