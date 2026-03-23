@@ -110,9 +110,9 @@ function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
     <div
       className="rounded-lg border px-3 py-2 text-sm shadow-md"
       style={{
-        backgroundColor: "hsl(var(--popover))",
-        borderColor: "hsl(var(--border))",
-        color: "hsl(var(--popover-foreground))",
+        backgroundColor: "var(--popover)",
+        borderColor: "var(--border)",
+        color: "var(--popover-foreground)",
       }}
     >
       <p className="mb-1.5 font-medium">{datum.displayDate}</p>
@@ -132,7 +132,7 @@ function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
       </div>
       {rows.length > 1 && (
         <>
-          <div className="my-1.5 border-t" style={{ borderColor: "hsl(var(--border))" }} />
+          <div className="my-1.5 border-t" style={{ borderColor: "var(--border)" }} />
           <div className="flex items-center justify-between font-medium">
             <span>합계</span>
             <span className="tabular-nums">{total}건</span>
@@ -206,10 +206,10 @@ export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartPr
             <ChartLegend />
             <ResponsiveContainer width="100%" height={256}>
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis allowDecimals={false} fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip content={<ChartTooltip />} cursor={{ fill: "hsl(var(--muted))" }} />
+                <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--muted)" }} />
                 {STACK_ORDER.map((status, i) => (
                   <Bar
                     key={status}
