@@ -5,9 +5,11 @@ import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WorkerTable } from "@/components/workers/worker-table";
 import { useWorkers } from "@/lib/queries/use-workers";
+import { useCompanyContext } from "@/lib/contexts/company-context";
 
 export default function WorkersPage() {
-  const { data: workers = [], isLoading, isError } = useWorkers();
+  const { selectedCompanyId, isLoading: companiesLoading } = useCompanyContext();
+  const { data: workers = [], isLoading, isError } = useWorkers(selectedCompanyId);
 
   return (
     <div className="space-y-6">
@@ -21,7 +23,13 @@ export default function WorkersPage() {
         </Link>
       </div>
 
-      {isError ? (
+      {companiesLoading ? (
+        <WorkerTable workers={[]} isLoading />
+      ) : selectedCompanyId == null ? (
+        <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
+          사업장을 선택해주세요
+        </div>
+      ) : isError ? (
         <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-destructive">
           근로자 목록을 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.
         </div>

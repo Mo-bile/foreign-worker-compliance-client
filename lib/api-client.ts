@@ -47,4 +47,13 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   return handleResponse<T>(response);
 }
 
-export const apiClient = { get, post } as const;
+async function put<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(`${getBaseUrl()}${path}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return handleResponse<T>(response);
+}
+
+export const apiClient = { get, post, put } as const;

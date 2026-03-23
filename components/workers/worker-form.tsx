@@ -3,6 +3,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   registerWorkerRequestSchema,
@@ -13,6 +14,9 @@ import {
 } from "@/types/api";
 import type { RegisterWorkerRequest } from "@/types/api";
 import { useRegisterWorker } from "@/lib/queries/use-workers";
+import { useCompanies } from "@/lib/queries/use-companies";
+import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +33,7 @@ import {
 export function WorkerForm() {
   const router = useRouter();
   const { mutate: registerWorker, isPending } = useRegisterWorker();
+  const { data: companies = [], isLoading: companiesLoading, isError: companiesError } = useCompanies();
 
   const {
     register,
@@ -47,7 +52,7 @@ export function WorkerForm() {
       registrationNumber: "",
       contractStartDate: "",
       contractEndDate: "",
-      workplaceId: undefined,
+      companyId: undefined,
       contactPhone: "",
       contactEmail: "",
     },
@@ -64,7 +69,11 @@ export function WorkerForm() {
     };
     registerWorker(sanitized, {
       onSuccess: (worker) => {
+        toast.success("근로자가 등록되었습니다");
         router.push(`/workers/${worker.id}`);
+      },
+      onError: (error) => {
+        toast.error(error.message);
       },
     });
   };
@@ -88,19 +97,45 @@ export function WorkerForm() {
             {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
           </div>
 
-          {/* 사업장 ID */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="workplaceId">사업장 ID</Label>
-            <Input
-              id="workplaceId"
-              type="number"
-              {...register("workplaceId", { valueAsNumber: true })}
-              aria-invalid={!!errors.workplaceId}
-              placeholder="1"
-            />
-            {errors.workplaceId && (
-              <p className="text-sm text-destructive">{errors.workplaceId.message}</p>
+            <Label htmlFor="companyId">사업장</Label>
+            {companiesLoading ? (
+              <Skeleton className="h-9 w-full" />
+            ) : companiesError ? (
+              <p className="text-sm text-destructive">
+                사업장 목록을 불러올 수 없습니다. 페이지를 새로고침해 주세요.
+              </p>
+            ) : companies.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                등록된 사업장이 없습니다.{" "}
+                <Link href="/companies/new" className="text-primary hover:underline">
+                  사업장을 먼저 등록해주세요
+                </Link>
+              </p>
+            ) : (
+              <Controller
+                name="companyId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value != null ? String(field.value) : undefined}
+                    onValueChange={(val) => field.onChange(Number(val))}
+                  >
+                    <SelectTrigger id="companyId" aria-label="사업장" aria-invalid={!!errors.companyId} className="w-full">
+                      <SelectValue placeholder="사업장 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {companies.map((c) => (
+                        <SelectItem key={c.id} value={String(c.id)}>
+                          {c.name} ({c.businessNumber})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             )}
+            {errors.companyId && <p className="text-sm text-destructive">{errors.companyId.message}</p>}
           </div>
 
           {/* 국적 */}
@@ -268,7 +303,7 @@ export function WorkerForm() {
           <Button type="button" variant="outline" onClick={() => router.back()}>
             취소
           </Button>
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" disabled={isPending || companiesLoading}>
             {isPending ? "등록 중..." : "등록"}
           </Button>
         </CardFooter>

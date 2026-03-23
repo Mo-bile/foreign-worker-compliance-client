@@ -1,4 +1,59 @@
-import type { WorkerResponse, ComplianceDeadlineResponse } from "@/types/api";
+import type { WorkerResponse, ComplianceDeadlineResponse, CompanyResponse } from "@/types/api";
+
+// ─── 사업장 목 데이터 ──────────────────────────────────
+export const mockCompanies: readonly CompanyResponse[] = [
+  {
+    id: 1,
+    name: "한국전자 주식회사",
+    businessNumber: "123-45-67890",
+    region: "SEOUL",
+    regionName: "서울",
+    subRegion: "강남구",
+    industryCategory: "MANUFACTURING",
+    industryCategoryName: "제조업",
+    industrySubCategory: "전자부품",
+    employeeCount: 150,
+    foreignWorkerCount: 30,
+    address: "서울시 강남구 테헤란로 123",
+    contactPhone: "02-1234-5678",
+    createdAt: "2025-01-15T09:00:00",
+    updatedAt: "2025-06-20T14:30:00",
+  },
+  {
+    id: 2,
+    name: "부산건설 주식회사",
+    businessNumber: "234-56-78901",
+    region: "BUSAN",
+    regionName: "부산",
+    subRegion: "해운대구",
+    industryCategory: "CONSTRUCTION",
+    industryCategoryName: "건설업",
+    industrySubCategory: null,
+    employeeCount: 80,
+    foreignWorkerCount: 25,
+    address: "부산시 해운대구 센텀로 45",
+    contactPhone: "051-9876-5432",
+    createdAt: "2025-03-01T10:00:00",
+    updatedAt: "2025-07-15T11:00:00",
+  },
+  {
+    id: 3,
+    name: "경기농업 영농조합",
+    businessNumber: "345-67-89012",
+    region: "GYEONGGI",
+    regionName: "경기",
+    subRegion: "이천시",
+    industryCategory: "AGRICULTURE",
+    industryCategoryName: "농업",
+    industrySubCategory: "시설원예",
+    employeeCount: 30,
+    foreignWorkerCount: 15,
+    address: "경기도 이천시 농업로 78",
+    contactPhone: "031-5555-1234",
+    createdAt: "2025-05-10T08:00:00",
+    updatedAt: "2025-08-01T09:30:00",
+  },
+];
 
 // ─── 목 데이터 생성 헬퍼 ─────────────────────────────────
 const SAMPLE_NATIONALITIES = [

@@ -13,14 +13,18 @@ import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 import { NATIONALITY_LABELS } from "@/types/api";
 
-export function useWorkers() {
+import { throwResponseError } from "./query-utils";
+
+export function useWorkers(companyId?: number | null) {
   return useQuery<readonly WorkerResponse[]>({
-    queryKey: ["workers"],
+    queryKey: ["workers", { companyId }],
     queryFn: async () => {
-      const res = await fetch("/api/workers");
-      if (!res.ok) throw new Error("근로자 목록을 불러올 수 없습니다");
+      const params = companyId ? `?companyId=${companyId}` : "";
+      const res = await fetch(`/api/workers${params}`);
+      if (!res.ok) await throwResponseError(res, "근로자 목록을 불러올 수 없습니다");
       return res.json();
     },
+    enabled: companyId != null && companyId > 0,
   });
 }
 
@@ -29,7 +33,7 @@ export function useWorker(id: number) {
     queryKey: ["workers", id],
     queryFn: async () => {
       const res = await fetch(`/api/workers/${id}`);
-      if (!res.ok) throw new Error("근로자 정보를 불러올 수 없습니다");
+      if (!res.ok) await throwResponseError(res, "근로자 정보를 불러올 수 없습니다");
       return res.json();
     },
     enabled: id > 0,
@@ -46,16 +50,7 @@ export function useRegisterWorker() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) {
-        let message = "등록에 실패했습니다";
-        try {
-          const body = await res.json();
-          if (body.message) message = body.message;
-        } catch {
-          // Server returned non-JSON error response — use default message
-        }
-        throw new Error(message);
-      }
+      if (!res.ok) await throwResponseError(res, "등록에 실패했습니다");
       return res.json();
     },
     onSuccess: () => {
@@ -74,12 +69,15 @@ export interface WorkerFilterParams {
 
 // TODO: 현재 WorkerTable이 자체 필터링/페이지네이션을 수행하므로 프로덕션에서 미사용.
 // 서버 사이드 필터링 전환 시 이 훅을 페이지에 연결하고 WorkerTable 내부 필터 로직을 제거할 것.
-export function usePaginatedWorkers(params: WorkerFilterParams): {
+export function usePaginatedWorkers(
+  companyId: number | null | undefined,
+  params: WorkerFilterParams,
+): {
   workers: PaginatedResult<WorkerResponse> | undefined;
   isLoading: boolean;
   isError: boolean;
 } {
-  const query = useWorkers();
+  const query = useWorkers(companyId);
 
   const workers = query.data
     ? paginateItems(filterWorkers(query.data, params), params.page)

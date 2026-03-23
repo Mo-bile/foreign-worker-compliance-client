@@ -1,0 +1,67 @@
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { CompanyResponse, CreateCompanyRequest, UpdateCompanyRequest } from "@/types/api";
+import { throwResponseError } from "./query-utils";
+
+export function useCompanies() {
+  return useQuery<readonly CompanyResponse[]>({
+    queryKey: ["companies"],
+    queryFn: async () => {
+      const res = await fetch("/api/companies");
+      if (!res.ok) await throwResponseError(res, "사업장 목록을 불러올 수 없습니다");
+      return res.json();
+    },
+  });
+}
+
+export function useCompany(id: number) {
+  return useQuery<CompanyResponse>({
+    queryKey: ["companies", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/companies/${id}`);
+      if (!res.ok) await throwResponseError(res, "사업장 정보를 불러올 수 없습니다");
+      return res.json();
+    },
+    enabled: id > 0,
+  });
+}
+
+export function useCreateCompany() {
+  const queryClient = useQueryClient();
+
+  return useMutation<CompanyResponse, Error, CreateCompanyRequest>({
+    mutationFn: async (data) => {
+      const res = await fetch("/api/companies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) await throwResponseError(res, "사업장 등록에 실패했습니다");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+    },
+  });
+}
+
+export function useUpdateCompany() {
+  const queryClient = useQueryClient();
+
+  return useMutation<CompanyResponse, Error, { id: number; data: UpdateCompanyRequest }>({
+    mutationFn: async ({ id, data }) => {
+      const res = await fetch(`/api/companies/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) await throwResponseError(res, "사업장 수정에 실패했습니다");
+      return res.json();
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["companies", variables.id] });
+    },
+  });
+}
