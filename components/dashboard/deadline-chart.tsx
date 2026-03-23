@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import {
   BarChart,
   Bar,
@@ -10,7 +10,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { TooltipProps } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ComplianceDeadlineResponse } from "@/types/api";
@@ -92,7 +91,12 @@ export function groupDeadlinesByDateAndStatus(
 }
 
 // ─── Custom Tooltip ──────────────────────────────────────
-function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
+interface ChartTooltipProps {
+  readonly active?: boolean;
+  readonly payload?: ReadonlyArray<{ readonly payload: ChartDatum }>;
+}
+
+function ChartTooltip({ active, payload }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
 
   const datum = payload[0]?.payload as ChartDatum | undefined;
@@ -170,17 +174,26 @@ interface DeadlineChartProps {
   readonly isError: boolean;
 }
 
+// ─── Reduced Motion (useSyncExternalStore) ──────────────
+function subscribeReducedMotion(callback: () => void) {
+  if (typeof window.matchMedia !== "function") return () => {};
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
+
+function getReducedMotion() {
+  if (typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 // ─── Component ───────────────────────────────────────────
 export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartProps) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  useEffect(() => {
-    if (typeof window.matchMedia !== "function") return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotion,
+    () => false,
+  );
 
   const chartData = useMemo(() => {
     if (!deadlines) return [];
