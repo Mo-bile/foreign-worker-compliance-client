@@ -1,43 +1,29 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { apiClient, ApiError } from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
 import { createCompanyRequestSchema } from "@/types/api";
 import type { CompanyResponse } from "@/types/api";
+import { handleRouteError, parseRequestBody, validateSchema } from "@/lib/api-route-utils";
 
 export async function GET() {
   try {
     const companies = await apiClient.get<CompanyResponse[]>("/api/companies");
     return NextResponse.json(companies);
   } catch (error) {
-    if (error instanceof ApiError) {
-      return NextResponse.json({ message: error.message }, { status: error.status });
-    }
-    console.error("[GET /api/companies] Unexpected error:", error);
-    return NextResponse.json({ message: "서버 오류가 발생했습니다" }, { status: 500 });
+    return handleRouteError(error, "GET /api/companies");
   }
 }
 
 export async function POST(request: NextRequest) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ message: "잘못된 요청 형식입니다" }, { status: 400 });
-  }
+  const bodyResult = await parseRequestBody(request);
+  if (bodyResult instanceof NextResponse) return bodyResult;
 
-  const parsed = createCompanyRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    const firstError = parsed.error.issues[0]?.message ?? "입력값이 올바르지 않습니다";
-    return NextResponse.json({ message: firstError }, { status: 400 });
-  }
+  const validated = validateSchema(createCompanyRequestSchema, bodyResult.data);
+  if (validated instanceof NextResponse) return validated;
 
   try {
-    const company = await apiClient.post<CompanyResponse>("/api/companies", parsed.data);
+    const company = await apiClient.post<CompanyResponse>("/api/companies", validated.data);
     return NextResponse.json(company, { status: 201 });
   } catch (error) {
-    if (error instanceof ApiError) {
-      return NextResponse.json({ message: error.message }, { status: error.status });
-    }
-    console.error("[POST /api/companies] Unexpected error:", error);
-    return NextResponse.json({ message: "서버 오류가 발생했습니다" }, { status: 500 });
+    return handleRouteError(error, "POST /api/companies");
   }
 }

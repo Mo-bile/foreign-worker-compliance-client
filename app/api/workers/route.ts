@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { apiClient, ApiError } from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
 import { parseId } from "@/lib/parse-id";
 import type { WorkerResponse } from "@/types/api";
+import { handleRouteError, parseRequestBody } from "@/lib/api-route-utils";
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,30 +19,18 @@ export async function GET(request: NextRequest) {
     const workers = await apiClient.get<WorkerResponse[]>(path);
     return NextResponse.json(workers);
   } catch (error) {
-    if (error instanceof ApiError) {
-      return NextResponse.json({ message: error.message }, { status: error.status });
-    }
-    console.error("[GET /api/workers] Unexpected error:", error);
-    return NextResponse.json({ message: "서버 오류가 발생했습니다" }, { status: 500 });
+    return handleRouteError(error, "GET /api/workers");
   }
 }
 
 export async function POST(request: NextRequest) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ message: "잘못된 요청 형식입니다" }, { status: 400 });
-  }
+  const bodyResult = await parseRequestBody(request);
+  if (bodyResult instanceof NextResponse) return bodyResult;
 
   try {
-    const worker = await apiClient.post<WorkerResponse>("/api/workers", body);
+    const worker = await apiClient.post<WorkerResponse>("/api/workers", bodyResult.data);
     return NextResponse.json(worker);
   } catch (error) {
-    if (error instanceof ApiError) {
-      return NextResponse.json({ message: error.message }, { status: error.status });
-    }
-    console.error("[POST /api/workers] Unexpected error:", error);
-    return NextResponse.json({ message: "서버 오류가 발생했습니다" }, { status: 500 });
+    return handleRouteError(error, "POST /api/workers");
   }
 }
