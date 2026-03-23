@@ -15,6 +15,7 @@ import {
 import type { RegisterWorkerRequest } from "@/types/api";
 import { useRegisterWorker } from "@/lib/queries/use-workers";
 import { useCompanies } from "@/lib/queries/use-companies";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,7 @@ import {
 export function WorkerForm() {
   const router = useRouter();
   const { mutate: registerWorker, isPending } = useRegisterWorker();
-  const { data: companies = [] } = useCompanies();
+  const { data: companies = [], isLoading: companiesLoading, isError: companiesError } = useCompanies();
 
   const {
     register,
@@ -96,10 +97,15 @@ export function WorkerForm() {
             {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
           </div>
 
-          {/* 사업장 */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="companyId">사업장</Label>
-            {companies.length === 0 ? (
+            {companiesLoading ? (
+              <Skeleton className="h-9 w-full" />
+            ) : companiesError ? (
+              <p className="text-sm text-destructive">
+                사업장 목록을 불러올 수 없습니다. 페이지를 새로고침해 주세요.
+              </p>
+            ) : companies.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 등록된 사업장이 없습니다.{" "}
                 <Link href="/companies/new" className="text-primary hover:underline">
@@ -297,7 +303,7 @@ export function WorkerForm() {
           <Button type="button" variant="outline" onClick={() => router.back()}>
             취소
           </Button>
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" disabled={isPending || companiesLoading}>
             {isPending ? "등록 중..." : "등록"}
           </Button>
         </CardFooter>

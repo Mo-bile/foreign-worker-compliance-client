@@ -126,6 +126,17 @@ export const handlers = [
     };
     return HttpResponse.json(newCompany, { status: 201 });
   }),
+  http.put("*/api/companies/:id", async ({ params, request }) => {
+    const company = mockCompanies.find((c) => c.id === Number(params.id));
+    if (!company) {
+      return HttpResponse.json(
+        { status: 404, error: "Not Found", message: "사업장을 찾을 수 없습니다", timestamp: new Date().toISOString() },
+        { status: 404 },
+      );
+    }
+    const body = (await request.json()) as Record<string, unknown>;
+    return HttpResponse.json({ ...company, ...body, updatedAt: new Date().toISOString() });
+  }),
 
   // ─── Compliance handlers ───────────────────────────────
   http.get(`${BACKEND}/api/compliance/overdue`, () => HttpResponse.json(mockOverdueDeadlines)),

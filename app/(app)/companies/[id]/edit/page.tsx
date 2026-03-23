@@ -29,9 +29,14 @@ export default function EditCompanyPage({ params }: { readonly params: Promise<{
   }
 
   if (error || !company) {
+    const status = (error as { status?: number } | null)?.status;
+    const message =
+      status === 404
+        ? "사업장을 찾을 수 없습니다"
+        : "사업장 정보를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요.";
     return (
       <div className="py-12 text-center">
-        <p className="text-destructive">사업장을 찾을 수 없습니다</p>
+        <p className="text-destructive">{message}</p>
       </div>
     );
   }
