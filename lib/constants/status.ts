@@ -1,17 +1,17 @@
 import type { DeadlineStatus } from "@/types/api";
 
 export const DEADLINE_STATUS_BADGE_STYLES: Record<DeadlineStatus, string> = {
-  OVERDUE: "bg-red-100 text-red-800 hover:bg-red-200",
-  URGENT: "bg-orange-100 text-orange-800 hover:bg-orange-200",
-  APPROACHING: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-  PENDING: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-  COMPLETED: "bg-green-100 text-green-800 hover:bg-green-200",
+  OVERDUE: "bg-[var(--signal-red-bg)] text-[var(--signal-red)] hover:bg-[var(--signal-red-bg)]",
+  URGENT: "bg-[var(--signal-orange-bg)] text-[var(--signal-orange)] hover:bg-[var(--signal-orange-bg)]",
+  APPROACHING: "bg-[var(--signal-yellow-bg)] text-[var(--signal-yellow)] hover:bg-[var(--signal-yellow-bg)]",
+  PENDING: "bg-[var(--signal-blue-bg)] text-[var(--signal-blue)] hover:bg-[var(--signal-blue-bg)]",
+  COMPLETED: "bg-[var(--signal-green-bg)] text-[var(--signal-green)] hover:bg-[var(--signal-green-bg)]",
 } as const;
 
 type ChartableStatus = Exclude<DeadlineStatus, "OVERDUE" | "COMPLETED">;
 
 export const DEADLINE_STATUS_CHART_COLORS: Record<ChartableStatus, string> = {
-  URGENT: "#ef4444",
-  APPROACHING: "#f59e0b",
-  PENDING: "#22c55e",
+  URGENT: "var(--signal-orange)",
+  APPROACHING: "var(--signal-yellow)",
+  PENDING: "var(--signal-green)",
 } as const;
