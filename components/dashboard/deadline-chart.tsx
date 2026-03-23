@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -19,13 +19,16 @@ import type { ComplianceDeadlineResponse } from "@/types/api";
 const CHART_STATUSES = ["PENDING", "APPROACHING", "URGENT"] as const;
 type ChartStatus = (typeof CHART_STATUSES)[number];
 
+// 차트 전용 색상: OVERDUE가 제외되므로 URGENT를 빨강으로 승격하여 시각적 경고 극대화.
+// SPEC 기준 URGENT=주황이지만, 이 차트에서는 의도적 편차. 테이블 등 다른 UI에는 적용하지 않음.
 const STATUS_CONFIG: Record<ChartStatus, { color: string; label: string }> = {
   URGENT: { color: "#ef4444", label: "긴급" },
   APPROACHING: { color: "#f59e0b", label: "임박" },
   PENDING: { color: "#22c55e", label: "대기" },
 };
 
-// Stack order: bottom → top
+// Stack order bottom → top: 낮은 긴급도가 바닥, 높은 긴급도가 꼭대기.
+// 마지막 요소(URGENT)에만 radius=[4,4,0,0] 적용됨 — 순서 변경 시 radius 로직도 확인할 것.
 const STACK_ORDER: ChartStatus[] = ["PENDING", "APPROACHING", "URGENT"];
 
 export interface ChartDatum {
@@ -40,13 +43,19 @@ export interface ChartDatum {
 // ─── Helpers ─────────────────────────────────────────────
 const weekdayFormatter = new Intl.DateTimeFormat("ko-KR", { weekday: "short" });
 
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 function formatDate(iso: string): string {
-  const [, month, day] = iso.split("-");
-  return `${Number(month)}/${Number(day)}`;
+  const parts = iso.split("-");
+  if (parts.length !== 3) return iso;
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+  return Number.isNaN(m) || Number.isNaN(d) ? iso : `${m}/${d}`;
 }
 
 function formatDateWithDay(iso: string): string {
   const date = new Date(iso + "T00:00:00");
+  if (Number.isNaN(date.getTime())) return formatDate(iso);
   const weekday = weekdayFormatter.format(date);
   return `${formatDate(iso)} (${weekday})`;
 }
@@ -55,13 +64,14 @@ function isChartStatus(status: string): status is ChartStatus {
   return CHART_STATUSES.includes(status as ChartStatus);
 }
 
-// ─── Grouping Logic (exported for testing) ───────────────
+// ─── Grouping Logic (exported for unit testing only — not part of public API) ──
 export function groupDeadlinesByDateAndStatus(
   deadlines: readonly ComplianceDeadlineResponse[],
 ): ChartDatum[] {
   const grouped = new Map<string, { urgent: number; approaching: number; pending: number }>();
 
   for (const d of deadlines) {
+    if (!d.dueDate || !ISO_DATE_RE.test(d.dueDate)) continue;
     if (!isChartStatus(d.status)) continue;
 
     const entry = grouped.get(d.dueDate) ?? { urgent: 0, approaching: 0, pending: 0 };
@@ -134,11 +144,13 @@ function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
 }
 
 // ─── Custom Legend ────────────────────────────────────────
+// Legend shows highest-severity first (URGENT → PENDING), opposite of STACK_ORDER.
+const LEGEND_ORDER: readonly ChartStatus[] = [...STACK_ORDER].reverse();
+
 function ChartLegend() {
-  const items: ChartStatus[] = ["URGENT", "APPROACHING", "PENDING"];
   return (
     <div className="flex items-center justify-center gap-4 pb-2">
-      {items.map((status) => (
+      {LEGEND_ORDER.map((status) => (
         <span key={status} className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span
             className="inline-block h-2.5 w-2.5 rounded-full"
@@ -155,15 +167,20 @@ function ChartLegend() {
 interface DeadlineChartProps {
   readonly deadlines: readonly ComplianceDeadlineResponse[] | undefined;
   readonly isLoading: boolean;
-  readonly isError?: boolean;
+  readonly isError: boolean;
 }
 
 // ─── Component ───────────────────────────────────────────
 export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartProps) {
-  const prefersReducedMotion =
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const chartData = useMemo(() => {
     if (!deadlines) return [];
