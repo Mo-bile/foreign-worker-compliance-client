@@ -28,7 +28,7 @@ const STATUS_CONFIG: Record<ChartStatus, { color: string; label: string }> = {
 // Stack order: bottom → top
 const STACK_ORDER: ChartStatus[] = ["PENDING", "APPROACHING", "URGENT"];
 
-interface ChartDatum {
+export interface ChartDatum {
   readonly sortKey: string;
   readonly date: string;
   readonly displayDate: string;
@@ -53,6 +53,32 @@ function formatDateWithDay(iso: string): string {
 
 function isChartStatus(status: string): status is ChartStatus {
   return CHART_STATUSES.includes(status as ChartStatus);
+}
+
+// ─── Grouping Logic (exported for testing) ───────────────
+export function groupDeadlinesByDateAndStatus(
+  deadlines: readonly ComplianceDeadlineResponse[],
+): ChartDatum[] {
+  const grouped = new Map<string, { urgent: number; approaching: number; pending: number }>();
+
+  for (const d of deadlines) {
+    if (!isChartStatus(d.status)) continue;
+
+    const entry = grouped.get(d.dueDate) ?? { urgent: 0, approaching: 0, pending: 0 };
+    const key = d.status.toLowerCase() as "urgent" | "approaching" | "pending";
+    grouped.set(d.dueDate, { ...entry, [key]: entry[key] + 1 });
+  }
+
+  return Array.from(grouped.entries())
+    .map(
+      ([date, counts]): ChartDatum => ({
+        sortKey: date,
+        date: formatDate(date),
+        displayDate: formatDateWithDay(date),
+        ...counts,
+      }),
+    )
+    .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
 }
 
 // ─── Custom Tooltip ──────────────────────────────────────
@@ -141,27 +167,7 @@ export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartPr
 
   const chartData = useMemo(() => {
     if (!deadlines) return [];
-
-    const grouped = new Map<string, { urgent: number; approaching: number; pending: number }>();
-
-    for (const d of deadlines) {
-      if (!isChartStatus(d.status)) continue;
-
-      const entry = grouped.get(d.dueDate) ?? { urgent: 0, approaching: 0, pending: 0 };
-      const key = d.status.toLowerCase() as "urgent" | "approaching" | "pending";
-      grouped.set(d.dueDate, { ...entry, [key]: entry[key] + 1 });
-    }
-
-    return Array.from(grouped.entries())
-      .map(
-        ([date, counts]): ChartDatum => ({
-          sortKey: date,
-          date: formatDate(date),
-          displayDate: formatDateWithDay(date),
-          ...counts,
-        }),
-      )
-      .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    return groupDeadlinesByDateAndStatus(deadlines);
   }, [deadlines]);
 
   return (

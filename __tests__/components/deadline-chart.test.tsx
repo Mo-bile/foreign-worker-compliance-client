@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { DeadlineChart } from "@/components/dashboard/deadline-chart";
+import { DeadlineChart, groupDeadlinesByDateAndStatus } from "@/components/dashboard/deadline-chart";
 import type { ComplianceDeadlineResponse } from "@/types/api";
 
 function makeDeadline(
@@ -58,5 +58,41 @@ describe("DeadlineChart", () => {
     const deadlines = [makeDeadline({ id: 1, status: "PENDING", dueDate: "2026-04-01" })];
     render(<DeadlineChart deadlines={deadlines} isLoading={false} />);
     expect(screen.queryByText("데이터가 없습니다")).toBeNull();
+  });
+
+  describe("groupDeadlinesByDateAndStatus", () => {
+    it("같은_날짜의_데드라인을_상태별로_집계한다", () => {
+      const deadlines = [
+        makeDeadline({ id: 1, status: "URGENT", dueDate: "2026-04-01" }),
+        makeDeadline({ id: 2, status: "URGENT", dueDate: "2026-04-01" }),
+        makeDeadline({ id: 3, status: "APPROACHING", dueDate: "2026-04-01" }),
+        makeDeadline({ id: 4, status: "PENDING", dueDate: "2026-04-02" }),
+      ];
+      const result = groupDeadlinesByDateAndStatus(deadlines);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toMatchObject({ urgent: 2, approaching: 1, pending: 0 });
+      expect(result[1]).toMatchObject({ urgent: 0, approaching: 0, pending: 1 });
+    });
+
+    it("OVERDUE와_COMPLETED를_제외한다", () => {
+      const deadlines = [
+        makeDeadline({ id: 1, status: "OVERDUE", dueDate: "2026-04-01" }),
+        makeDeadline({ id: 2, status: "COMPLETED", dueDate: "2026-04-01" }),
+        makeDeadline({ id: 3, status: "PENDING", dueDate: "2026-04-01" }),
+      ];
+      const result = groupDeadlinesByDateAndStatus(deadlines);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({ urgent: 0, approaching: 0, pending: 1 });
+    });
+
+    it("날짜순으로_정렬한다", () => {
+      const deadlines = [
+        makeDeadline({ id: 1, status: "PENDING", dueDate: "2026-04-10" }),
+        makeDeadline({ id: 2, status: "PENDING", dueDate: "2026-04-01" }),
+      ];
+      const result = groupDeadlinesByDateAndStatus(deadlines);
+      expect(result[0]?.sortKey).toBe("2026-04-01");
+      expect(result[1]?.sortKey).toBe("2026-04-10");
+    });
   });
 });
