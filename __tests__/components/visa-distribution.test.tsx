@@ -4,9 +4,9 @@ import { VisaDistribution } from "@/components/dashboard/visa-distribution";
 import type { VisaDistributionItem } from "@/types/dashboard";
 
 const items: VisaDistributionItem[] = [
-  { type: "E-9", count: 8, percentage: 66.7 },
-  { type: "H-2", count: 3, percentage: 25.0 },
-  { type: "E-7", count: 1, percentage: 8.3 },
+  { type: "E9", count: 8, percentage: 66.7 },
+  { type: "H2", count: 3, percentage: 25.0 },
+  { type: "E7", count: 1, percentage: 8.3 },
 ];
 
 describe("VisaDistribution", () => {

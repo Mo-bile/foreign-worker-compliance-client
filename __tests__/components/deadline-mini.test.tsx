@@ -8,12 +8,12 @@ const deadlines: DashboardDeadline[] = [
     id: "1",
     title: "비자 연장",
     workerName: "Nguyen",
-    visaType: "E-9",
+    visaType: "E9",
     dDay: 4,
     urgency: "overdue",
   },
-  { id: "2", title: "보험 신고", workerName: "Pham", visaType: "E-9", dDay: 0, urgency: "d7" },
-  { id: "3", title: "계약 갱신", workerName: "Rahman", visaType: "H-2", dDay: 21, urgency: "d30" },
+  { id: "2", title: "보험 신고", workerName: "Pham", visaType: "E9", dDay: 0, urgency: "d7" },
+  { id: "3", title: "계약 갱신", workerName: "Rahman", visaType: "H2", dDay: 21, urgency: "d30" },
 ];
 
 describe("DeadlineMini", () => {

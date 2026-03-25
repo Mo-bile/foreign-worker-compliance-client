@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { http, HttpResponse } from "msw";
 import type { ReactNode } from "react";
 import { server } from "@/mocks/server";
 import { useDashboard } from "@/lib/queries/use-dashboard";
@@ -45,5 +46,32 @@ describe("useDashboard", () => {
     });
 
     expect(result.current.fetchStatus).toBe("idle");
+  });
+
+  it("companyId가_null이면_쿼리를_비활성화한다", () => {
+    const { result } = renderHook(() => useDashboard(null), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.fetchStatus).toBe("idle");
+  });
+
+  it("API_500_에러_시_에러_상태를_반환한다", async () => {
+    server.use(
+      http.get("*/api/dashboard", () =>
+        HttpResponse.json(
+          { status: 500, error: "Internal Server Error", message: "서버 에러" },
+          { status: 500 },
+        ),
+      ),
+    );
+
+    const { result } = renderHook(() => useDashboard(1), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    expect(result.current.data).toBeUndefined();
   });
 });

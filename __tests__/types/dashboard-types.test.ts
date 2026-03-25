@@ -16,7 +16,7 @@ describe("Dashboard Types", () => {
     const response: DashboardResponse = {
       stats: {
         totalWorkers: 12,
-        visaBreakdown: [{ type: "E-9", count: 8 }],
+        visaBreakdown: [{ type: "E9", count: 8 }],
         insuranceRate: 91.7,
         insuranceRateChange: 4.2,
         upcomingDeadlines: 5,

@@ -72,6 +72,17 @@ export const VISA_TYPE_LABELS: Record<VisaType, string> = {
   F6: "결혼이민",
 };
 
+export const VISA_TYPE_SHORT: Record<VisaType, string> = {
+  E9: "E-9",
+  E8: "E-8",
+  H2: "H-2",
+  E7: "E-7",
+  E7_4: "E-7-4",
+  F2: "F-2",
+  F5: "F-5",
+  F6: "F-6",
+};
+
 // ─── DeadlineType / DeadlineStatus ────────────────────────
 export const DEADLINE_TYPES = [
   "VISA_EXPIRY",

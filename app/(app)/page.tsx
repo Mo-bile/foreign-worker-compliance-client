@@ -1,5 +1,6 @@
 "use client";
 
+import { VISA_TYPE_SHORT } from "@/types/api";
 import { Users, Shield, Clock, AlertTriangle } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { AlertCard } from "@/components/dashboard/alert-card";
@@ -15,7 +16,18 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const { selectedCompanyId } = useCompanyContext();
-  const { data, isLoading, isError } = useDashboard(selectedCompanyId ?? undefined);
+  const { data, isLoading, isError, error, refetch } = useDashboard(selectedCompanyId);
+
+  if (selectedCompanyId == null) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-lg font-semibold">사업장을 선택해주세요</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          대시보드를 확인하려면 상단에서 사업장을 먼저 선택해야 합니다.
+        </p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -25,7 +37,16 @@ export default function DashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-lg font-semibold text-destructive">대시보드를 불러올 수 없습니다</p>
-        <p className="mt-2 text-sm text-muted-foreground">잠시 후 다시 시도해주세요.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {error?.message ?? "잠시 후 다시 시도해주세요."}
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-4 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+        >
+          다시 시도
+        </button>
       </div>
     );
   }
@@ -42,7 +63,7 @@ export default function DashboardPage() {
           icon={Users}
           isLoading={false}
           className="border-t-[color:var(--signal-blue)]"
-          subtitle={stats.visaBreakdown.map((v) => `${v.type} ${v.count}명`).join(" · ")}
+          subtitle={stats.visaBreakdown.map((v) => `${VISA_TYPE_SHORT[v.type]} ${v.count}명`).join(" · ")}
         />
         <StatCard
           title="보험 가입률"

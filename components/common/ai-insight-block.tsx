@@ -17,7 +17,7 @@ export function AiInsightBlock({
   showDisclaimer = true,
 }: AiInsightBlockProps) {
   const sanitizedContent = useMemo(
-    () => DOMPurify.sanitize(content, { ALLOWED_TAGS: ["strong", "em", "br"] }),
+    () => DOMPurify.sanitize(content, { ALLOWED_TAGS: ["strong", "em", "br"], ALLOWED_ATTR: [] }),
     [content],
   );
 

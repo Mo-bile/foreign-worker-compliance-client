@@ -1,3 +1,5 @@
+import type { VisaType } from "./api";
+
 export type AlertLevel = "critical" | "warning" | "info";
 export type DeadlineUrgency = "overdue" | "d7" | "d30" | "safe";
 
@@ -17,7 +19,7 @@ export interface DashboardAlert {
 }
 
 export interface VisaDistributionItem {
-  readonly type: string;
+  readonly type: VisaType;
   readonly count: number;
   readonly percentage: number;
 }
@@ -44,14 +46,14 @@ export interface DashboardDeadline {
   readonly id: string;
   readonly title: string;
   readonly workerName: string;
-  readonly visaType: string;
+  readonly visaType: VisaType;
   readonly dDay: number;
   readonly urgency: DeadlineUrgency;
 }
 
 export interface DashboardStats {
   readonly totalWorkers: number;
-  readonly visaBreakdown: readonly { readonly type: string; readonly count: number }[];
+  readonly visaBreakdown: readonly { readonly type: VisaType; readonly count: number }[];
   readonly insuranceRate: number;
   readonly insuranceRateChange: number;
   readonly upcomingDeadlines: number;
@@ -65,7 +67,7 @@ export interface DashboardResponse {
   readonly alerts: readonly DashboardAlert[];
   readonly visaDistribution: readonly VisaDistributionItem[];
   readonly insuranceSummary: readonly InsuranceSummaryItem[];
-  readonly complianceScore: ComplianceScoreData;
+  readonly complianceScore: Readonly<ComplianceScoreData>;
   readonly aiInsight: string;
   readonly upcomingDeadlines: readonly DashboardDeadline[];
 }

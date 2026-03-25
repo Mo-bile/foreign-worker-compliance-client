@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { VISA_TYPE_SHORT } from "@/types/api";
 import type { DashboardDeadline, DeadlineUrgency } from "@/types/dashboard";
 import Link from "next/link";
 
@@ -46,7 +47,7 @@ export function DeadlineMini({ deadlines }: DeadlineMiniProps) {
             <div className="min-w-0 flex-1">
               <p className="font-medium">{item.title}</p>
               <p className="text-[11px] text-muted-foreground">
-                {item.workerName} · {item.visaType}
+                {item.workerName} · {VISA_TYPE_SHORT[item.visaType]}
               </p>
             </div>
             <span className={cn("shrink-0 text-xs font-semibold", dDayColors[item.urgency])}>
