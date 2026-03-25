@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import type { CompanyResponse } from "@/types/api";
 import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies } from "./data";
+import { mockDashboard } from "@/mocks/dashboard-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
@@ -86,6 +87,9 @@ const getComplianceByWorker: Parameters<typeof http.get>[1] = ({ params }) => {
   return HttpResponse.json(deadlines);
 };
 
+const getDashboard: Parameters<typeof http.get>[1] = () =>
+  HttpResponse.json(mockDashboard);
+
 // ─── Handler registration (BACKEND + jsdom paths) ───────
 
 export const handlers = [
@@ -113,6 +117,10 @@ export const handlers = [
   http.get("*/api/compliance/worker/:id", getComplianceByWorker),
   http.get("*/api/compliance/overdue", getComplianceOverdue),
   http.get("*/api/compliance/upcoming", getComplianceUpcoming),
+
+  // Dashboard
+  http.get(`${BACKEND}/api/dashboard`, getDashboard),
+  http.get("*/api/dashboard", getDashboard),
 
   // Test endpoints (api-client tests only — BACKEND paths)
   http.get(`${BACKEND}/test`, () => HttpResponse.json({ message: "ok" })),
