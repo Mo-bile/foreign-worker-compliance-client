@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { mockDashboard } from "@/mocks/dashboard-data";
 import { handleRouteError } from "@/lib/api-route-utils";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // TODO: Replace with actual backend call when BE is ready
     // const companyId = request.nextUrl.searchParams.get("companyId");
