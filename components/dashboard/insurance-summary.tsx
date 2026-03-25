@@ -14,10 +14,9 @@ export function InsuranceSummary({ items }: InsuranceSummaryProps) {
         <CardTitle className="flex items-center gap-2 text-sm font-semibold">
           <Shield className="h-4 w-4 text-muted-foreground" />
           4대보험 현황
-          <Info
-            className="h-3.5 w-3.5 cursor-help text-muted-foreground"
-            title="비자 유형별 보험 가입 의무가 상이합니다"
-          />
+          <span title="비자 유형별 보험 가입 의무가 상이합니다">
+            <Info className="h-3.5 w-3.5 cursor-help text-muted-foreground" />
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent>
