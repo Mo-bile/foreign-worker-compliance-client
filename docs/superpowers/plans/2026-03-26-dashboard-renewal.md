@@ -6,7 +6,7 @@
 
 **Architecture:** New `GET /api/dashboard` BFF endpoint returns aggregated dashboard data from mock. Client fetches via `useDashboard()` React Query hook. Dashboard page renders 7 component types in a 2-column grid layout (main + 360px sidebar).
 
-**Tech Stack:** Next.js 16, React 19, TanStack Query v5, Recharts (existing), Tailwind CSS v4 (oklch), shadcn/ui, Lucide React, Vitest + Testing Library, MSW v2, DOMPurify (for AI content sanitization)
+**Tech Stack:** Next.js 16, React 19, TanStack Query v5, Recharts (existing), Tailwind CSS v4 (oklch), shadcn/ui, Lucide React, Vitest + Testing Library, MSW v2, isomorphic-dompurify (for AI content sanitization in both browser and jsdom/Node)
 
 **Spec:** `docs/superpowers/specs/2026-03-26-dashboard-renewal-design.md`
 **Mockup:** `../foreign-worker-compliance-project-management/design/ui-mockup-dashboard.html`
@@ -19,16 +19,18 @@
 | File | Responsibility |
 |------|---------------|
 | `types/dashboard.ts` | Dashboard API response TypeScript interfaces |
-| `lib/mock/dashboard.ts` | Mock data matching mockup hardcoded values |
+| `mocks/dashboard-data.ts` | Mock data matching mockup hardcoded values (follows existing `mocks/` convention) |
 | `app/api/dashboard/route.ts` | BFF route handler returning mock/backend data |
 | `lib/queries/use-dashboard.ts` | `useDashboard(companyId)` React Query hook |
 | `components/dashboard/alert-card.tsx` | Urgent alert card (critical/warning/info) |
 | `components/dashboard/compliance-gauge.tsx` | SVG semicircle gauge + breakdown |
 | `components/dashboard/visa-distribution.tsx` | Horizontal bar chart for visa types |
 | `components/dashboard/insurance-summary.tsx` | 4-column insurance status grid |
-| `components/common/ai-insight-block.tsx` | Reusable AI analysis block + disclaimer (DOMPurify sanitized) |
+| `components/common/ai-insight-block.tsx` | Reusable AI analysis block + disclaimer (isomorphic-dompurify sanitized) |
 | `components/dashboard/deadline-mini.tsx` | Mini timeline with urgency bars |
-| `__tests__/types/dashboard-types.test.ts` | Type guard tests |
+| `__tests__/types/dashboard-types.test.ts` | Type shape compile-time verification tests |
+| `__tests__/mocks/dashboard-data.test.ts` | Mock data structure verification tests |
+| `__tests__/pages/dashboard-page.test.tsx` | Dashboard page integration test |
 | `__tests__/components/alert-card.test.tsx` | AlertCard unit tests |
 | `__tests__/components/compliance-gauge.test.tsx` | ComplianceGauge unit tests |
 | `__tests__/components/visa-distribution.test.tsx` | VisaDistribution unit tests |
@@ -44,8 +46,7 @@
 | `app/globals.css` | Sync CSS variables with mockup oklch values; add sidebar tokens |
 | `components/dashboard/stat-card.tsx` | Add `variant`, `subtitle`, `change` props |
 | `__tests__/components/stat-card.test.tsx` | Add tests for new props |
-| `mocks/handlers.ts` | Add `GET /api/dashboard` handler |
-| `mocks/data.ts` | Re-export or reference dashboard mock |
+| `mocks/handlers.ts` | Add `GET /api/dashboard` handler (imports from `mocks/dashboard-data.ts`) |
 | `app/(app)/page.tsx` | Complete rewrite with new layout + components |
 
 ---
@@ -200,7 +201,11 @@ git commit -m "feat: add dashboard response types"
 **Files:**
 - Modify: `app/globals.css:51-144` (`:root` and `.dark` blocks)
 
-This task syncs the CSS variables with the mockup's oklch values. The main differences are in semantic tokens (`--background`, `--primary`, etc.) and adding sidebar-specific tokens from the mockup.
+This task syncs the CSS variables with the mockup's oklch values. The main changes:
+- Semantic tokens updated to mockup values (hue 260 base)
+- Sidebar changes from light theme (`0.96` lightness) to dark theme (`0.17` lightness) — the existing sidebar component uses `--sidebar` CSS variable, so it will automatically adapt
+- `--sidebar-muted` added (new variable)
+- Dark mode `--border`/`--input` keep existing opacity syntax pattern to avoid visual regression
 
 - [ ] **Step 1: Update `:root` block in globals.css**
 
@@ -251,7 +256,7 @@ Replace the `:root` block with values from `ui-mockup-dashboard.html` lines 9-60
   --chart-4: var(--signal-red);
   --chart-5: var(--accent-decorative);
 
-  /* Sidebar */
+  /* Sidebar — dark sidebar in light mode (per mockup) */
   --sidebar: oklch(0.17 0.02 260);
   --sidebar-foreground: oklch(0.85 0.01 260);
   --sidebar-primary: oklch(0.42 0.12 260);
@@ -266,7 +271,7 @@ Replace the `:root` block with values from `ui-mockup-dashboard.html` lines 9-60
 
 - [ ] **Step 2: Update `.dark` block**
 
-Replace the `.dark` block with values from mockup lines 62-92:
+Replace the `.dark` block. Note: `--border` and `--input` use solid values matching mockup (the existing opacity syntax `oklch(... / 12%)` is a Tailwind v4 convention that works differently from the mockup's approach — follow mockup for consistency across all Phase 1 screens):
 
 ```css
 .dark {
@@ -359,23 +364,24 @@ git commit -m "refactor: sync CSS variables with design mockup oklch values"
 
 ---
 
-## Task 3: Mock Data + DOMPurify Setup
+## Task 3: Mock Data + isomorphic-dompurify Setup
 
 **Files:**
-- Create: `lib/mock/dashboard.ts`
+- Create: `mocks/dashboard-data.ts`
+- Test: `__tests__/mocks/dashboard-data.test.ts`
 
-- [ ] **Step 1: Install DOMPurify**
+- [ ] **Step 1: Install isomorphic-dompurify**
 
-Run: `npm install dompurify && npm install -D @types/dompurify`
+Run: `npm install isomorphic-dompurify`
 
-DOMPurify is used to sanitize AI-generated HTML content in the AiInsightBlock component (Task 10). The AI insight content contains `<strong>` tags for emphasis, which are rendered via `dangerouslySetInnerHTML`. Even though the content comes from our own backend, sanitization prevents XSS if the backend is ever compromised.
+`isomorphic-dompurify` wraps DOMPurify to work in both browser and Node/jsdom environments. This is needed because `AiInsightBlock` (Task 10) runs in both browser (production) and jsdom (Vitest tests). Regular `dompurify` may fail in Node without a `window` object.
 
 - [ ] **Step 2: Create mock data file**
 
-Data is directly from the mockup HTML hardcoded values:
+Follow existing convention: mock data lives in `mocks/` directory (alongside `mocks/data.ts` and `mocks/handlers.ts`).
 
 ```typescript
-// lib/mock/dashboard.ts
+// mocks/dashboard-data.ts
 import type { DashboardResponse } from "@/types/dashboard";
 
 export const mockDashboard: DashboardResponse = {
@@ -459,11 +465,55 @@ export const mockDashboard: DashboardResponse = {
 };
 ```
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Write mock data verification test**
+
+```typescript
+// __tests__/mocks/dashboard-data.test.ts
+import { describe, it, expect } from "vitest";
+import { mockDashboard } from "@/mocks/dashboard-data";
+
+describe("mockDashboard", () => {
+  it("stats_필드가_올바른_구조를_갖는다", () => {
+    expect(mockDashboard.stats.totalWorkers).toBe(12);
+    expect(mockDashboard.stats.visaBreakdown).toHaveLength(3);
+    expect(mockDashboard.stats.insuranceRate).toBe(91.7);
+    expect(mockDashboard.stats.urgentActions).toBe(3);
+  });
+
+  it("alerts가_3개_있다", () => {
+    expect(mockDashboard.alerts).toHaveLength(3);
+    expect(mockDashboard.alerts[0].level).toBe("critical");
+    expect(mockDashboard.alerts[1].level).toBe("warning");
+    expect(mockDashboard.alerts[2].level).toBe("info");
+  });
+
+  it("complianceScore_total이_73이다", () => {
+    expect(mockDashboard.complianceScore.total).toBe(73);
+    expect(mockDashboard.complianceScore.breakdown).toHaveLength(3);
+  });
+
+  it("upcomingDeadlines가_5개_있다", () => {
+    expect(mockDashboard.upcomingDeadlines).toHaveLength(5);
+  });
+
+  it("모든_alert에_actions가_있다", () => {
+    for (const alert of mockDashboard.alerts) {
+      expect(alert.actions.length).toBeGreaterThan(0);
+    }
+  });
+});
+```
+
+- [ ] **Step 4: Run test**
+
+Run: `npx vitest run __tests__/mocks/dashboard-data.test.ts`
+Expected: PASS
+
+- [ ] **Step 5: Commit**
 
 ```bash
-git add lib/mock/dashboard.ts package.json package-lock.json
-git commit -m "feat: add dashboard mock data and DOMPurify dependency"
+git add mocks/dashboard-data.ts __tests__/mocks/dashboard-data.test.ts package.json package-lock.json
+git commit -m "feat: add dashboard mock data and isomorphic-dompurify dependency"
 ```
 
 ---
@@ -507,7 +557,7 @@ Expected: FAIL (module not found)
 ```typescript
 // app/api/dashboard/route.ts
 import { NextResponse, type NextRequest } from "next/server";
-import { mockDashboard } from "@/lib/mock/dashboard";
+import { mockDashboard } from "@/mocks/dashboard-data";
 import { handleRouteError } from "@/lib/api-route-utils";
 
 export async function GET(request: NextRequest) {
@@ -530,7 +580,7 @@ In `mocks/handlers.ts`, add the import and handler:
 
 ```typescript
 // Add import at top
-import { mockDashboard } from "@/lib/mock/dashboard";
+import { mockDashboard } from "@/mocks/dashboard-data";
 
 // Add handler callback before handler registration
 const getDashboard: Parameters<typeof http.get>[1] = () =>
@@ -896,6 +946,19 @@ const criticalAlert: DashboardAlert = {
   ],
 };
 
+const warningAlert: DashboardAlert = {
+  id: "2",
+  level: "warning",
+  title: "건강보험 미가입 — Pham Thi B",
+  description: "입사 후 14일이 경과했으나 건강보험 취득신고가 완료되지 않았습니다.",
+  dDay: 0,
+  badgeText: "D-0",
+  actions: [
+    { label: "일정 확인", href: "/deadlines" },
+    { label: "조치하기", href: "/workers/2" },
+  ],
+};
+
 const infoAlert: DashboardAlert = {
   id: "3",
   level: "info",
@@ -928,6 +991,12 @@ describe("AlertCard", () => {
     const { container } = render(<AlertCard alert={criticalAlert} />);
     const card = container.firstElementChild as HTMLElement;
     expect(card.className).toContain("bg-signal-red-bg");
+  });
+
+  it("warning_레벨에_signal-orange-bg_배경이다", () => {
+    const { container } = render(<AlertCard alert={warningAlert} />);
+    const card = container.firstElementChild as HTMLElement;
+    expect(card.className).toContain("bg-signal-orange-bg");
   });
 
   it("info_레벨에_signal-blue-bg_배경이다", () => {
@@ -1318,6 +1387,13 @@ describe("InsuranceSummary", () => {
     render(<InsuranceSummary items={items} />);
     expect(screen.getByText("4대보험 현황")).toBeDefined();
   });
+
+  it("보험_의무_안내_툴팁이_있다", () => {
+    render(<InsuranceSummary items={items} />);
+    expect(
+      screen.getByTitle("비자 유형별 보험 가입 의무가 상이합니다"),
+    ).toBeDefined();
+  });
 });
 ```
 
@@ -1383,7 +1459,7 @@ export function VisaDistribution({ items }: VisaDistributionProps) {
 ```tsx
 // components/dashboard/insurance-summary.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield } from "lucide-react";
+import { Shield, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { InsuranceSummaryItem } from "@/types/dashboard";
 
@@ -1398,6 +1474,10 @@ export function InsuranceSummary({ items }: InsuranceSummaryProps) {
         <CardTitle className="flex items-center gap-2 text-sm font-semibold">
           <Shield className="h-4 w-4 text-muted-foreground" />
           4대보험 현황
+          <Info
+            className="h-3.5 w-3.5 cursor-help text-muted-foreground"
+            title="비자 유형별 보험 가입 의무가 상이합니다"
+          />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -1482,6 +1562,14 @@ describe("AiInsightBlock", () => {
       screen.queryByText(/본 서비스는 법률 자문이 아닌 관리 보조 도구입니다/),
     ).toBeNull();
   });
+
+  it("XSS_스크립트를_제거한다", () => {
+    const { container } = render(
+      <AiInsightBlock content='<script>alert("xss")</script>안전한 텍스트' />,
+    );
+    expect(container.querySelector("script")).toBeNull();
+    expect(screen.getByText("안전한 텍스트")).toBeDefined();
+  });
 });
 ```
 
@@ -1534,14 +1622,14 @@ Expected: FAIL
 
 - [ ] **Step 4: Implement AiInsightBlock**
 
-Uses DOMPurify to sanitize HTML content before rendering. This prevents XSS even though the content comes from our backend — defense in depth.
+Uses `isomorphic-dompurify` to sanitize HTML content before rendering. This prevents XSS even though the content comes from our backend — defense in depth. `isomorphic-dompurify` works in both browser and Node/jsdom (Vitest).
 
 ```tsx
 // components/common/ai-insight-block.tsx
 "use client";
 
 import { useMemo } from "react";
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lightbulb } from "lucide-react";
 
@@ -1685,7 +1773,65 @@ git commit -m "feat: add AiInsightBlock and DeadlineMini components"
 **Files:**
 - Modify: `app/(app)/page.tsx` (complete rewrite)
 
-- [ ] **Step 1: Rewrite the dashboard page**
+- [ ] **Step 1: Write integration test**
+
+```tsx
+// __tests__/pages/dashboard-page.test.tsx
+import { describe, it, expect } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+import DashboardPage from "@/app/(app)/page";
+
+// Mock company context
+vi.mock("@/lib/contexts/company-context", () => ({
+  useCompanyContext: () => ({ selectedCompanyId: 1, companies: [] }),
+}));
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  };
+}
+
+describe("DashboardPage", () => {
+  it("모든_대시보드_섹션을_렌더링한다", async () => {
+    render(<DashboardPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText("등록 근로자")).toBeDefined();
+    });
+
+    // Stat cards
+    expect(screen.getByText("12")).toBeDefined();
+    expect(screen.getByText("보험 가입률")).toBeDefined();
+    expect(screen.getByText("긴급 조치 필요")).toBeDefined();
+
+    // Alerts
+    expect(screen.getByText(/비자 만료 임박/)).toBeDefined();
+    expect(screen.getByText(/건강보험 미가입/)).toBeDefined();
+
+    // Sections
+    expect(screen.getByText("비자 유형별 분포")).toBeDefined();
+    expect(screen.getByText("4대보험 현황")).toBeDefined();
+    expect(screen.getByText("AI 인사이트")).toBeDefined();
+    expect(screen.getByText("컴플라이언스 점수")).toBeDefined();
+    expect(screen.getByText("다가오는 데드라인")).toBeDefined();
+  });
+});
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `npx vitest run __tests__/pages/dashboard-page.test.tsx`
+Expected: FAIL (page not yet rewritten)
+
+- [ ] **Step 3: Rewrite the dashboard page**
 
 ```tsx
 // app/(app)/page.tsx
@@ -1706,10 +1852,19 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const { selectedCompanyId } = useCompanyContext();
-  const { data, isLoading } = useDashboard(selectedCompanyId ?? undefined);
+  const { data, isLoading, isError } = useDashboard(selectedCompanyId ?? undefined);
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return <DashboardSkeleton />;
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-lg font-semibold text-destructive">대시보드를 불러올 수 없습니다</p>
+        <p className="mt-2 text-sm text-muted-foreground">잠시 후 다시 시도해주세요.</p>
+      </div>
+    );
   }
 
   const { stats } = data;
@@ -1827,21 +1982,21 @@ function DashboardSkeleton() {
 }
 ```
 
-- [ ] **Step 2: Verify build**
+- [ ] **Step 4: Verify build**
 
 Run: `npm run build`
 Expected: Build succeeds
 
-- [ ] **Step 3: Run all tests**
+- [ ] **Step 5: Run all tests (including integration test)**
 
 Run: `npm run test`
 Expected: All tests pass
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add app/(app)/page.tsx
-git commit -m "feat: assemble dashboard page with all new components"
+git add app/(app)/page.tsx __tests__/pages/dashboard-page.test.tsx
+git commit -m "feat: assemble dashboard page with all new components and integration test"
 ```
 
 ---
@@ -1854,15 +2009,17 @@ Run: `npm run dev`
 Open: `http://localhost:3000`
 
 Check:
+- [ ] **Sidebar**: Dark sidebar with light text (light→dark change from CSS sync). Nav items, logo, user card all readable
 - [ ] 4 stat cards with correct layout (3+1, urgent card spans 2 rows)
 - [ ] 3 alert cards (critical red, warning orange, info blue)
 - [ ] Visa distribution bars with correct percentages
-- [ ] 4대보험 grid with ok/warn status colors
+- [ ] 4대보험 grid with ok/warn status colors + info tooltip
 - [ ] AI insight block with ✦ tag and disclaimer
 - [ ] Compliance gauge SVG with score 73
 - [ ] Deadline mini timeline with urgency bars
-- [ ] Dark mode toggle works correctly
+- [ ] Dark mode toggle works correctly (including sidebar staying dark)
 - [ ] No layout overflow or misalignment
+- [ ] Existing pages (workers, companies, compliance) still look correct with new CSS values
 
 - [ ] **Step 2: Fix any visual issues found**
 
