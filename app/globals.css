@@ -63,21 +63,21 @@
 
 :root {
   /* shadcn semantic tokens — Light */
-  --background: oklch(0.99 0.00 0);
+  --background: oklch(0.99 0 0);
   --foreground: oklch(0.15 0.01 260);
-  --card: oklch(1.00 0.00 0);
+  --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0.01 260);
-  --popover: oklch(1.00 0.00 0);
+  --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0.01 260);
   --primary: oklch(0.42 0.12 260);
-  --primary-foreground: oklch(0.98 0.00 0);
+  --primary-foreground: oklch(0.98 0 0);
   --secondary: oklch(0.96 0.01 260);
   --secondary-foreground: oklch(0.25 0.02 260);
   --muted: oklch(0.96 0.01 260);
   --muted-foreground: oklch(0.55 0.02 260);
   --accent: oklch(0.96 0.01 260);
   --accent-foreground: oklch(0.25 0.02 260);
-  --destructive: oklch(0.55 0.20 25);
+  --destructive: oklch(0.55 0.2 25);
   --border: oklch(0.91 0.01 260);
   --input: oklch(0.91 0.01 260);
   --ring: oklch(0.42 0.12 260);
@@ -85,13 +85,13 @@
   --accent-decorative: oklch(0.72 0.12 85);
 
   /* Signal colors */
-  --signal-red: oklch(0.55 0.20 25);
+  --signal-red: oklch(0.55 0.2 25);
   --signal-red-bg: oklch(0.92 0.04 25);
   --signal-orange: oklch(0.65 0.18 55);
   --signal-orange-bg: oklch(0.93 0.04 55);
   --signal-yellow: oklch(0.65 0.16 85);
   --signal-yellow-bg: oklch(0.95 0.04 85);
-  --signal-blue: oklch(0.50 0.15 255);
+  --signal-blue: oklch(0.5 0.15 255);
   --signal-blue-bg: oklch(0.93 0.04 255);
   --signal-green: oklch(0.52 0.15 155);
   --signal-green-bg: oklch(0.94 0.04 155);
@@ -109,9 +109,9 @@
   --sidebar: oklch(0.17 0.02 260);
   --sidebar-foreground: oklch(0.85 0.01 260);
   --sidebar-primary: oklch(0.42 0.12 260);
-  --sidebar-primary-foreground: oklch(0.95 0.00 0);
+  --sidebar-primary-foreground: oklch(0.95 0 0);
   --sidebar-accent: oklch(0.22 0.02 260);
-  --sidebar-accent-foreground: oklch(0.95 0.00 0);
+  --sidebar-accent-foreground: oklch(0.95 0 0);
   --sidebar-border: oklch(0.25 0.02 260);
   --sidebar-ring: oklch(0.42 0.12 260);
   --sidebar-muted: oklch(0.55 0.02 260);
@@ -129,10 +129,10 @@
   --secondary: oklch(0.22 0.02 260);
   --secondary-foreground: oklch(0.85 0.01 260);
   --muted: oklch(0.22 0.02 260);
-  --muted-foreground: oklch(0.60 0.02 260);
+  --muted-foreground: oklch(0.6 0.02 260);
   --accent: oklch(0.22 0.02 260);
   --accent-foreground: oklch(0.85 0.01 260);
-  --destructive: oklch(0.60 0.22 25);
+  --destructive: oklch(0.6 0.22 25);
   --border: oklch(0.28 0.02 260);
   --input: oklch(0.28 0.02 260);
   --ring: oklch(0.65 0.15 255);
@@ -142,8 +142,8 @@
   --signal-red-bg: oklch(0.22 0.06 25);
   --signal-orange-bg: oklch(0.22 0.06 55);
   --signal-yellow-bg: oklch(0.22 0.06 85);
-  --signal-blue-bg: oklch(0.20 0.06 255);
-  --signal-green-bg: oklch(0.20 0.06 155);
+  --signal-blue-bg: oklch(0.2 0.06 255);
+  --signal-green-bg: oklch(0.2 0.06 155);
   --signal-gray-bg: oklch(0.22 0.01 255);
 
   /* Chart */
@@ -159,7 +159,7 @@
   --sidebar-primary: oklch(0.65 0.15 255);
   --sidebar-primary-foreground: oklch(0.13 0.01 260);
   --sidebar-accent: oklch(0.24 0.05 255);
-  --sidebar-accent-foreground: oklch(0.95 0.00 0);
+  --sidebar-accent-foreground: oklch(0.95 0 0);
   --sidebar-border: oklch(0.28 0.02 260);
   --sidebar-ring: oklch(0.65 0.15 255);
   --sidebar-muted: oklch(0.55 0.02 260);

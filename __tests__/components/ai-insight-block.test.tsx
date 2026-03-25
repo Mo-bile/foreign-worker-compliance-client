@@ -15,16 +15,12 @@ describe("AiInsightBlock", () => {
 
   it("면책_고지를_표시한다", () => {
     render(<AiInsightBlock content="테스트" />);
-    expect(
-      screen.getByText(/본 서비스는 법률 자문이 아닌 관리 보조 도구입니다/),
-    ).toBeDefined();
+    expect(screen.getByText(/본 서비스는 법률 자문이 아닌 관리 보조 도구입니다/)).toBeDefined();
   });
 
   it("면책_고지를_숨길_수_있다", () => {
     render(<AiInsightBlock content="테스트" showDisclaimer={false} />);
-    expect(
-      screen.queryByText(/본 서비스는 법률 자문이 아닌 관리 보조 도구입니다/),
-    ).toBeNull();
+    expect(screen.queryByText(/본 서비스는 법률 자문이 아닌 관리 보조 도구입니다/)).toBeNull();
   });
 
   it("XSS_스크립트를_제거한다", () => {

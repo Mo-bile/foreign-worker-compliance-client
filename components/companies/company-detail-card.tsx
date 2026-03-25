@@ -28,9 +28,7 @@ export function CompanyDetailCard({ company }: CompanyDetailCardProps) {
             <dt className="text-sm text-muted-foreground">업종</dt>
             <dd className="font-medium">
               {company.industryCategoryName}
-              {company.industrySubCategory
-                ? ` (${company.industrySubCategory})`
-                : ""}
+              {company.industrySubCategory ? ` (${company.industrySubCategory})` : ""}
             </dd>
           </div>
           <div>

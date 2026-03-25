@@ -22,18 +22,13 @@ export function InsuranceSummary({ items }: InsuranceSummaryProps) {
       <CardContent>
         <div className="grid grid-cols-4 gap-2">
           {items.map((item) => (
-            <div
-              key={item.type}
-              className="rounded-lg bg-secondary p-3 text-center"
-            >
+            <div key={item.type} className="rounded-lg bg-secondary p-3 text-center">
               <p className="text-xl font-bold">{item.enrolled}</p>
               <p className="text-[10px] text-muted-foreground">{item.label}</p>
               <p
                 className={cn(
                   "mt-0.5 text-[10px]",
-                  item.status === "ok"
-                    ? "text-signal-green"
-                    : "text-signal-orange",
+                  item.status === "ok" ? "text-signal-green" : "text-signal-orange",
                 )}
               >
                 {item.statusText}

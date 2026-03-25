@@ -70,7 +70,11 @@ describe("CompanyContext", () => {
   });
 
   it("API_에러_시_isError가_true이다", async () => {
-    server.use(http.get("*/api/companies", () => HttpResponse.json({ message: "서버 오류" }, { status: 500 })));
+    server.use(
+      http.get("*/api/companies", () =>
+        HttpResponse.json({ message: "서버 오류" }, { status: 500 }),
+      ),
+    );
     const { result } = renderHook(() => useCompanyContext(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isError).toBe(true));
   });

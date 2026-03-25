@@ -14,9 +14,11 @@ import type { PaginatedResult } from "@/lib/pagination";
 export function useOverdueDeadlines() {
   return useQuery<readonly ComplianceDeadlineResponse[]>({
     queryKey: ["compliance", "overdue"],
-    queryFn: () => fetchApi<readonly ComplianceDeadlineResponse[]>(
-      "/api/compliance/overdue", "기한초과 데이터를 불러올 수 없습니다",
-    ),
+    queryFn: () =>
+      fetchApi<readonly ComplianceDeadlineResponse[]>(
+        "/api/compliance/overdue",
+        "기한초과 데이터를 불러올 수 없습니다",
+      ),
     refetchInterval: 30_000,
   });
 }
@@ -24,9 +26,11 @@ export function useOverdueDeadlines() {
 export function useUpcomingDeadlines(days: number = 30) {
   return useQuery<readonly ComplianceDeadlineResponse[]>({
     queryKey: ["compliance", "upcoming", days],
-    queryFn: () => fetchApi<readonly ComplianceDeadlineResponse[]>(
-      `/api/compliance/upcoming?days=${days}`, "임박 데드라인을 불러올 수 없습니다",
-    ),
+    queryFn: () =>
+      fetchApi<readonly ComplianceDeadlineResponse[]>(
+        `/api/compliance/upcoming?days=${days}`,
+        "임박 데드라인을 불러올 수 없습니다",
+      ),
     refetchInterval: 30_000,
   });
 }
@@ -34,9 +38,11 @@ export function useUpcomingDeadlines(days: number = 30) {
 export function useWorkerDeadlines(workerId: number) {
   return useQuery<readonly ComplianceDeadlineResponse[]>({
     queryKey: ["compliance", "worker", workerId],
-    queryFn: () => fetchApi<readonly ComplianceDeadlineResponse[]>(
-      `/api/compliance/worker/${workerId}`, "데드라인 정보를 불러올 수 없습니다",
-    ),
+    queryFn: () =>
+      fetchApi<readonly ComplianceDeadlineResponse[]>(
+        `/api/compliance/worker/${workerId}`,
+        "데드라인 정보를 불러올 수 없습니다",
+      ),
     enabled: workerId > 0,
   });
 }

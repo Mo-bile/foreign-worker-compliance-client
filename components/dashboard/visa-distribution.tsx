@@ -35,9 +35,7 @@ export function VisaDistribution({ items }: VisaDistributionProps) {
                 style={{ width: `${item.percentage}%` }}
               />
             </div>
-            <span className="w-9 text-right text-xs font-semibold">
-              {item.count}명
-            </span>
+            <span className="w-9 text-right text-xs font-semibold">{item.count}명</span>
           </div>
         ))}
       </CardContent>

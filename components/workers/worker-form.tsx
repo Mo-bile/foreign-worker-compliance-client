@@ -33,7 +33,11 @@ import {
 export function WorkerForm() {
   const router = useRouter();
   const { mutate: registerWorker, isPending } = useRegisterWorker();
-  const { data: companies = [], isLoading: companiesLoading, isError: companiesError } = useCompanies();
+  const {
+    data: companies = [],
+    isLoading: companiesLoading,
+    isError: companiesError,
+  } = useCompanies();
 
   const {
     register,
@@ -86,7 +90,13 @@ export function WorkerForm() {
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* 이름 */}
-          <FormField<RegisterWorkerRequest> label="이름" name="name" register={register} errors={errors} placeholder="홍길동" />
+          <FormField<RegisterWorkerRequest>
+            label="이름"
+            name="name"
+            register={register}
+            errors={errors}
+            placeholder="홍길동"
+          />
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="companyId">사업장</Label>
@@ -112,7 +122,12 @@ export function WorkerForm() {
                     value={field.value != null ? String(field.value) : undefined}
                     onValueChange={(val) => field.onChange(Number(val))}
                   >
-                    <SelectTrigger id="companyId" aria-label="사업장" aria-invalid={!!errors.companyId} className="w-full">
+                    <SelectTrigger
+                      id="companyId"
+                      aria-label="사업장"
+                      aria-invalid={!!errors.companyId}
+                      className="w-full"
+                    >
                       <SelectValue placeholder="사업장 선택" />
                     </SelectTrigger>
                     <SelectContent>
@@ -126,7 +141,9 @@ export function WorkerForm() {
                 )}
               />
             )}
-            {errors.companyId && <p className="text-sm text-destructive">{errors.companyId.message}</p>}
+            {errors.companyId && (
+              <p className="text-sm text-destructive">{errors.companyId.message}</p>
+            )}
           </div>
 
           {/* 국적 */}
@@ -192,28 +209,78 @@ export function WorkerForm() {
           </div>
 
           {/* 비자 만료일 */}
-          <FormField<RegisterWorkerRequest> label="비자 만료일" name="visaExpiryDate" register={register} errors={errors} type="date" />
+          <FormField<RegisterWorkerRequest>
+            label="비자 만료일"
+            name="visaExpiryDate"
+            register={register}
+            errors={errors}
+            type="date"
+          />
 
           {/* 입국일 */}
-          <FormField<RegisterWorkerRequest> label="입국일" name="entryDate" register={register} errors={errors} type="date" />
+          <FormField<RegisterWorkerRequest>
+            label="입국일"
+            name="entryDate"
+            register={register}
+            errors={errors}
+            type="date"
+          />
 
           {/* 계약 시작일 */}
-          <FormField<RegisterWorkerRequest> label="계약 시작일" name="contractStartDate" register={register} errors={errors} type="date" />
+          <FormField<RegisterWorkerRequest>
+            label="계약 시작일"
+            name="contractStartDate"
+            register={register}
+            errors={errors}
+            type="date"
+          />
 
           {/* 계약 종료일 (선택) */}
-          <FormField<RegisterWorkerRequest> label="계약 종료일 (선택)" name="contractEndDate" register={register} errors={errors} type="date" />
+          <FormField<RegisterWorkerRequest>
+            label="계약 종료일 (선택)"
+            name="contractEndDate"
+            register={register}
+            errors={errors}
+            type="date"
+          />
 
           {/* 여권번호 (선택) */}
-          <FormField<RegisterWorkerRequest> label="여권번호 (선택)" name="passportNumber" register={register} errors={errors} placeholder="M12345678" />
+          <FormField<RegisterWorkerRequest>
+            label="여권번호 (선택)"
+            name="passportNumber"
+            register={register}
+            errors={errors}
+            placeholder="M12345678"
+          />
 
           {/* 외국인등록번호 (선택) */}
-          <FormField<RegisterWorkerRequest> label="외국인등록번호 (선택)" name="registrationNumber" register={register} errors={errors} placeholder="000000-0000000" />
+          <FormField<RegisterWorkerRequest>
+            label="외국인등록번호 (선택)"
+            name="registrationNumber"
+            register={register}
+            errors={errors}
+            placeholder="000000-0000000"
+          />
 
           {/* 연락처 (선택) */}
-          <FormField<RegisterWorkerRequest> label="연락처 (선택)" name="contactPhone" register={register} errors={errors} type="tel" placeholder="010-0000-0000" />
+          <FormField<RegisterWorkerRequest>
+            label="연락처 (선택)"
+            name="contactPhone"
+            register={register}
+            errors={errors}
+            type="tel"
+            placeholder="010-0000-0000"
+          />
 
           {/* 이메일 (선택) */}
-          <FormField<RegisterWorkerRequest> label="이메일 (선택)" name="contactEmail" register={register} errors={errors} type="email" placeholder="example@email.com" />
+          <FormField<RegisterWorkerRequest>
+            label="이메일 (선택)"
+            name="contactEmail"
+            register={register}
+            errors={errors}
+            type="email"
+            placeholder="example@email.com"
+          />
         </CardContent>
 
         <CardFooter className="flex justify-end gap-2">

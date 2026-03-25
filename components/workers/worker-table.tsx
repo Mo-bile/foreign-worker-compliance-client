@@ -17,9 +17,12 @@ const VISA_FILTER_LABELS: Record<VisaType, string> = Object.fromEntries(
 ) as Record<VisaType, string>;
 
 const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
-  ACTIVE: "bg-[var(--signal-green-bg)] text-[var(--signal-green)] px-2 py-0.5 rounded-full text-xs font-medium",
-  INACTIVE: "bg-[var(--signal-gray-bg)] text-[var(--signal-gray)] px-2 py-0.5 rounded-full text-xs font-medium",
-  TERMINATED: "bg-[var(--signal-red-bg)] text-[var(--signal-red)] px-2 py-0.5 rounded-full text-xs font-medium",
+  ACTIVE:
+    "bg-[var(--signal-green-bg)] text-[var(--signal-green)] px-2 py-0.5 rounded-full text-xs font-medium",
+  INACTIVE:
+    "bg-[var(--signal-gray-bg)] text-[var(--signal-gray)] px-2 py-0.5 rounded-full text-xs font-medium",
+  TERMINATED:
+    "bg-[var(--signal-red-bg)] text-[var(--signal-red)] px-2 py-0.5 rounded-full text-xs font-medium",
 };
 import {
   Table,

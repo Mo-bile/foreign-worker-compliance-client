@@ -17,7 +17,9 @@ describe("StatCard", () => {
   });
 
   it("에러_상태에서_대시를_표시한다", () => {
-    render(<StatCard title="전체 근로자" value={undefined} icon={Users} isLoading={false} isError />);
+    render(
+      <StatCard title="전체 근로자" value={undefined} icon={Users} isLoading={false} isError />,
+    );
     expect(screen.getByText("—")).toBeDefined();
   });
 
@@ -60,13 +62,7 @@ describe("StatCard", () => {
 
   it("urgent_variant에서_signal-red-bg_배경을_적용한다", () => {
     const { container } = render(
-      <StatCard
-        title="긴급 조치"
-        value={3}
-        icon={Users}
-        isLoading={false}
-        variant="urgent"
-      />,
+      <StatCard title="긴급 조치" value={3} icon={Users} isLoading={false} variant="urgent" />,
     );
     const card = container.firstElementChild as HTMLElement;
     expect(card.className).toContain("bg-signal-red-bg");
@@ -128,13 +124,7 @@ describe("StatCard", () => {
 
   it("valueSuffix를_렌더링한다", () => {
     render(
-      <StatCard
-        title="보험 가입률"
-        value={91.7}
-        icon={Users}
-        isLoading={false}
-        valueSuffix="%"
-      />,
+      <StatCard title="보험 가입률" value={91.7} icon={Users} isLoading={false} valueSuffix="%" />,
     );
     expect(screen.getByText("%")).toBeDefined();
   });

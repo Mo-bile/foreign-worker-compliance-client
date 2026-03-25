@@ -41,9 +41,7 @@ export function FormField<T extends FieldValues>({
           disabled={disabled}
         />
       )}
-      {error && (
-        <p className="text-sm text-destructive">{error.message}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error.message}</p>}
     </div>
   );
 }

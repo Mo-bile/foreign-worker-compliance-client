@@ -3,12 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  REGIONS,
-  REGION_LABELS,
-  INDUSTRY_CATEGORIES,
-  INDUSTRY_CATEGORY_LABELS,
-} from "@/types/api";
+import { REGIONS, REGION_LABELS, INDUSTRY_CATEGORIES, INDUSTRY_CATEGORY_LABELS } from "@/types/api";
 import type { CompanyResponse, Region, IndustryCategory, FilterOption } from "@/types/api";
 import {
   Table,
@@ -46,16 +41,12 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
   const filtered = companies.filter((c) => {
     if (search.trim() !== "") {
       const s = search.toLowerCase();
-      if (
-        !c.name.toLowerCase().includes(s) &&
-        !c.businessNumber.includes(s)
-      ) {
+      if (!c.name.toLowerCase().includes(s) && !c.businessNumber.includes(s)) {
         return false;
       }
     }
     if (regionFilter !== "ALL" && c.region !== regionFilter) return false;
-    if (industryFilter !== "ALL" && c.industryCategory !== industryFilter)
-      return false;
+    if (industryFilter !== "ALL" && c.industryCategory !== industryFilter) return false;
     return true;
   });
 
@@ -91,7 +82,10 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
         />
         <FilterSelect
           value={regionFilter}
-          onValueChange={(v) => { setRegionFilter(v as FilterOption<Region>); setPage(1); }}
+          onValueChange={(v) => {
+            setRegionFilter(v as FilterOption<Region>);
+            setPage(1);
+          }}
           placeholder="지역 전체"
           options={[...REGIONS]}
           labelMap={REGION_LABELS}
@@ -99,7 +93,10 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
         />
         <FilterSelect
           value={industryFilter}
-          onValueChange={(v) => { setIndustryFilter(v as FilterOption<IndustryCategory>); setPage(1); }}
+          onValueChange={(v) => {
+            setIndustryFilter(v as FilterOption<IndustryCategory>);
+            setPage(1);
+          }}
           placeholder="업종 전체"
           options={[...INDUSTRY_CATEGORIES]}
           labelMap={INDUSTRY_CATEGORY_LABELS}
@@ -112,7 +109,9 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
           message="등록된 사업장이 없습니다"
           action={
             <Link href="/companies/new">
-              <Button variant="outline" size="sm">첫 사업장을 등록해보세요</Button>
+              <Button variant="outline" size="sm">
+                첫 사업장을 등록해보세요
+              </Button>
             </Link>
           }
         />
@@ -139,9 +138,7 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
                   onClick={() => router.push(`/companies/${c.id}`)}
                 >
                   <TableCell className="font-medium">{c.name}</TableCell>
-                  <TableCell className="font-mono text-xs">
-                    {c.businessNumber}
-                  </TableCell>
+                  <TableCell className="font-mono text-xs">{c.businessNumber}</TableCell>
                   <TableCell>{c.regionName}</TableCell>
                   <TableCell>{c.industryCategoryName}</TableCell>
                   <TableCell>{c.employeeCount}명</TableCell>

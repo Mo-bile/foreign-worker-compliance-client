@@ -84,9 +84,7 @@ export function ComplianceGauge({ data }: ComplianceGaugeProps) {
         <div className="mt-5 grid grid-cols-3 gap-3">
           {data.breakdown.map((item) => (
             <div key={item.label} className="rounded-lg bg-secondary p-3 text-center">
-              <p className={cn("text-lg font-bold", getScoreColor(item.score))}>
-                {item.score}
-              </p>
+              <p className={cn("text-lg font-bold", getScoreColor(item.score))}>{item.score}</p>
               <p className="mt-0.5 text-[11px] text-muted-foreground">{item.label}</p>
             </div>
           ))}

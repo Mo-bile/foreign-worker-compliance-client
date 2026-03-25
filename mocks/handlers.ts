@@ -11,7 +11,12 @@ const getWorkerById: Parameters<typeof http.get>[1] = ({ params }) => {
   const worker = mockWorkers.find((w) => w.id === Number(params.id));
   if (!worker) {
     return HttpResponse.json(
-      { status: 404, error: "Not Found", message: "근로자를 찾을 수 없습니다", timestamp: new Date().toISOString() },
+      {
+        status: 404,
+        error: "Not Found",
+        message: "근로자를 찾을 수 없습니다",
+        timestamp: new Date().toISOString(),
+      },
       { status: 404 },
     );
   }
@@ -42,7 +47,12 @@ const getCompanyById: Parameters<typeof http.get>[1] = ({ params }) => {
   const company = mockCompanies.find((c) => c.id === Number(params.id));
   if (!company) {
     return HttpResponse.json(
-      { status: 404, error: "Not Found", message: "사업장을 찾을 수 없습니다", timestamp: new Date().toISOString() },
+      {
+        status: 404,
+        error: "Not Found",
+        message: "사업장을 찾을 수 없습니다",
+        timestamp: new Date().toISOString(),
+      },
       { status: 404 },
     );
   }
@@ -66,7 +76,12 @@ const putCompany: Parameters<typeof http.put>[1] = async ({ params, request }) =
   const company = mockCompanies.find((c) => c.id === Number(params.id));
   if (!company) {
     return HttpResponse.json(
-      { status: 404, error: "Not Found", message: "사업장을 찾을 수 없습니다", timestamp: new Date().toISOString() },
+      {
+        status: 404,
+        error: "Not Found",
+        message: "사업장을 찾을 수 없습니다",
+        timestamp: new Date().toISOString(),
+      },
       { status: 404 },
     );
   }
@@ -87,8 +102,7 @@ const getComplianceByWorker: Parameters<typeof http.get>[1] = ({ params }) => {
   return HttpResponse.json(deadlines);
 };
 
-const getDashboard: Parameters<typeof http.get>[1] = () =>
-  HttpResponse.json(mockDashboard);
+const getDashboard: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockDashboard);
 
 // ─── Handler registration (BACKEND + jsdom paths) ───────
 
@@ -128,13 +142,23 @@ export const handlers = [
   http.put(`${BACKEND}/test/put`, () => HttpResponse.json({ id: 1 })),
   http.get(`${BACKEND}/test/404`, () =>
     HttpResponse.json(
-      { status: 404, error: "Not Found", message: "not found", timestamp: new Date().toISOString() },
+      {
+        status: 404,
+        error: "Not Found",
+        message: "not found",
+        timestamp: new Date().toISOString(),
+      },
       { status: 404 },
     ),
   ),
   http.get(`${BACKEND}/test/500`, () =>
     HttpResponse.json(
-      { status: 500, error: "Internal Server Error", message: "server error", timestamp: new Date().toISOString() },
+      {
+        status: 500,
+        error: "Internal Server Error",
+        message: "server error",
+        timestamp: new Date().toISOString(),
+      },
       { status: 500 },
     ),
   ),

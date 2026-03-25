@@ -10,7 +10,11 @@ const schema = z.object({ name: z.string().min(1, "이름은 필수입니다") }
 type TestForm = z.infer<typeof schema>;
 
 function TestWrapper() {
-  const { register, handleSubmit, formState: { errors } } = useForm<TestForm>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TestForm>({
     resolver: standardSchemaResolver(schema),
     defaultValues: { name: "" },
   });
@@ -29,7 +33,10 @@ function TestWrapper() {
 }
 
 function ChildrenWrapper() {
-  const { register, formState: { errors } } = useForm<TestForm>({
+  const {
+    register,
+    formState: { errors },
+  } = useForm<TestForm>({
     defaultValues: { name: "" },
   });
   return (

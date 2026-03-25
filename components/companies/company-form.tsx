@@ -162,9 +162,7 @@ export function CompanyForm(props: CompanyFormProps) {
                 </Select>
               )}
             />
-            {errors.region && (
-              <p className="text-sm text-destructive">{errors.region.message}</p>
-            )}
+            {errors.region && <p className="text-sm text-destructive">{errors.region.message}</p>}
           </div>
 
           <FormField
@@ -257,13 +255,7 @@ export function CompanyForm(props: CompanyFormProps) {
             취소
           </Button>
           <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending
-              ? isEdit
-                ? "수정 중..."
-                : "등록 중..."
-              : isEdit
-                ? "수정"
-                : "등록"}
+            {mutation.isPending ? (isEdit ? "수정 중..." : "등록 중...") : isEdit ? "수정" : "등록"}
           </Button>
         </CardFooter>
       </form>

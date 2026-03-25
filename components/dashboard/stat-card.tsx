@@ -53,9 +53,7 @@ export function StatCard({
         <div
           className={cn(
             "flex h-9 w-9 items-center justify-center rounded-lg",
-            isUrgent
-              ? "bg-signal-red-bg text-signal-red"
-              : "bg-muted text-muted-foreground",
+            isUrgent ? "bg-signal-red-bg text-signal-red" : "bg-muted text-muted-foreground",
           )}
         >
           <Icon className="h-[18px] w-[18px]" />
@@ -68,30 +66,17 @@ export function StatCard({
           <p className="text-2xl font-bold text-destructive">—</p>
         ) : (
           <>
-            <p
-              className={cn(
-                "font-bold",
-                isUrgent
-                  ? "text-5xl text-signal-red"
-                  : "text-2xl",
-              )}
-            >
+            <p className={cn("font-bold", isUrgent ? "text-5xl text-signal-red" : "text-2xl")}>
               {value ?? 0}
-              {valueSuffix && (
-                <span className="text-base font-normal">{valueSuffix}</span>
-              )}
+              {valueSuffix && <span className="text-base font-normal">{valueSuffix}</span>}
             </p>
-            {subtitle && (
-              <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
-            )}
+            {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
             {change && (
               <p
                 data-testid="stat-change"
                 className={cn(
                   "mt-1 flex items-center gap-1 text-xs",
-                  change.direction === "up"
-                    ? "text-signal-green"
-                    : "text-signal-red",
+                  change.direction === "up" ? "text-signal-green" : "text-signal-red",
                 )}
               >
                 {change.direction === "up" ? "↑" : "↓"} {change.text}

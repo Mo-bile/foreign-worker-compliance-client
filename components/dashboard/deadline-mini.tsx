@@ -42,24 +42,14 @@ export function DeadlineMini({ deadlines }: DeadlineMiniProps) {
             key={item.id}
             className="flex items-center gap-2.5 rounded-lg bg-secondary p-2.5 text-[13px]"
           >
-            <div
-              className={cn(
-                "h-8 w-1 shrink-0 rounded-sm",
-                urgencyColors[item.urgency],
-              )}
-            />
+            <div className={cn("h-8 w-1 shrink-0 rounded-sm", urgencyColors[item.urgency])} />
             <div className="min-w-0 flex-1">
               <p className="font-medium">{item.title}</p>
               <p className="text-[11px] text-muted-foreground">
                 {item.workerName} · {item.visaType}
               </p>
             </div>
-            <span
-              className={cn(
-                "shrink-0 text-xs font-semibold",
-                dDayColors[item.urgency],
-              )}
-            >
+            <span className={cn("shrink-0 text-xs font-semibold", dDayColors[item.urgency])}>
               D-{item.dDay}
             </span>
           </div>

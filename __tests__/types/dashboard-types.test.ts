@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type {
-  DashboardResponse,
-  AlertLevel,
-  DeadlineUrgency,
-} from "@/types/dashboard";
+import type { DashboardResponse, AlertLevel, DeadlineUrgency } from "@/types/dashboard";
 
 describe("Dashboard Types", () => {
   it("AlertLevel_유니온이_3가지_값을_허용한다", () => {

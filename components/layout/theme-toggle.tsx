@@ -9,7 +9,11 @@ const emptySubscribe = () => () => {};
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   return (
     <Button

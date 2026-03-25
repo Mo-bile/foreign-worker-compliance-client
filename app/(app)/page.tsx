@@ -42,9 +42,7 @@ export default function DashboardPage() {
           icon={Users}
           isLoading={false}
           className="border-t-[color:var(--signal-blue)]"
-          subtitle={stats.visaBreakdown
-            .map((v) => `${v.type} ${v.count}명`)
-            .join(" · ")}
+          subtitle={stats.visaBreakdown.map((v) => `${v.type} ${v.count}명`).join(" · ")}
         />
         <StatCard
           title="보험 가입률"

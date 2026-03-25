@@ -54,9 +54,7 @@ export function AlertCard({ alert }: AlertCardProps) {
         <div className={cn("h-2 w-2 shrink-0 rounded-full", style.dot)} />
         <div className="min-w-0">
           <p className="text-[13px] font-semibold">{alert.title}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {alert.description}
-          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{alert.description}</p>
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">
@@ -74,10 +72,7 @@ export function AlertCard({ alert }: AlertCardProps) {
         ))}
       </div>
       <span
-        className={cn(
-          "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold",
-          style.badge,
-        )}
+        className={cn("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold", style.badge)}
       >
         {alert.badgeText}
       </span>

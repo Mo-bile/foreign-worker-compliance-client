@@ -13,10 +13,7 @@ export function handleRouteError(error: unknown, context: string): NextResponse 
     return NextResponse.json({ message: error.message }, { status: error.status });
   }
   console.error(`[${context}] Unexpected error:`, error);
-  return NextResponse.json(
-    { message: ERROR_MESSAGES.SERVER_ERROR },
-    { status: 500 },
-  );
+  return NextResponse.json({ message: ERROR_MESSAGES.SERVER_ERROR }, { status: 500 });
 }
 
 export async function parseRequestBody(
@@ -27,23 +24,14 @@ export async function parseRequestBody(
     return { data };
   } catch (error) {
     if (error instanceof SyntaxError) {
-      return NextResponse.json(
-        { message: ERROR_MESSAGES.INVALID_REQUEST_FORMAT },
-        { status: 400 },
-      );
+      return NextResponse.json({ message: ERROR_MESSAGES.INVALID_REQUEST_FORMAT }, { status: 400 });
     }
     console.error("[parseRequestBody] Unexpected error reading request body:", error);
-    return NextResponse.json(
-      { message: ERROR_MESSAGES.SERVER_ERROR },
-      { status: 500 },
-    );
+    return NextResponse.json({ message: ERROR_MESSAGES.SERVER_ERROR }, { status: 500 });
   }
 }
 
-export function validateSchema<T>(
-  schema: ZodSchema<T>,
-  body: unknown,
-): { data: T } | NextResponse {
+export function validateSchema<T>(schema: ZodSchema<T>, body: unknown): { data: T } | NextResponse {
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
     const firstError = parsed.error.issues[0]?.message ?? ERROR_MESSAGES.INVALID_INPUT;

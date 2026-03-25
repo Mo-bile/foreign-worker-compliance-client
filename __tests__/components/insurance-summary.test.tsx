@@ -7,7 +7,13 @@ const items: InsuranceSummaryItem[] = [
   { type: "national_pension", enrolled: 10, label: "국민연금", status: "ok", statusText: "✓ 가입" },
   { type: "health", enrolled: 11, label: "건강보험", status: "warn", statusText: "1 미가입" },
   { type: "employment", enrolled: 9, label: "고용보험", status: "warn", statusText: "1 미가입" },
-  { type: "industrial_accident", enrolled: 12, label: "산재보험", status: "ok", statusText: "✓ 전원" },
+  {
+    type: "industrial_accident",
+    enrolled: 12,
+    label: "산재보험",
+    status: "ok",
+    statusText: "✓ 전원",
+  },
 ];
 
 describe("InsuranceSummary", () => {
@@ -38,8 +44,6 @@ describe("InsuranceSummary", () => {
 
   it("보험_의무_안내_툴팁이_있다", () => {
     render(<InsuranceSummary items={items} />);
-    expect(
-      screen.getByTitle("비자 유형별 보험 가입 의무가 상이합니다"),
-    ).toBeDefined();
+    expect(screen.getByTitle("비자 유형별 보험 가입 의무가 상이합니다")).toBeDefined();
   });
 });
