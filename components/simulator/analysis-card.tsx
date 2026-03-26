@@ -47,7 +47,7 @@ export function AnalysisCard({ section, defaultOpen = false }: AnalysisCardProps
 
   const Icon = iconMap[section.icon] ?? BarChart3;
   const iconBgClass = sectionBgColors[section.id] ?? "bg-signal-gray-bg text-signal-gray";
-  const badgeClass = badgeColors[section.badge.color as keyof typeof badgeColors];
+  const badgeClass = badgeColors[section.badge.color];
 
   const sanitizedInsight = DOMPurify.sanitize(section.aiInsight, {
     ALLOWED_TAGS: ["strong", "em", "br"],
