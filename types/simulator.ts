@@ -19,7 +19,7 @@ export const E9_NATIONALITIES = [
   "KYRGYZSTAN",
   "TAJIKISTAN",
   "KAZAKHSTAN",
-] as const;
+] as const satisfies readonly Nationality[];
 
 // ─── Preferred Periods ────────────────────────────────────────────
 export const PREFERRED_PERIODS = ["2026_H1", "2026_H2", "2027_H1", "2027_H2"] as const;
