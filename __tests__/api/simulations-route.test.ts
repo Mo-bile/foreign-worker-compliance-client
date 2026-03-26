@@ -33,4 +33,15 @@ describe("POST /api/simulations", () => {
     const response = await POST(request as unknown as Parameters<typeof POST>[0]);
     expect(response.status).toBe(400);
   });
+
+  it("잘못된_JSON_형식이면_400을_반환한다", async () => {
+    const request = new Request("http://localhost:3000/api/simulations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "not json",
+    });
+
+    const response = await POST(request as unknown as Parameters<typeof POST>[0]);
+    expect(response.status).toBe(400);
+  });
 });

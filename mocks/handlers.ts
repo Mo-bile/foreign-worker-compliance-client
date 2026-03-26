@@ -141,6 +141,7 @@ export const handlers = [
   http.get("*/api/dashboard", getDashboard),
 
   // Simulations
+  http.post(`${BACKEND}/api/simulations`, postSimulation),
   http.post("*/api/simulations", postSimulation),
 
   // Test endpoints (api-client tests only — BACKEND paths)

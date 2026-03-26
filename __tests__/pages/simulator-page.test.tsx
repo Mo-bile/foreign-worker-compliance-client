@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeAll, afterAll, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { http, HttpResponse } from "msw";
 import type { ReactNode } from "react";
 import { server } from "@/mocks/server";
 import SimulatorPage from "@/app/(app)/simulator/page";
@@ -97,5 +98,31 @@ describe("SimulatorPage", () => {
     expect(screen.getByText("배정 가능성")).toBeDefined();
     expect(screen.getByText("쿼터 분석")).toBeDefined();
     expect(screen.getByText("다음 단계 추천")).toBeDefined();
+  });
+
+  it("API_에러_시_에러_메시지를_렌더링한다", async () => {
+    server.use(
+      http.post("*/api/simulations", () =>
+        HttpResponse.json(
+          { status: 500, error: "Internal Server Error", message: "서버 에러" },
+          { status: 500 },
+        ),
+      ),
+    );
+
+    render(<SimulatorPage />, { wrapper: createWrapper() });
+
+    const countInput = screen.getByLabelText("희망 고용인원");
+    fireEvent.change(countInput, { target: { value: "3" } });
+
+    const periodSelect = screen.getByLabelText("희망 시기");
+    fireEvent.change(periodSelect, { target: { value: "2026_H2" } });
+
+    const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("시뮬레이션 분석에 실패했습니다")).toBeDefined();
+    });
   });
 });

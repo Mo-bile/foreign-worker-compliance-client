@@ -13,8 +13,8 @@ export function RecommendationBox({ recommendations }: RecommendationBoxProps) {
         <span className="text-sm font-medium text-signal-green">다음 단계 추천</span>
       </div>
       <ul className="space-y-2">
-        {recommendations.map((item, index) => (
-          <li key={index} className="flex items-start gap-2">
+        {recommendations.map((item) => (
+          <li key={item.text} className="flex items-start gap-2">
             <span className="text-signal-green">→</span>
             <div className="text-sm">
               <span>{item.text}</span>

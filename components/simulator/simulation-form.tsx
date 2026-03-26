@@ -17,17 +17,21 @@ interface SimulationFormProps {
 export function SimulationForm({ company, onSubmit, isPending }: SimulationFormProps) {
   const [desiredCount, setDesiredCount] = useState<number>(1);
   const [preferredNationality, setPreferredNationality] = useState<string>("");
-  const [preferredPeriod, setPreferredPeriod] = useState<string>("");
+  const [preferredPeriod, setPreferredPeriod] = useState<
+    (typeof PREFERRED_PERIODS)[number] | ""
+  >("");
 
-  const isSubmitDisabled = isPending || desiredCount < 1 || preferredPeriod === "";
+  const isSubmitDisabled =
+    isPending || !Number.isFinite(desiredCount) || desiredCount < 1 || preferredPeriod === "";
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (preferredPeriod === "") return;
 
     const request: SimulationRequest = {
       desiredCount,
       preferredNationality: preferredNationality === "" ? undefined : preferredNationality,
-      preferredPeriod: preferredPeriod as (typeof PREFERRED_PERIODS)[number],
+      preferredPeriod,
     };
 
     onSubmit(request);
@@ -64,7 +68,10 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
               max={50}
               required
               value={desiredCount}
-              onChange={(e) => setDesiredCount(Number(e.target.value))}
+              onChange={(e) => {
+                const parsed = Number(e.target.value);
+                setDesiredCount(Number.isFinite(parsed) ? parsed : 0);
+              }}
               className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </div>
@@ -95,7 +102,9 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
             <select
               id="preferredPeriod"
               value={preferredPeriod}
-              onChange={(e) => setPreferredPeriod(e.target.value)}
+              onChange={(e) =>
+                setPreferredPeriod(e.target.value as (typeof PREFERRED_PERIODS)[number] | "")
+              }
               required
               className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
