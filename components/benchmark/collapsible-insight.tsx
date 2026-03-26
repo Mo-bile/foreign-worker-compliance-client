@@ -9,9 +9,9 @@ interface CollapsibleInsightProps {
 }
 
 const PURIFY_CONFIG = {
-  ALLOWED_TAGS: ["strong", "em", "br", "p"],
-  ALLOWED_ATTR: ["class"],
-} as const;
+  ALLOWED_TAGS: ["strong", "em", "br", "p"] as string[],
+  ALLOWED_ATTR: ["class"] as string[],
+};
 
 export function CollapsibleInsight({ content, defaultOpen = false }: CollapsibleInsightProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);

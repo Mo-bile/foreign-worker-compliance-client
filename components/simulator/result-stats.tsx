@@ -19,7 +19,7 @@ const colorClasses: Record<SignalColor, { border: string; text: string }> = {
 };
 
 function StatCard({ stat }: { readonly stat: SimStatItem }) {
-  const { border, text } = colorClasses[stat.color];
+  const { border, text } = colorClasses[stat.color as keyof typeof colorClasses];
 
   return (
     <Card className={`border-t-[3px] ${border}`}>
