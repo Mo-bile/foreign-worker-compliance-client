@@ -42,8 +42,10 @@ export type SimulationRequest = z.infer<typeof simulationRequestSchema>;
 
 // ─── Type Unions ──────────────────────────────────────────────────
 export type SimulationVerdict = "HIGH" | "MEDIUM" | "LOW";
-export type SignalColor = "red" | "orange" | "yellow" | "blue" | "green" | "gray";
 export type ProgressLevel = "low" | "mid" | "high";
+
+// ─── Shared Types ─────────────────────────────────────────────────
+export type { SignalColor, DataSource, DataRow } from "./shared";
 
 // ─── Interfaces ───────────────────────────────────────────────────
 export interface SimStatItem {
@@ -51,16 +53,6 @@ export interface SimStatItem {
   readonly value: string;
   readonly subText: string;
   readonly color: SignalColor;
-}
-
-export interface DataSource {
-  readonly name: string;
-  readonly dataId: string;
-}
-
-export interface DataRow {
-  readonly key: string;
-  readonly value: string;
 }
 
 export interface ProgressData {
