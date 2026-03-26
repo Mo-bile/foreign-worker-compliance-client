@@ -1,15 +1,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ComplianceDeadlineResponse } from "@/types/api";
@@ -99,9 +91,21 @@ function ChartTooltip({ active, payload }: ChartTooltipProps) {
   const total = datum.urgent + datum.approaching + datum.pending;
 
   const rows: { label: string; color: string; value: number }[] = [
-    { label: DEADLINE_STATUS_LABELS.URGENT, color: DEADLINE_STATUS_CHART_COLORS.URGENT, value: datum.urgent },
-    { label: DEADLINE_STATUS_LABELS.APPROACHING, color: DEADLINE_STATUS_CHART_COLORS.APPROACHING, value: datum.approaching },
-    { label: DEADLINE_STATUS_LABELS.PENDING, color: DEADLINE_STATUS_CHART_COLORS.PENDING, value: datum.pending },
+    {
+      label: DEADLINE_STATUS_LABELS.URGENT,
+      color: DEADLINE_STATUS_CHART_COLORS.URGENT,
+      value: datum.urgent,
+    },
+    {
+      label: DEADLINE_STATUS_LABELS.APPROACHING,
+      color: DEADLINE_STATUS_CHART_COLORS.APPROACHING,
+      value: datum.approaching,
+    },
+    {
+      label: DEADLINE_STATUS_LABELS.PENDING,
+      color: DEADLINE_STATUS_CHART_COLORS.PENDING,
+      value: datum.pending,
+    },
   ].filter((r) => r.value > 0);
 
   return (

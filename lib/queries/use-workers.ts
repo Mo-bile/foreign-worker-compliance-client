@@ -21,7 +21,8 @@ export function useWorkers(companyId?: number | null) {
     queryFn: () => {
       const params = companyId ? `?companyId=${companyId}` : "";
       return fetchApi<readonly WorkerResponse[]>(
-        `/api/workers${params}`, "근로자 목록을 불러올 수 없습니다",
+        `/api/workers${params}`,
+        "근로자 목록을 불러올 수 없습니다",
       );
     },
     enabled: companyId != null && companyId > 0,
@@ -31,9 +32,8 @@ export function useWorkers(companyId?: number | null) {
 export function useWorker(id: number) {
   return useQuery<WorkerResponse>({
     queryKey: ["workers", id],
-    queryFn: () => fetchApi<WorkerResponse>(
-      `/api/workers/${id}`, "근로자 정보를 불러올 수 없습니다",
-    ),
+    queryFn: () =>
+      fetchApi<WorkerResponse>(`/api/workers/${id}`, "근로자 정보를 불러올 수 없습니다"),
     enabled: id > 0,
   });
 }
@@ -42,9 +42,8 @@ export function useRegisterWorker() {
   const queryClient = useQueryClient();
 
   return useMutation<WorkerResponse, Error, RegisterWorkerRequest>({
-    mutationFn: (data) => mutateApi<WorkerResponse>(
-      "/api/workers", "POST", data, "등록에 실패했습니다",
-    ),
+    mutationFn: (data) =>
+      mutateApi<WorkerResponse>("/api/workers", "POST", data, "등록에 실패했습니다"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workers"] });
     },

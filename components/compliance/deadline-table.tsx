@@ -80,7 +80,10 @@ export function DeadlineTable({
             ))}
           </div>
         ) : isError ? (
-          <EmptyState message="데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요." variant="error" />
+          <EmptyState
+            message="데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요."
+            variant="error"
+          />
         ) : !items?.length ? (
           <EmptyState message={emptyMessage} />
         ) : (

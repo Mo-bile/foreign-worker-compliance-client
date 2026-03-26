@@ -19,19 +19,12 @@ export function CompanySelector() {
   }
 
   if (isError) {
-    return (
-      <span className="text-sm text-destructive">
-        사업장 목록을 불러올 수 없습니다
-      </span>
-    );
+    return <span className="text-sm text-destructive">사업장 목록을 불러올 수 없습니다</span>;
   }
 
   if (companies.length === 0) {
     return (
-      <Link
-        href="/companies/new"
-        className="text-sm text-primary hover:underline"
-      >
+      <Link href="/companies/new" className="text-sm text-primary hover:underline">
         사업장을 등록해주세요
       </Link>
     );

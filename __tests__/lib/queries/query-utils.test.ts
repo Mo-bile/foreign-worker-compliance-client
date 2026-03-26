@@ -77,7 +77,9 @@ describe("fetchApi", () => {
       ok: true,
       json: () => Promise.reject(new SyntaxError("Unexpected token")),
     });
-    await expect(fetchApi("/api/test", "데이터 로드 실패")).rejects.toThrow("데이터 로드 실패 (응답 형식 오류)");
+    await expect(fetchApi("/api/test", "데이터 로드 실패")).rejects.toThrow(
+      "데이터 로드 실패 (응답 형식 오류)",
+    );
   });
 });
 

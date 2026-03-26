@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { DeadlineChart, groupDeadlinesByDateAndStatus } from "@/components/dashboard/deadline-chart";
+import {
+  DeadlineChart,
+  groupDeadlinesByDateAndStatus,
+} from "@/components/dashboard/deadline-chart";
 import type { ComplianceDeadlineResponse } from "@/types/api";
 
 function makeDeadline(
@@ -107,9 +110,7 @@ describe("DeadlineChart", () => {
     });
 
     it("date_필드를_M/D_형식으로_포맷한다", () => {
-      const result = groupDeadlinesByDateAndStatus([
-        makeDeadline({ dueDate: "2026-04-01" }),
-      ]);
+      const result = groupDeadlinesByDateAndStatus([makeDeadline({ dueDate: "2026-04-01" })]);
       expect(result[0]?.date).toBe("4/1");
     });
   });

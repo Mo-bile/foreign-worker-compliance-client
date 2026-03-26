@@ -72,6 +72,17 @@ export const VISA_TYPE_LABELS: Record<VisaType, string> = {
   F6: "결혼이민",
 };
 
+export const VISA_TYPE_SHORT: Record<VisaType, string> = {
+  E9: "E-9",
+  E8: "E-8",
+  H2: "H-2",
+  E7: "E-7",
+  E7_4: "E-7-4",
+  F2: "F-2",
+  F5: "F-5",
+  F6: "F-6",
+};
+
 // ─── DeadlineType / DeadlineStatus ────────────────────────
 export const DEADLINE_TYPES = [
   "VISA_EXPIRY",
@@ -109,31 +120,68 @@ export type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
 
 // ─── Region ─────────────────────────────────────────────
 export const REGIONS = [
-  "SEOUL", "BUSAN", "DAEGU", "INCHEON", "GWANGJU", "DAEJEON", "ULSAN", "SEJONG",
-  "GYEONGGI", "GANGWON", "CHUNGBUK", "CHUNGNAM", "JEONBUK", "JEONNAM",
-  "GYEONGBUK", "GYEONGNAM", "JEJU",
+  "SEOUL",
+  "BUSAN",
+  "DAEGU",
+  "INCHEON",
+  "GWANGJU",
+  "DAEJEON",
+  "ULSAN",
+  "SEJONG",
+  "GYEONGGI",
+  "GANGWON",
+  "CHUNGBUK",
+  "CHUNGNAM",
+  "JEONBUK",
+  "JEONNAM",
+  "GYEONGBUK",
+  "GYEONGNAM",
+  "JEJU",
 ] as const;
 export type Region = (typeof REGIONS)[number];
 
 export const REGION_LABELS: Record<Region, string> = {
-  SEOUL: "서울", BUSAN: "부산", DAEGU: "대구", INCHEON: "인천",
-  GWANGJU: "광주", DAEJEON: "대전", ULSAN: "울산", SEJONG: "세종",
-  GYEONGGI: "경기", GANGWON: "강원", CHUNGBUK: "충북", CHUNGNAM: "충남",
-  JEONBUK: "전북", JEONNAM: "전남", GYEONGBUK: "경북", GYEONGNAM: "경남",
+  SEOUL: "서울",
+  BUSAN: "부산",
+  DAEGU: "대구",
+  INCHEON: "인천",
+  GWANGJU: "광주",
+  DAEJEON: "대전",
+  ULSAN: "울산",
+  SEJONG: "세종",
+  GYEONGGI: "경기",
+  GANGWON: "강원",
+  CHUNGBUK: "충북",
+  CHUNGNAM: "충남",
+  JEONBUK: "전북",
+  JEONNAM: "전남",
+  GYEONGBUK: "경북",
+  GYEONGNAM: "경남",
   JEJU: "제주",
 };
 
 // ─── IndustryCategory ───────────────────────────────────
 export const INDUSTRY_CATEGORIES = [
-  "MANUFACTURING", "CONSTRUCTION", "AGRICULTURE", "FISHING",
-  "SERVICE", "MINING", "ACCOMMODATION", "OTHER",
+  "MANUFACTURING",
+  "CONSTRUCTION",
+  "AGRICULTURE",
+  "FISHING",
+  "SERVICE",
+  "MINING",
+  "ACCOMMODATION",
+  "OTHER",
 ] as const;
 export type IndustryCategory = (typeof INDUSTRY_CATEGORIES)[number];
 
 export const INDUSTRY_CATEGORY_LABELS: Record<IndustryCategory, string> = {
-  MANUFACTURING: "제조업", CONSTRUCTION: "건설업", AGRICULTURE: "농업",
-  FISHING: "어업", SERVICE: "서비스업", MINING: "광업",
-  ACCOMMODATION: "숙박업", OTHER: "기타",
+  MANUFACTURING: "제조업",
+  CONSTRUCTION: "건설업",
+  AGRICULTURE: "농업",
+  FISHING: "어업",
+  SERVICE: "서비스업",
+  MINING: "광업",
+  ACCOMMODATION: "숙박업",
+  OTHER: "기타",
 };
 
 // ─── Label Maps ──────────────────────────────────────────────
@@ -168,14 +216,13 @@ const companyBaseFields = z.object({
   contactPhone: z.string().min(1, "연락처를 입력해주세요"),
 });
 
-function refineWorkerCount<T extends z.ZodType<{ foreignWorkerCount: number; employeeCount: number }>>(schema: T) {
-  return schema.refine(
-    (d) => d.foreignWorkerCount <= d.employeeCount,
-    {
-      message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
-      path: ["foreignWorkerCount"],
-    },
-  );
+function refineWorkerCount<
+  T extends z.ZodType<{ foreignWorkerCount: number; employeeCount: number }>,
+>(schema: T) {
+  return schema.refine((d) => d.foreignWorkerCount <= d.employeeCount, {
+    message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
+    path: ["foreignWorkerCount"],
+  });
 }
 
 export const createCompanyRequestSchema = refineWorkerCount(

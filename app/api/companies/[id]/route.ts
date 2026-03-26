@@ -5,10 +5,7 @@ import { updateCompanyRequestSchema } from "@/types/api";
 import type { CompanyResponse } from "@/types/api";
 import { handleRouteError, parseRequestBody, validateSchema } from "@/lib/api-route-utils";
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const companyId = parseId(id);
   if (companyId === null) {
@@ -23,10 +20,7 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const companyId = parseId(id);
   if (companyId === null) {
@@ -40,7 +34,10 @@ export async function PUT(
   if (validated instanceof NextResponse) return validated;
 
   try {
-    const company = await apiClient.put<CompanyResponse>(`/api/companies/${companyId}`, validated.data);
+    const company = await apiClient.put<CompanyResponse>(
+      `/api/companies/${companyId}`,
+      validated.data,
+    );
     return NextResponse.json(company);
   } catch (error) {
     return handleRouteError(error, `PUT /api/companies/${companyId}`);

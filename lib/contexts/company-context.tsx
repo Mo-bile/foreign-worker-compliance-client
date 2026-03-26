@@ -69,7 +69,14 @@ export function CompanyProvider({ children }: { readonly children: ReactNode }) 
   );
 
   const value = useMemo<CompanyContextValue>(
-    () => ({ selectedCompanyId, selectedCompany, companies, isLoading, isError, setSelectedCompanyId }),
+    () => ({
+      selectedCompanyId,
+      selectedCompany,
+      companies,
+      isLoading,
+      isError,
+      setSelectedCompanyId,
+    }),
     [selectedCompanyId, selectedCompany, companies, isLoading, isError, setSelectedCompanyId],
   );
 

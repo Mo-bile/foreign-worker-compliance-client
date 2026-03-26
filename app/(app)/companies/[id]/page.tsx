@@ -11,7 +11,11 @@ import { useCompany } from "@/lib/queries/use-companies";
 import { useWorkers } from "@/lib/queries/use-workers";
 import { parseId } from "@/lib/parse-id";
 
-export default function CompanyDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
+export default function CompanyDetailPage({
+  params,
+}: {
+  readonly params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const companyId = parseId(id);
   const company = useCompany(companyId ?? 0);

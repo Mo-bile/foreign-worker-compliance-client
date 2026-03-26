@@ -135,7 +135,11 @@ export default function CompliancePage() {
               : undefined
           }
         />
-        <DeadlineChart deadlines={upcomingAll.data} isLoading={upcomingAll.isLoading} isError={upcomingAll.isError} />
+        <DeadlineChart
+          deadlines={upcomingAll.data}
+          isLoading={upcomingAll.isLoading}
+          isError={upcomingAll.isError}
+        />
       </div>
     </div>
   );
