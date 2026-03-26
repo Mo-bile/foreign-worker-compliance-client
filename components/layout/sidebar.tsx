@@ -14,7 +14,7 @@ interface NavItem {
 
 interface NavSection {
   readonly label: string;
-  readonly items: readonly NavItem[];
+  readonly items: readonly [NavItem, ...NavItem[]];
 }
 
 const NAV_SECTIONS: readonly NavSection[] = [
@@ -44,7 +44,7 @@ export function Sidebar() {
       <nav className="flex flex-col gap-4">
         {NAV_SECTIONS.map((section) => (
           <div key={section.label} className="flex flex-col gap-1">
-            <h3 className="px-3 text-[10px] font-semibold tracking-[0.08em] uppercase text-sidebar-muted">
+            <h3 className="px-3 text-[10px] font-semibold tracking-[0.08em] text-sidebar-muted">
               {section.label}
             </h3>
             {section.items.map(({ href, label, icon: Icon }) => {
