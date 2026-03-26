@@ -41,7 +41,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {company !== null && (
-            <div className="rounded-lg bg-[var(--signal-blue-bg)] p-4">
+            <div className="rounded-lg bg-signal-blue-bg p-4">
               <div className="mb-2 flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-signal-blue" />
                 <span className="text-sm font-medium text-signal-blue">자동 입력</span>
