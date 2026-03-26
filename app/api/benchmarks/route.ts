@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
+import { handleRouteError } from "@/lib/api-route-utils";
 
 export async function GET(request: NextRequest) {
-  const url = new URL(request.url);
-  const raw = url.searchParams.get("companyId");
+  const raw = request.nextUrl.searchParams.get("companyId");
   if (!raw) {
     return NextResponse.json({ message: "companyId required" }, { status: 400 });
   }
@@ -13,6 +13,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "유효하지 않은 companyId" }, { status: 400 });
   }
 
-  // Mock phase: return hardcoded data directly
-  return NextResponse.json(mockBenchmarkResponse);
+  try {
+    // Mock phase: return hardcoded data directly
+    // TODO: Replace with apiClient.get<BenchmarkResponse>(`/api/benchmarks?companyId=${companyId}`)
+    return NextResponse.json(mockBenchmarkResponse);
+  } catch (error) {
+    return handleRouteError(error, "GET /api/benchmarks");
+  }
 }

@@ -15,6 +15,8 @@ export function PercentileBar({ percentile, medianPercentile, label }: Percentil
     <div className="space-y-1">
       <p className="text-xs text-muted-foreground">{label}</p>
       <svg
+        role="img"
+        aria-label={`임금 백분위 ${percentile}%`}
         width="100%"
         height={40}
         viewBox="0 0 300 40"
@@ -41,7 +43,6 @@ export function PercentileBar({ percentile, medianPercentile, label }: Percentil
         <line
           x1={percentile * 3} y1={4} x2={percentile * 3} y2={28}
           stroke="currentColor" strokeWidth={2} className="text-foreground"
-          aria-label={`임금 백분위 ${percentile}%`}
         />
         <text x={percentile * 3} y={38} textAnchor="middle" className="fill-foreground text-[9px] font-medium">
           귀사 {percentile}%
