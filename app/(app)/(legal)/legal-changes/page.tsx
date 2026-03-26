@@ -23,12 +23,16 @@ function applyFilter(
       return changes.filter((c) => c.status === "action_required");
     case "resolved":
       return changes.filter((c) => c.status === "resolved");
+    default: {
+      const _exhaustive: never = filter;
+      return changes;
+    }
   }
 }
 
 export default function LegalChangesPage() {
   const { selectedCompanyId } = useCompanyContext();
-  const { data, isLoading, isError, error } = useLegalChanges(selectedCompanyId);
+  const { data, isLoading, isError, error, refetch } = useLegalChanges(selectedCompanyId);
   const [filter, setFilter] = useState<FilterValue>("all");
 
   const filteredChanges = useMemo(
@@ -54,11 +58,18 @@ export default function LegalChangesPage() {
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
         <p className="text-sm font-medium text-destructive">법령 변경 조회에 실패했습니다</p>
         <p className="mt-1 text-xs text-muted-foreground">{error?.message}</p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-2 text-xs text-primary hover:underline"
+        >
+          다시 시도
+        </button>
       </div>
     );
   }
 
-  if (!data) return null;
+  if (!data) return <LegalChangesSkeleton />;
 
   if (data.changes.length === 0) {
     return (

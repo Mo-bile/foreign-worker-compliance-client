@@ -7,16 +7,8 @@ import { AiInsightBlock } from "./ai-insight-block";
 import { ActionRow } from "./action-row";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { BADGE_COLORS, BADGE_FALLBACK } from "@/lib/constants/signal-colors";
 import type { LegalChange } from "@/types/legal";
-
-const BADGE_COLORS: Record<string, string> = {
-  red: "bg-signal-red-bg text-signal-red",
-  orange: "bg-signal-orange-bg text-signal-orange",
-  yellow: "bg-signal-yellow-bg text-signal-yellow",
-  green: "bg-signal-green-bg text-signal-green",
-  blue: "bg-signal-blue-bg text-signal-blue",
-  gray: "bg-signal-gray-bg text-signal-gray",
-};
 
 interface LegalCardProps {
   readonly change: LegalChange;
@@ -44,7 +36,7 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
         시행일: {change.effectiveDate} · 감지일: {change.detectedDate} · {change.lawName}
       </p>
       <div className="mt-2 flex gap-2">
-        <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", BADGE_COLORS[change.badge.color])}>
+        <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", BADGE_COLORS[change.badge.color] ?? BADGE_FALLBACK)}>
           {change.badge.text}
         </span>
         {change.dDay != null && (
@@ -73,14 +65,13 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
       </button>
       {isOpen && (
         <div id={bodyId} className="space-y-4 border-t px-4 pb-4 pt-3">
-          {isLoading && (
+          {isLoading ? (
             <div className="space-y-2">
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
             </div>
-          )}
-          {isError && (
+          ) : isError ? (
             <div className="rounded-md bg-destructive/5 p-3 text-center">
               <p className="text-sm text-destructive">영향 분석을 불러오지 못했습니다</p>
               <button
@@ -91,14 +82,13 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
                 다시 시도
               </button>
             </div>
-          )}
-          {data && (
+          ) : data ? (
             <>
               <ImpactBox impacts={data.impacts} />
               <AiInsightBlock html={data.aiAnalysis} />
               <ActionRow actions={data.actions} />
             </>
-          )}
+          ) : null}
         </div>
       )}
     </div>

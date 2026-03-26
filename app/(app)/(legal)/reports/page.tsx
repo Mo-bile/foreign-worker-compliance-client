@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ReportsPage() {
   const { selectedCompanyId } = useCompanyContext();
-  const { data, isLoading, isError, error } = useComplianceReport(selectedCompanyId);
+  const { data, isLoading, isError, error, refetch } = useComplianceReport(selectedCompanyId);
 
   if (selectedCompanyId == null) {
     return (
@@ -33,11 +33,18 @@ export default function ReportsPage() {
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
         <p className="text-sm font-medium text-destructive">리포트 조회에 실패했습니다</p>
         <p className="mt-1 text-xs text-muted-foreground">{error?.message}</p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-2 text-xs text-primary hover:underline"
+        >
+          다시 시도
+        </button>
       </div>
     );
   }
 
-  if (!data) return null;
+  if (!data) return <ReportSkeleton />;
 
   return (
     <div className="space-y-6">
