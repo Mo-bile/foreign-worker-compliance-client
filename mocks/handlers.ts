@@ -4,6 +4,8 @@ import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies
 import { mockDashboard } from "@/mocks/dashboard-data";
 import { mockSimulationResponse } from "@/mocks/simulator-data";
 import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
+import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
+import { mockComplianceReport } from "./report-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
@@ -112,6 +114,18 @@ const postSimulation: Parameters<typeof http.post>[1] = () =>
 const getBenchmark: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockBenchmarkResponse);
 
+const getLegalChanges: Parameters<typeof http.get>[1] = () =>
+  HttpResponse.json(mockLegalChangesResponse);
+
+const getLegalImpact: Parameters<typeof http.get>[1] = ({ params }) => {
+  const impact = mockImpacts[params.id as string];
+  if (!impact) return new HttpResponse(null, { status: 404 });
+  return HttpResponse.json(impact);
+};
+
+const getReport: Parameters<typeof http.get>[1] = () =>
+  HttpResponse.json(mockComplianceReport);
+
 // ─── Handler registration (BACKEND + jsdom paths) ───────
 
 export const handlers = [
@@ -151,6 +165,16 @@ export const handlers = [
   // Benchmarks
   http.get(`${BACKEND}/api/benchmarks`, getBenchmark),
   http.get("*/api/benchmarks", getBenchmark),
+
+  // Legal Changes (impacts BEFORE legal-changes for correct matching)
+  http.get(`${BACKEND}/api/legal-changes/:id/impacts`, getLegalImpact),
+  http.get("*/api/legal-changes/:id/impacts", getLegalImpact),
+  http.get(`${BACKEND}/api/legal-changes`, getLegalChanges),
+  http.get("*/api/legal-changes", getLegalChanges),
+
+  // Reports
+  http.get(`${BACKEND}/api/reports`, getReport),
+  http.get("*/api/reports", getReport),
 
   // Test endpoints (api-client tests only — BACKEND paths)
   http.get(`${BACKEND}/test`, () => HttpResponse.json({ message: "ok" })),
