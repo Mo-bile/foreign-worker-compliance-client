@@ -3,6 +3,7 @@ import type { CompanyResponse } from "@/types/api";
 import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies } from "./data";
 import { mockDashboard } from "@/mocks/dashboard-data";
 import { mockSimulationResponse } from "@/mocks/simulator-data";
+import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
@@ -108,6 +109,9 @@ const getDashboard: Parameters<typeof http.get>[1] = () => HttpResponse.json(moc
 const postSimulation: Parameters<typeof http.post>[1] = () =>
   HttpResponse.json(mockSimulationResponse);
 
+const getBenchmark: Parameters<typeof http.get>[1] = () =>
+  HttpResponse.json(mockBenchmarkResponse);
+
 // ─── Handler registration (BACKEND + jsdom paths) ───────
 
 export const handlers = [
@@ -143,6 +147,10 @@ export const handlers = [
   // Simulations
   http.post(`${BACKEND}/api/simulations`, postSimulation),
   http.post("*/api/simulations", postSimulation),
+
+  // Benchmarks
+  http.get(`${BACKEND}/api/benchmarks`, getBenchmark),
+  http.get("*/api/benchmarks", getBenchmark),
 
   // Test endpoints (api-client tests only — BACKEND paths)
   http.get(`${BACKEND}/test`, () => HttpResponse.json({ message: "ok" })),
