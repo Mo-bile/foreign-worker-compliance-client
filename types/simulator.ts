@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Nationality } from "./api";
+import type { SignalColor, DataSource, DataRow } from "./shared";
 
 // ─── E9 Eligible Nationalities ────────────────────────────────────
 export const E9_NATIONALITIES = [
