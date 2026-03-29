@@ -94,7 +94,7 @@ describe("enum 상수", () => {
     expect(REGIONS).toHaveLength(17);
   });
 
-  it("INDUSTRY_CATEGORIES는_8개_값을_가진다", () => {
-    expect(INDUSTRY_CATEGORIES).toHaveLength(8);
+  it("INDUSTRY_CATEGORIES는_9개_값을_가진다", () => {
+    expect(INDUSTRY_CATEGORIES).toHaveLength(9);
   });
 });
