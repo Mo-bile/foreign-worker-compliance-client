@@ -136,6 +136,15 @@ export interface NationalityAnalysisResult {
   readonly industryShareRate: number;
 }
 
+export interface AiInsightsResponse {
+  readonly overallVerdict: string;
+  readonly quotaInsight: string;
+  readonly competitionInsight: string;
+  readonly nationalityInsight: string;
+  readonly actionItems: readonly string[];
+  readonly disclaimer: string;
+}
+
 export interface SimulationResultResponse {
   readonly id: number;
   readonly companyId: number;
@@ -145,6 +154,6 @@ export interface SimulationResultResponse {
   readonly quotaAnalysis: QuotaAnalysis;
   readonly competitionAnalysis: CompetitionAnalysis;
   readonly nationalityAnalysis: NationalityAnalysisResult | null;
-  readonly aiReport: string;
+  readonly aiInsights: AiInsightsResponse;
   readonly createdAt: string;
 }

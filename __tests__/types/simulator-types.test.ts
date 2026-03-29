@@ -108,10 +108,17 @@ describe("Simulator Types", () => {
         competitionLevel: "MEDIUM",
       },
       nationalityAnalysis: null,
-      aiReport: "분석 보고서",
+      aiInsights: {
+        overallVerdict: "종합 판정",
+        quotaInsight: "쿼터 인사이트",
+        competitionInsight: "경쟁 인사이트",
+        nationalityInsight: "국적 인사이트",
+        actionItems: ["서류 준비"],
+        disclaimer: "법률 자문 아님",
+      },
       createdAt: "2026-03-24T14:32:00Z",
     };
     expect(raw.quotaAnalysis.quotaSufficient).toBe(true);
-    expect(raw.competitionAnalysis.competitionLevel).toBe("MEDIUM");
+    expect(raw.aiInsights.actionItems).toHaveLength(1);
   });
 });
