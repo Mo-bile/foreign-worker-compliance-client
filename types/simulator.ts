@@ -22,10 +22,10 @@ export const E9_NATIONALITIES = [
   "KAZAKHSTAN",
 ] as const satisfies readonly Nationality[];
 
-// ─── Preferred Periods ────────────────────────────────────────────
-export const PREFERRED_PERIODS = ["2026_H1", "2026_H2", "2027_H1", "2027_H2"] as const;
+// ─── Desired Timings ─────────────────────────────────────────────
+export const DESIRED_TIMINGS = ["2026_H1", "2026_H2", "2027_H1", "2027_H2"] as const;
 
-export const PREFERRED_PERIOD_LABELS: Record<(typeof PREFERRED_PERIODS)[number], string> = {
+export const DESIRED_TIMING_LABELS: Record<(typeof DESIRED_TIMINGS)[number], string> = {
   "2026_H1": "2026년 상반기",
   "2026_H2": "2026년 하반기",
   "2027_H1": "2027년 상반기",
@@ -34,9 +34,9 @@ export const PREFERRED_PERIOD_LABELS: Record<(typeof PREFERRED_PERIODS)[number],
 
 // ─── Zod Schema ───────────────────────────────────────────────────
 export const simulationRequestSchema = z.object({
-  desiredCount: z.number().int().min(1).max(50),
+  desiredWorkers: z.number().int().min(1).max(50),
   preferredNationality: z.enum(E9_NATIONALITIES as unknown as [string, ...string[]]).optional(),
-  preferredPeriod: z.enum(PREFERRED_PERIODS),
+  desiredTiming: z.enum(DESIRED_TIMINGS),
 });
 
 export type SimulationRequest = z.infer<typeof simulationRequestSchema>;
@@ -106,4 +106,40 @@ export interface SimulationResponse {
   readonly analyses: readonly AnalysisSection[];
   readonly nationality: NationalityAnalysis | null;
   readonly recommendations: readonly RecommendationItem[];
+}
+
+// ─── BE Response Types ───────────────────────────────────────────
+export interface QuotaAnalysis {
+  readonly industryQuota: number;
+  readonly currentAllocated: number;
+  readonly remainingQuota: number;
+  readonly utilizationRate: number;
+  readonly quotaSufficient: boolean;
+}
+
+export interface CompetitionAnalysis {
+  readonly regionApplicants: number;
+  readonly densityRank: number;
+  readonly avgApplicationRate: number;
+  readonly competitionLevel: "HIGH" | "MEDIUM" | "LOW";
+}
+
+export interface NationalityAnalysisResult {
+  readonly nationality: string;
+  readonly industryShareRate: number;
+  readonly requestedShareRate: number;
+  readonly available: boolean;
+}
+
+export interface SimulationResultResponse {
+  readonly id: string;
+  readonly companyId: number;
+  readonly desiredWorkers: number;
+  readonly desiredTiming: string;
+  readonly preferredNationality: string | null;
+  readonly quotaAnalysis: QuotaAnalysis;
+  readonly competitionAnalysis: CompetitionAnalysis;
+  readonly nationalityAnalysis: NationalityAnalysisResult | null;
+  readonly aiReport: string;
+  readonly createdAt: string;
 }

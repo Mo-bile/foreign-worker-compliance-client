@@ -32,7 +32,7 @@ function toNationalitySection(n: NationalityAnalysis): AnalysisSection {
 
 export default function SimulatorPage() {
   const { selectedCompanyId, selectedCompany } = useCompanyContext();
-  const mutation = useSimulation();
+  const mutation = useSimulation(selectedCompanyId);
 
   if (selectedCompanyId == null) {
     return (

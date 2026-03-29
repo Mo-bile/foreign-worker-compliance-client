@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CheckCircle, Lightbulb, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { E9_NATIONALITIES, PREFERRED_PERIODS, PREFERRED_PERIOD_LABELS } from "@/types/simulator";
+import { E9_NATIONALITIES, DESIRED_TIMINGS, DESIRED_TIMING_LABELS } from "@/types/simulator";
 import { NATIONALITY_LABELS } from "@/types/api";
 import type { SimulationRequest } from "@/types/simulator";
 import type { CompanyResponse } from "@/types/api";
@@ -15,23 +15,21 @@ interface SimulationFormProps {
 }
 
 export function SimulationForm({ company, onSubmit, isPending }: SimulationFormProps) {
-  const [desiredCount, setDesiredCount] = useState<number>(1);
+  const [desiredWorkers, setDesiredWorkers] = useState<number>(1);
   const [preferredNationality, setPreferredNationality] = useState<string>("");
-  const [preferredPeriod, setPreferredPeriod] = useState<
-    (typeof PREFERRED_PERIODS)[number] | ""
-  >("");
+  const [desiredTiming, setDesiredTiming] = useState<(typeof DESIRED_TIMINGS)[number] | "">("");
 
   const isSubmitDisabled =
-    isPending || !Number.isFinite(desiredCount) || desiredCount < 1 || preferredPeriod === "";
+    isPending || !Number.isFinite(desiredWorkers) || desiredWorkers < 1 || desiredTiming === "";
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (preferredPeriod === "") return;
+    if (desiredTiming === "") return;
 
     const request: SimulationRequest = {
-      desiredCount,
+      desiredWorkers,
       preferredNationality: preferredNationality === "" ? undefined : preferredNationality,
-      preferredPeriod,
+      desiredTiming,
     };
 
     onSubmit(request);
@@ -58,19 +56,19 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="desiredCount" className="text-sm font-medium">
+            <label htmlFor="desiredWorkers" className="text-sm font-medium">
               희망 고용인원
             </label>
             <input
-              id="desiredCount"
+              id="desiredWorkers"
               type="number"
               min={1}
               max={50}
               required
-              value={desiredCount}
+              value={desiredWorkers}
               onChange={(e) => {
                 const parsed = Number(e.target.value);
-                setDesiredCount(Number.isFinite(parsed) ? parsed : 0);
+                setDesiredWorkers(Number.isFinite(parsed) ? parsed : 0);
               }}
               className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
@@ -96,14 +94,14 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="preferredPeriod" className="text-sm font-medium">
+            <label htmlFor="desiredTiming" className="text-sm font-medium">
               희망 시기
             </label>
             <select
-              id="preferredPeriod"
-              value={preferredPeriod}
+              id="desiredTiming"
+              value={desiredTiming}
               onChange={(e) =>
-                setPreferredPeriod(e.target.value as (typeof PREFERRED_PERIODS)[number] | "")
+                setDesiredTiming(e.target.value as (typeof DESIRED_TIMINGS)[number] | "")
               }
               required
               className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -111,9 +109,9 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
               <option value="" disabled>
                 선택해주세요
               </option>
-              {PREFERRED_PERIODS.map((period) => (
-                <option key={period} value={period}>
-                  {PREFERRED_PERIOD_LABELS[period]}
+              {DESIRED_TIMINGS.map((timing) => (
+                <option key={timing} value={timing}>
+                  {DESIRED_TIMING_LABELS[timing]}
                 </option>
               ))}
             </select>

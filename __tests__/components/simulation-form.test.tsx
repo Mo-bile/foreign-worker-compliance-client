@@ -41,16 +41,16 @@ describe("SimulationForm", () => {
     const countInput = screen.getByLabelText("희망 고용인원");
     fireEvent.change(countInput, { target: { value: "3" } });
 
-    const periodSelect = screen.getByLabelText("희망 시기");
-    fireEvent.change(periodSelect, { target: { value: "2026_H2" } });
+    const timingSelect = screen.getByLabelText("희망 시기");
+    fireEvent.change(timingSelect, { target: { value: "2026_H2" } });
 
     const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
     fireEvent.click(submitButton);
 
     expect(onSubmit).toHaveBeenCalledWith({
-      desiredCount: 3,
+      desiredWorkers: 3,
       preferredNationality: undefined,
-      preferredPeriod: "2026_H2",
+      desiredTiming: "2026_H2",
     });
   });
 
