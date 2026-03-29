@@ -9,6 +9,7 @@ import type {
   QuotaAnalysis,
   CompetitionAnalysis,
   NationalityAnalysisResult,
+  AiInsightsResponse,
   SignalColor,
 } from "@/types/simulator";
 import type { Nationality } from "@/types/api";
@@ -196,97 +197,20 @@ function mapNationality(raw: NationalityAnalysisResult | null): NationalityAnaly
   };
 }
 
-// ─── AI Report Parsing ───────────────────────────────────────────
-
-interface ParsedReport {
-  readonly summary: string;
-  readonly quotaInsight: string;
-  readonly competitionInsight: string;
-}
-
-function parseAiReport(aiReport: string): ParsedReport {
-  const sections = aiReport.split(/^#{2,3}\s+/m).filter(Boolean);
-
-  if (sections.length < 2) {
-    console.warn(
-      `[parseAiReport] Unexpected AI report format: expected >=2 sections, got ${sections.length}. ` +
-        `Report preview: "${aiReport.slice(0, 100)}"`,
-    );
-    const trimmed = aiReport.trim() || "분석 요약을 불러올 수 없습니다";
-    return { summary: trimmed, quotaInsight: trimmed, competitionInsight: trimmed };
-  }
-
-  const firstContent = sections[0]!;
-  const contentLines = firstContent
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
-  const summary =
-    contentLines.length > 0 ? contentLines.join(" ") : aiReport.trim();
-
-  const quotaSection = sections.find((s) => s.match(/쿼터|소진율|배정/));
-  const competitionSection = sections.find((s) => s.match(/경쟁|지역|점유/));
-
-  const extractContent = (section: string | undefined): string => {
-    if (!section) return summary;
-    const lines = section
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    return lines.slice(1).join(" ") || lines[0] || summary;
-  };
-
-  return {
-    summary,
-    quotaInsight: extractContent(quotaSection),
-    competitionInsight: extractContent(competitionSection),
-  };
-}
-
 // ─── Recommendations ─────────────────────────────────────────────
 
 function buildRecommendations(
-  quota: QuotaAnalysis,
-  level: CompetitionLevel,
+  insights: AiInsightsResponse,
 ): readonly RecommendationItem[] {
-  const items: RecommendationItem[] = [
-    {
+  const items: RecommendationItem[] = insights.actionItems.map((text) => ({ text }));
+
+  if (items.length === 0) {
+    items.push({
       text: "내국인 구인노력 의무기간 14일을 우선 이행하세요",
       linkText: "워크넷 바로가기",
       href: "https://www.work.go.kr",
-    },
-  ];
-
-  if (!quota.quotaSufficient) {
-    items.push({
-      text: "현재 쿼터가 부족한 상태입니다. 다음 배정 시기를 확인하세요",
     });
   }
-
-  if (level === "HIGH") {
-    items.push({
-      text: "경쟁이 치열한 지역입니다. 서류를 미리 준비하면 처리 기간을 단축할 수 있습니다",
-      linkText: "서류 목록 보기",
-      href: "/documents",
-    });
-  } else {
-    items.push({
-      text: "필요 서류를 미리 준비하면 처리 기간을 단축할 수 있습니다",
-      linkText: "서류 목록 보기",
-      href: "/documents",
-    });
-  }
-
-  items.push(
-    {
-      text: "관할 고용센터에 사전 상담을 신청하세요",
-      linkText: "고용센터 찾기",
-      href: "https://www.ei.go.kr",
-    },
-    {
-      text: "E-9 비자 발급까지 평균 3~5개월이 소요됩니다",
-    },
-  );
 
   return items;
 }
@@ -294,16 +218,15 @@ function buildRecommendations(
 // ─── Main Transform ──────────────────────────────────────────────
 
 export function transformSimulationResult(raw: SimulationResultResponse): SimulationResponse {
-  const { quotaAnalysis, competitionAnalysis, nationalityAnalysis, aiReport } = raw;
+  const { quotaAnalysis, competitionAnalysis, nationalityAnalysis, aiInsights } = raw;
   const level = normalizeCompetitionLevel(competitionAnalysis.competitionLevel);
   const verdict = deriveVerdict(quotaAnalysis.quotaSufficient, level);
-  const parsed = parseAiReport(aiReport);
 
   return {
     id: String(raw.id),
     verdict,
     verdictText: VERDICT_TEXT[verdict],
-    summary: parsed.summary,
+    summary: aiInsights.overallVerdict,
     analyzedAt: raw.createdAt,
     dataSourceCount: DATA_SOURCE_COUNT,
     stats: {
@@ -312,10 +235,10 @@ export function transformSimulationResult(raw: SimulationResultResponse): Simula
       duration: buildDurationStat(level, raw.desiredTiming),
     },
     analyses: [
-      buildQuotaSection(quotaAnalysis, parsed.quotaInsight),
-      buildCompetitionSection(competitionAnalysis, level, parsed.competitionInsight),
+      buildQuotaSection(quotaAnalysis, aiInsights.quotaInsight),
+      buildCompetitionSection(competitionAnalysis, level, aiInsights.competitionInsight),
     ],
     nationality: mapNationality(nationalityAnalysis),
-    recommendations: buildRecommendations(quotaAnalysis, level),
+    recommendations: buildRecommendations(aiInsights),
   };
 }
