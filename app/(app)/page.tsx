@@ -55,8 +55,8 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Stat Cards: 3 normal + 1 urgent (row-span-2) */}
-      <div className="grid grid-cols-[repeat(3,1fr)_1fr] gap-4">
+      {/* Stat Cards: 4 equal columns */}
+      <div className="grid grid-cols-4 gap-4">
         <StatCard
           title="등록 근로자"
           value={stats.totalWorkers}
@@ -89,17 +89,15 @@ export default function DashboardPage() {
           className="border-t-[color:var(--signal-orange)]"
           subtitle={`D-7 이내 ${stats.deadlineBreakdown.d7}건 · D-30 이내 ${stats.deadlineBreakdown.d30}건`}
         />
-        <div className="col-start-4 row-span-2">
-          <StatCard
-            title="긴급 조치 필요"
-            value={stats.urgentActions}
-            icon={AlertTriangle}
-            isLoading={false}
-            variant="urgent"
-            className="h-full border-t-[color:var(--signal-red)]"
-            subtitle={`비자 만료 ${stats.urgentBreakdown.visa} · 보험 미가입 ${stats.urgentBreakdown.insurance}`}
-          />
-        </div>
+        <StatCard
+          title="긴급 조치 필요"
+          value={stats.urgentActions}
+          icon={AlertTriangle}
+          isLoading={false}
+          variant="urgent"
+          className="border-t-[color:var(--signal-red)]"
+          subtitle={`비자 만료 ${stats.urgentBreakdown.visa} · 보험 미가입 ${stats.urgentBreakdown.insurance}`}
+        />
       </div>
 
       {/* Main Grid: Left content + Right 360px sidebar */}
