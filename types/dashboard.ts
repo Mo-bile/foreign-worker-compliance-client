@@ -1,4 +1,4 @@
-import type { VisaType } from "./api";
+import type { VisaType, DeadlineType, DeadlineStatus } from "./api";
 
 export type AlertLevel = "critical" | "warning" | "info";
 export type DeadlineUrgency = "overdue" | "d7" | "d30" | "safe";
@@ -55,7 +55,7 @@ export interface DashboardStats {
   readonly totalWorkers: number;
   readonly visaBreakdown: readonly { readonly type: VisaType; readonly count: number }[];
   readonly insuranceRate: number;
-  readonly insuranceRateChange: number;
+  readonly insuranceRateChange: number | null;
   readonly upcomingDeadlines: number;
   readonly deadlineBreakdown: { readonly d7: number; readonly d30: number };
   readonly urgentActions: number;
@@ -70,4 +70,70 @@ export interface DashboardResponse {
   readonly complianceScore: Readonly<ComplianceScoreData>;
   readonly aiInsight: string;
   readonly upcomingDeadlines: readonly DashboardDeadline[];
+}
+
+// ─── BE Raw Response Types ──────────────────────────────────
+
+export interface DashboardRawResponse {
+  readonly stats: DashboardRawStats;
+  readonly alerts: readonly DashboardRawAlert[];
+  readonly visaDistribution: readonly VisaRawDistributionItem[];
+  readonly insuranceSummary: readonly InsuranceRawSummaryItem[];
+  readonly complianceScore: Readonly<ComplianceRawScoreData>;
+  readonly aiInsight: string;
+  readonly upcomingDeadlines: readonly DashboardRawDeadline[];
+}
+
+export interface DashboardRawStats {
+  readonly totalWorkers: number;
+  readonly visaBreakdown: readonly { readonly visaType: VisaType; readonly count: number }[];
+  readonly insuranceRate: number;
+  readonly upcomingDeadlines: number;
+  readonly deadlineBreakdown: { readonly d7: number; readonly d30: number };
+  readonly urgentActions: number;
+  readonly urgentBreakdown: { readonly visa: number; readonly insurance: number };
+}
+
+export interface DashboardRawAlert {
+  readonly deadlineId: number;
+  readonly workerId: number;
+  readonly workerName: string;
+  readonly deadlineType: DeadlineType;
+  readonly status: DeadlineStatus;
+  readonly dDay: number;
+  readonly dueDate: string;
+  readonly description: string;
+}
+
+export interface VisaRawDistributionItem {
+  readonly visaType: VisaType;
+  readonly count: number;
+  readonly percentage: number;
+}
+
+export interface InsuranceRawSummaryItem {
+  readonly insuranceType: string;
+  readonly mandatoryCount: number;
+  readonly totalWorkers: number;
+}
+
+export interface ComplianceRawScoreData {
+  readonly total: number;
+  readonly breakdown: readonly ComplianceRawBreakdownItem[];
+}
+
+export interface ComplianceRawBreakdownItem {
+  readonly category: string;
+  readonly score: number;
+}
+
+export interface DashboardRawDeadline {
+  readonly deadlineId: number;
+  readonly workerId: number;
+  readonly workerName: string;
+  readonly visaType: VisaType;
+  readonly deadlineType: DeadlineType;
+  readonly status: DeadlineStatus;
+  readonly dDay: number;
+  readonly dueDate: string;
 }
