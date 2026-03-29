@@ -72,10 +72,14 @@ export default function DashboardPage() {
           isLoading={false}
           className="border-t-[color:var(--signal-green)]"
           valueSuffix="%"
-          change={{
-            direction: stats.insuranceRateChange >= 0 ? "up" : "down",
-            text: `전월 대비 ${Math.abs(stats.insuranceRateChange)}%p ${stats.insuranceRateChange >= 0 ? "개선" : "하락"}`,
-          }}
+          change={
+            stats.insuranceRateChange != null
+              ? {
+                  direction: stats.insuranceRateChange >= 0 ? "up" : "down",
+                  text: `전월 대비 ${Math.abs(stats.insuranceRateChange)}%p ${stats.insuranceRateChange >= 0 ? "개선" : "하락"}`,
+                }
+              : undefined
+          }
         />
         <StatCard
           title="다가오는 데드라인"
