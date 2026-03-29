@@ -55,8 +55,8 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Stat Cards: 3 normal + 1 urgent (row-span-2) */}
-      <div className="grid grid-cols-[repeat(3,1fr)_1fr] gap-4">
+      {/* Stat Cards: 4 equal columns */}
+      <div className="grid grid-cols-4 gap-4">
         <StatCard
           title="등록 근로자"
           value={stats.totalWorkers}
@@ -72,10 +72,14 @@ export default function DashboardPage() {
           isLoading={false}
           className="border-t-[color:var(--signal-green)]"
           valueSuffix="%"
-          change={{
-            direction: stats.insuranceRateChange >= 0 ? "up" : "down",
-            text: `전월 대비 ${Math.abs(stats.insuranceRateChange)}%p ${stats.insuranceRateChange >= 0 ? "개선" : "하락"}`,
-          }}
+          change={
+            stats.insuranceRateChange != null
+              ? {
+                  direction: stats.insuranceRateChange >= 0 ? "up" : "down",
+                  text: `전월 대비 ${Math.abs(stats.insuranceRateChange)}%p ${stats.insuranceRateChange >= 0 ? "개선" : "하락"}`,
+                }
+              : undefined
+          }
         />
         <StatCard
           title="다가오는 데드라인"
@@ -85,17 +89,15 @@ export default function DashboardPage() {
           className="border-t-[color:var(--signal-orange)]"
           subtitle={`D-7 이내 ${stats.deadlineBreakdown.d7}건 · D-30 이내 ${stats.deadlineBreakdown.d30}건`}
         />
-        <div className="col-start-4 row-span-2">
-          <StatCard
-            title="긴급 조치 필요"
-            value={stats.urgentActions}
-            icon={AlertTriangle}
-            isLoading={false}
-            variant="urgent"
-            className="h-full border-t-[color:var(--signal-red)]"
-            subtitle={`비자 만료 ${stats.urgentBreakdown.visa} · 보험 미가입 ${stats.urgentBreakdown.insurance}`}
-          />
-        </div>
+        <StatCard
+          title="긴급 조치 필요"
+          value={stats.urgentActions}
+          icon={AlertTriangle}
+          isLoading={false}
+          variant="urgent"
+          className="border-t-[color:var(--signal-red)]"
+          subtitle={`비자 만료 ${stats.urgentBreakdown.visa} · 보험 미가입 ${stats.urgentBreakdown.insurance}`}
+        />
       </div>
 
       {/* Main Grid: Left content + Right 360px sidebar */}
@@ -106,7 +108,7 @@ export default function DashboardPage() {
           <section>
             <div className="mb-3.5 flex items-center justify-between">
               <h2 className="text-[15px] font-semibold">⚡ 긴급 알림</h2>
-              <Link href="/deadlines" className="text-xs text-primary hover:underline">
+              <Link href="/compliance" className="text-xs text-primary hover:underline">
                 전체 보기 →
               </Link>
             </div>

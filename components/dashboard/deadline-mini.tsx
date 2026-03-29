@@ -32,7 +32,7 @@ export function DeadlineMini({ deadlines }: DeadlineMiniProps) {
             <Clock className="h-4 w-4 text-muted-foreground" />
             다가오는 데드라인
           </CardTitle>
-          <Link href="/deadlines" className="text-xs text-primary hover:underline">
+          <Link href="/compliance" className="text-xs text-primary hover:underline">
             전체 →
           </Link>
         </div>
@@ -51,7 +51,7 @@ export function DeadlineMini({ deadlines }: DeadlineMiniProps) {
               </p>
             </div>
             <span className={cn("shrink-0 text-xs font-semibold", dDayColors[item.urgency])}>
-              D-{item.dDay}
+              D-{Math.abs(item.dDay)}
             </span>
           </div>
         ))}

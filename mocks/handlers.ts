@@ -1,7 +1,8 @@
 import { http, HttpResponse } from "msw";
 import type { CompanyResponse } from "@/types/api";
 import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies } from "./data";
-import { mockDashboard } from "@/mocks/dashboard-data";
+import { mockDashboardRaw } from "@/mocks/dashboard-data";
+import { transformDashboardResponse } from "@/lib/transforms/dashboard-transform";
 import { mockSimulationResultResponse, mockSimulationResponse } from "@/mocks/simulator-data";
 import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
 import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
@@ -112,7 +113,11 @@ const patchComplianceComplete: Parameters<typeof http.patch>[1] = () =>
 
 const getMetadata: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockMetadata);
 
-const getDashboard: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockDashboard);
+const getDashboardBackend: Parameters<typeof http.get>[1] = () =>
+  HttpResponse.json(mockDashboardRaw);
+
+const getDashboardBff: Parameters<typeof http.get>[1] = () =>
+  HttpResponse.json(transformDashboardResponse(mockDashboardRaw));
 
 const postSimulationBackend: Parameters<typeof http.post>[1] = () =>
   new HttpResponse(null, {
@@ -176,8 +181,8 @@ export const handlers = [
   http.get("*/api/metadata", getMetadata),
 
   // Dashboard
-  http.get(`${BACKEND}/api/dashboard`, getDashboard),
-  http.get("*/api/dashboard", getDashboard),
+  http.get(`${BACKEND}/api/dashboard`, getDashboardBackend),
+  http.get("*/api/dashboard", getDashboardBff),
 
   // Simulations
   http.post(`${BACKEND}/api/simulations`, postSimulationBackend),
