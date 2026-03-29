@@ -213,6 +213,7 @@ const companyBaseFields = z.object({
   industryCategory: z.enum(INDUSTRY_CATEGORIES, { error: "업종을 선택해주세요" }),
   industrySubCategory: z.string().optional(),
   employeeCount: z.number().int().min(1, "1명 이상이어야 합니다"),
+  domesticInsuredCount: z.number().int().min(0, "0명 이상이어야 합니다").optional(),
   foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
   address: z.string().min(1, "주소를 입력해주세요"),
   contactPhone: z.string().min(1, "연락처를 입력해주세요"),
@@ -272,6 +273,7 @@ export interface CompanyResponse {
   readonly industryCategoryName: string;
   readonly industrySubCategory: string | null;
   readonly employeeCount: number;
+  readonly domesticInsuredCount: number | null;
   readonly foreignWorkerCount: number;
   readonly address: string;
   readonly contactPhone: string;

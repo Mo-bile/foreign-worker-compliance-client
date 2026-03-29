@@ -36,6 +36,12 @@ export function CompanyDetailCard({ company }: CompanyDetailCardProps) {
             <dd className="font-medium">{company.employeeCount}명</dd>
           </div>
           <div>
+            <dt className="text-sm text-muted-foreground">내국인 피보험자 수</dt>
+            <dd className="font-medium">
+              {company.domesticInsuredCount != null ? `${company.domesticInsuredCount}명` : "—"}
+            </dd>
+          </div>
+          <div>
             <dt className="text-sm text-muted-foreground">외국인 근로자 수</dt>
             <dd className="font-medium">{company.foreignWorkerCount}명</dd>
           </div>

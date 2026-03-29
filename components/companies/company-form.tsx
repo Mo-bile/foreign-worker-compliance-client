@@ -232,6 +232,16 @@ export function CompanyForm(props: CompanyFormProps) {
           />
 
           <FormField
+            label="내국인 피보험자 수 (선택)"
+            name="domesticInsuredCount"
+            register={register}
+            errors={errors}
+            type="number"
+            placeholder="40"
+            registerOptions={{ setValueAs: (v: string) => (v === "" ? undefined : Number(v)) }}
+          />
+
+          <FormField
             label="외국인 근로자 수"
             name="foreignWorkerCount"
             register={register}
