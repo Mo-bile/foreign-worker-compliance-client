@@ -95,4 +95,63 @@ describe("DeadlineTable", () => {
     render(<DeadlineTable title="테스트" deadlines={undefined} isLoading={true} />);
     expect(document.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);
   });
+
+  it("onComplete이_있으면_처리_컬럼과_완료_버튼이_표시된다", () => {
+    const onComplete = vi.fn();
+    render(
+      <DeadlineTable
+        title="테스트"
+        deadlines={testDeadlines.slice(0, 3)}
+        isLoading={false}
+        onComplete={onComplete}
+      />,
+    );
+    expect(screen.getByText("처리")).toBeDefined();
+    expect(screen.getAllByRole("button", { name: "완료" })).toHaveLength(3);
+  });
+
+  it("onComplete이_없으면_처리_컬럼이_표시되지_않는다", () => {
+    render(
+      <DeadlineTable title="테스트" deadlines={testDeadlines.slice(0, 3)} isLoading={false} />,
+    );
+    expect(screen.queryByText("처리")).toBeNull();
+    expect(screen.queryByRole("button", { name: "완료" })).toBeNull();
+  });
+
+  it("COMPLETED_상태인_항목은_완료_버튼이_비활성화된다", () => {
+    const completedDeadline: ComplianceDeadlineResponse[] = [
+      {
+        id: 99,
+        workerId: 1,
+        deadlineType: "VISA_EXPIRY",
+        dueDate: "2026-01-01",
+        status: "COMPLETED",
+        description: "완료된 데드라인",
+      },
+    ];
+    render(
+      <DeadlineTable
+        title="테스트"
+        deadlines={completedDeadline}
+        isLoading={false}
+        onComplete={vi.fn()}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "완료됨" });
+    expect(button).toHaveProperty("disabled", true);
+  });
+
+  it("완료_버튼_클릭시_onComplete_콜백이_호출된다", async () => {
+    const onComplete = vi.fn();
+    render(
+      <DeadlineTable
+        title="테스트"
+        deadlines={testDeadlines.slice(0, 1)}
+        isLoading={false}
+        onComplete={onComplete}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "완료" }));
+    expect(onComplete).toHaveBeenCalledWith(testDeadlines[0].id);
+  });
 });

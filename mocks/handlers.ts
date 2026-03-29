@@ -6,6 +6,7 @@ import { mockSimulationResultResponse, mockSimulationResponse } from "@/mocks/si
 import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
 import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
 import { mockComplianceReport } from "./report-data";
+import { mockMetadata } from "./metadata-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
@@ -106,6 +107,11 @@ const getComplianceByWorker: Parameters<typeof http.get>[1] = ({ params }) => {
   return HttpResponse.json(deadlines);
 };
 
+const patchComplianceComplete: Parameters<typeof http.patch>[1] = () =>
+  new HttpResponse(null, { status: 204 });
+
+const getMetadata: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockMetadata);
+
 const getDashboard: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockDashboard);
 
 const postSimulationBackend: Parameters<typeof http.post>[1] = () =>
@@ -162,6 +168,12 @@ export const handlers = [
   http.get("*/api/compliance/worker/:id", getComplianceByWorker),
   http.get("*/api/compliance/overdue", getComplianceOverdue),
   http.get("*/api/compliance/upcoming", getComplianceUpcoming),
+  http.patch(`${BACKEND}/api/compliance/:id/complete`, patchComplianceComplete),
+  http.patch("*/api/compliance/:id/complete", patchComplianceComplete),
+
+  // Metadata
+  http.get(`${BACKEND}/api/metadata`, getMetadata),
+  http.get("*/api/metadata", getMetadata),
 
   // Dashboard
   http.get(`${BACKEND}/api/dashboard`, getDashboard),

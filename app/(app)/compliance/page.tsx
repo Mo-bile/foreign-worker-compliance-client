@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -16,6 +17,7 @@ import {
   usePaginatedOverdueDeadlines,
   usePaginatedUpcomingDeadlines,
   useUpcomingDeadlines,
+  useCompleteDeadline,
 } from "@/lib/queries/use-compliance";
 import type { ComplianceFilterValues } from "@/lib/queries/use-compliance";
 import {
@@ -43,6 +45,22 @@ export default function CompliancePage() {
   // useUpcomingDeadlines(30) is already called inside usePaginatedUpcomingDeadlines above,
   // so React Query deduplicates — no extra fetch for the chart.
   const upcomingAll = useUpcomingDeadlines(30);
+
+  const completeMutation = useCompleteDeadline();
+
+  const handleComplete = useCallback(
+    (id: number) => {
+      completeMutation.mutate(id, {
+        onSuccess: () => {
+          toast.success("데드라인이 완료 처리되었습니다");
+        },
+        onError: (error) => {
+          toast.error(error.message);
+        },
+      });
+    },
+    [completeMutation],
+  );
 
   const resetPages = useCallback(() => {
     setOverduePage(1);
@@ -103,6 +121,8 @@ export default function CompliancePage() {
         isLoading={overdue.isLoading}
         isError={overdue.isError}
         hasUnfilteredData={(overdueAll.data?.length ?? 0) > 0}
+        onComplete={handleComplete}
+        isCompleting={completeMutation.isPending}
         pagination={
           overdue.deadlines && overdue.deadlines.totalPages > 0
             ? {
@@ -123,6 +143,8 @@ export default function CompliancePage() {
           isLoading={upcoming.isLoading}
           isError={upcoming.isError}
           hasUnfilteredData={(upcomingAll.data?.length ?? 0) > 0}
+          onComplete={handleComplete}
+          isCompleting={completeMutation.isPending}
           pagination={
             upcoming.deadlines && upcoming.deadlines.totalPages > 0
               ? {
