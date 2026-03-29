@@ -55,6 +55,20 @@ const COMPLIANCE_CATEGORY_LABEL_MAP: Record<string, string> = {
 
 // ─── Helpers ─────────────────────────────────────────────────────
 
+function toAlertLevel(status: string): AlertLevel {
+  const mapped = STATUS_TO_LEVEL[status];
+  if (mapped !== undefined) return mapped;
+  console.warn(`[transformAlert] Unexpected alert status: "${status}". Defaulting to "info".`);
+  return "info";
+}
+
+function toDeadlineUrgency(status: string): DeadlineUrgency {
+  const mapped = STATUS_TO_URGENCY[status];
+  if (mapped !== undefined) return mapped;
+  console.warn(`[transformDeadline] Unexpected deadline status: "${status}". Defaulting to "safe".`);
+  return "safe";
+}
+
 function formatBadgeText(dDay: number): string {
   if (dDay > 0) return `D+${dDay}`;
   if (dDay === 0) return "D-0";
@@ -85,6 +99,9 @@ function buildAlertActions(workerId: number, deadlineType: DeadlineType): readon
         { label: "신고하기", href: workerHref },
         { label: "근로자 상세", href: workerHref },
       ];
+    default:
+      console.warn(`[buildAlertActions] Unknown deadlineType: "${deadlineType as string}"`);
+      return [{ label: "근로자 상세", href: workerHref }];
   }
 }
 
@@ -93,7 +110,7 @@ function buildAlertActions(workerId: number, deadlineType: DeadlineType): readon
 function transformAlert(raw: DashboardRawAlert): DashboardAlert {
   return {
     id: String(raw.deadlineId),
-    level: STATUS_TO_LEVEL[raw.status] ?? "info",
+    level: toAlertLevel(raw.status),
     title: `${ALERT_TITLE_MAP[raw.deadlineType] ?? raw.deadlineType} — ${raw.workerName}`,
     description: raw.description,
     dDay: raw.dDay,
@@ -136,7 +153,7 @@ function transformDeadline(raw: DashboardRawDeadline): DashboardDeadline {
     workerName: raw.workerName,
     visaType: raw.visaType,
     dDay: raw.dDay,
-    urgency: STATUS_TO_URGENCY[raw.status] ?? "safe",
+    urgency: toDeadlineUrgency(raw.status),
   };
 }
 

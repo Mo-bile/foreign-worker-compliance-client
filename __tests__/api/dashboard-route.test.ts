@@ -1,8 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
+import { http, HttpResponse } from "msw";
 import { server } from "@/mocks/server";
 import { GET } from "@/app/api/dashboard/route";
 import { NextRequest } from "next/server";
 import type { DashboardResponse } from "@/types/dashboard";
+
+const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
@@ -39,5 +42,27 @@ describe("GET /api/dashboard", () => {
     const request = makeRequest("http://localhost:3000/api/dashboard?companyId=abc");
     const response = await GET(request);
     expect(response.status).toBe(400);
+  });
+
+  it("BE가_500을_반환하면_500을_전달한다", async () => {
+    server.use(
+      http.get(`${BACKEND}/api/dashboard`, () =>
+        HttpResponse.json({ message: "서버 오류" }, { status: 500 }),
+      ),
+    );
+    const request = makeRequest("http://localhost:3000/api/dashboard?companyId=1");
+    const response = await GET(request);
+    expect(response.status).toBe(500);
+  });
+
+  it("BE_응답이_변환_불가하면_502를_반환한다", async () => {
+    server.use(
+      http.get(`${BACKEND}/api/dashboard`, () =>
+        HttpResponse.json({ stats: null, alerts: null }),
+      ),
+    );
+    const request = makeRequest("http://localhost:3000/api/dashboard?companyId=1");
+    const response = await GET(request);
+    expect(response.status).toBe(502);
   });
 });
