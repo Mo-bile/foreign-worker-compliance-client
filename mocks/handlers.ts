@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
 import type { CompanyResponse } from "@/types/api";
 import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies } from "./data";
-import { mockDashboard } from "@/mocks/dashboard-data";
+import { mockDashboardRaw } from "@/mocks/dashboard-data";
 import { mockSimulationResultResponse, mockSimulationResponse } from "@/mocks/simulator-data";
 import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
 import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
@@ -112,7 +112,7 @@ const patchComplianceComplete: Parameters<typeof http.patch>[1] = () =>
 
 const getMetadata: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockMetadata);
 
-const getDashboard: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockDashboard);
+const getDashboard: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockDashboardRaw);
 
 const postSimulationBackend: Parameters<typeof http.post>[1] = () =>
   new HttpResponse(null, {

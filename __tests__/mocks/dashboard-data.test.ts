@@ -1,33 +1,34 @@
 import { describe, it, expect } from "vitest";
-import { mockDashboard } from "@/mocks/dashboard-data";
+import { mockDashboardRaw } from "@/mocks/dashboard-data";
 
-describe("mockDashboard", () => {
+describe("mockDashboardRaw", () => {
   it("stats_필드가_올바른_구조를_갖는다", () => {
-    expect(mockDashboard.stats.totalWorkers).toBe(12);
-    expect(mockDashboard.stats.visaBreakdown).toHaveLength(3);
-    expect(mockDashboard.stats.insuranceRate).toBe(91.7);
-    expect(mockDashboard.stats.urgentActions).toBe(3);
+    expect(mockDashboardRaw.stats.totalWorkers).toBe(12);
+    expect(mockDashboardRaw.stats.visaBreakdown).toHaveLength(3);
+    expect(mockDashboardRaw.stats.insuranceRate).toBe(91.7);
+    expect(mockDashboardRaw.stats.urgentActions).toBe(3);
   });
 
-  it("alerts가_3개_있다", () => {
-    expect(mockDashboard.alerts).toHaveLength(3);
-    expect(mockDashboard.alerts[0].level).toBe("critical");
-    expect(mockDashboard.alerts[1].level).toBe("warning");
-    expect(mockDashboard.alerts[2].level).toBe("info");
+  it("alerts가_3개_있고_BE_도메인_필드를_갖는다", () => {
+    expect(mockDashboardRaw.alerts).toHaveLength(3);
+    expect(mockDashboardRaw.alerts[0].deadlineType).toBe("VISA_EXPIRY");
+    expect(mockDashboardRaw.alerts[0].status).toBe("URGENT");
+    expect(mockDashboardRaw.alerts[1].status).toBe("OVERDUE");
+    expect(mockDashboardRaw.alerts[2].status).toBe("APPROACHING");
   });
 
   it("complianceScore_total이_73이다", () => {
-    expect(mockDashboard.complianceScore.total).toBe(73);
-    expect(mockDashboard.complianceScore.breakdown).toHaveLength(3);
+    expect(mockDashboardRaw.complianceScore.total).toBe(73);
+    expect(mockDashboardRaw.complianceScore.breakdown).toHaveLength(2);
   });
 
   it("upcomingDeadlines가_5개_있다", () => {
-    expect(mockDashboard.upcomingDeadlines).toHaveLength(5);
+    expect(mockDashboardRaw.upcomingDeadlines).toHaveLength(5);
   });
 
-  it("모든_alert에_actions가_있다", () => {
-    for (const alert of mockDashboard.alerts) {
-      expect(alert.actions.length).toBeGreaterThan(0);
-    }
+  it("insuranceSummary가_BE_도메인_필드를_갖는다", () => {
+    expect(mockDashboardRaw.insuranceSummary[0].insuranceType).toBe("NATIONAL_PENSION");
+    expect(mockDashboardRaw.insuranceSummary[0].mandatoryCount).toBe(10);
+    expect(mockDashboardRaw.insuranceSummary[0].totalWorkers).toBe(12);
   });
 });
