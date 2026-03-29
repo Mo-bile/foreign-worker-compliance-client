@@ -109,6 +109,12 @@ const getComplianceByWorker: Parameters<typeof http.get>[1] = ({ params }) => {
 const getDashboard: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockDashboard);
 
 const postSimulationBackend: Parameters<typeof http.post>[1] = () =>
+  new HttpResponse(null, {
+    status: 201,
+    headers: { Location: `/api/simulations/${mockSimulationResultResponse.id}` },
+  });
+
+const getSimulationBackend: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockSimulationResultResponse);
 
 const postSimulationBff: Parameters<typeof http.post>[1] = () =>
@@ -163,6 +169,7 @@ export const handlers = [
 
   // Simulations
   http.post(`${BACKEND}/api/simulations`, postSimulationBackend),
+  http.get(`${BACKEND}/api/simulations/:id`, getSimulationBackend),
   http.post("*/api/simulations", postSimulationBff),
 
   // Benchmarks

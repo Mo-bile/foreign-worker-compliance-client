@@ -47,6 +47,29 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   return handleResponse<T>(response);
 }
 
+async function postAndFollow<T>(path: string, body: unknown): Promise<T> {
+  const base = getBaseUrl();
+  const response = await fetch(`${base}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    return handleResponse<T>(response);
+  }
+
+  if (response.status === 201) {
+    const location = response.headers.get("Location");
+    if (location) {
+      const followPath = location.startsWith("/") ? location : `/${location}`;
+      return get<T>(followPath);
+    }
+  }
+
+  return response.json() as Promise<T>;
+}
+
 async function put<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${getBaseUrl()}${path}`, {
     method: "PUT",
@@ -56,4 +79,4 @@ async function put<T>(path: string, body: unknown): Promise<T> {
   return handleResponse<T>(response);
 }
 
-export const apiClient = { get, post, put } as const;
+export const apiClient = { get, post, postAndFollow, put } as const;

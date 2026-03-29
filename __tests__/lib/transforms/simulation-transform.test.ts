@@ -3,29 +3,34 @@ import { transformSimulationResult } from "@/lib/transforms/simulation-transform
 import type { SimulationResultResponse } from "@/types/simulator";
 
 const baseRaw: SimulationResultResponse = {
-  id: "sim-001",
+  id: 1,
   companyId: 1,
   desiredWorkers: 3,
   desiredTiming: "2026_H2",
   preferredNationality: "VIETNAM",
   quotaAnalysis: {
-    industryQuota: 4200,
-    currentAllocated: 2856,
+    industry: "MANUFACTURING",
+    annualQuota: 4200,
+    currentWorkerCount: 2856,
+    exhaustionRate: 68.0,
     remainingQuota: 1344,
-    utilizationRate: 68.0,
     quotaSufficient: true,
   },
   competitionAnalysis: {
-    regionApplicants: 127,
-    densityRank: 35,
-    avgApplicationRate: 1.4,
+    region: "GYEONGGI",
+    industry: "MANUFACTURING",
+    regionalWorkerCount: 15200,
+    nationalWorkerCount: 48000,
+    regionalShare: 0.317,
     competitionLevel: "MEDIUM",
   },
   nationalityAnalysis: {
     nationality: "VIETNAM",
+    industry: "MANUFACTURING",
+    totalCount: 12500,
+    maleCount: 8200,
+    femaleCount: 4300,
     industryShareRate: 32.4,
-    requestedShareRate: 28.7,
-    available: true,
   },
   aiReport:
     "## 분석 요약\n현재 조건에서 E-9 근로자 배정 가능성이 높습니다.\n\n## 상세 분석\n해당 지역의 쿼터 여유분과 업종 수요를 고려할 때 신청 적기입니다.",
@@ -36,7 +41,7 @@ describe("transformSimulationResult", () => {
   it("기본_구조를_올바르게_변환한다", () => {
     const result = transformSimulationResult(baseRaw);
 
-    expect(result.id).toBe("sim-001");
+    expect(result.id).toBe("1");
     expect(result.analyzedAt).toBe("2026-03-24T14:32:00Z");
     expect(result.verdict).toBeDefined();
     expect(result.verdictText).toBeDefined();
@@ -96,12 +101,12 @@ describe("transformSimulationResult", () => {
       expect(allocation.color).toBeDefined();
     });
 
-    it("competition_stat을_올바르게_생성한다", () => {
+    it("competition_stat에_지역_점유율을_표시한다", () => {
       const result = transformSimulationResult(baseRaw);
       const { competition } = result.stats;
 
       expect(competition.label).toBe("지역 경쟁도");
-      expect(competition.subText).toContain("상위");
+      expect(competition.subText).toContain("점유율");
       expect(competition.color).toBeDefined();
     });
 
@@ -178,25 +183,10 @@ describe("transformSimulationResult", () => {
       expect(result.nationality).not.toBeNull();
       expect(result.nationality!.nationality).toBe("VIETNAM");
       expect(result.nationality!.percentage).toBe(32.4);
-      expect(result.nationality!.avgPercentage).toBe(28.7);
-      expect(result.nationality!.trend).toBeDefined();
     });
 
     it("nationalityAnalysis가_null이면_null을_반환한다", () => {
       const raw: SimulationResultResponse = { ...baseRaw, nationalityAnalysis: null };
-      const result = transformSimulationResult(raw);
-
-      expect(result.nationality).toBeNull();
-    });
-
-    it("available이_false면_null을_반환한다", () => {
-      const raw: SimulationResultResponse = {
-        ...baseRaw,
-        nationalityAnalysis: {
-          ...baseRaw.nationalityAnalysis!,
-          available: false,
-        },
-      };
       const result = transformSimulationResult(raw);
 
       expect(result.nationality).toBeNull();
@@ -236,7 +226,7 @@ describe("transformSimulationResult", () => {
     it("쿼터_부족_시_관련_추천을_포함한다", () => {
       const raw: SimulationResultResponse = {
         ...baseRaw,
-        quotaAnalysis: { ...baseRaw.quotaAnalysis, quotaSufficient: false, utilizationRate: 95 },
+        quotaAnalysis: { ...baseRaw.quotaAnalysis, quotaSufficient: false, exhaustionRate: 95 },
       };
       const result = transformSimulationResult(raw);
       const texts = result.recommendations.map((r) => r.text);
@@ -247,5 +237,14 @@ describe("transformSimulationResult", () => {
   it("dataSourceCount를_고유_데이터소스_수로_계산한다", () => {
     const result = transformSimulationResult(baseRaw);
     expect(result.dataSourceCount).toBe(2);
+  });
+
+  it("competitionLevel_문자열을_정규화한다", () => {
+    const raw: SimulationResultResponse = {
+      ...baseRaw,
+      competitionAnalysis: { ...baseRaw.competitionAnalysis, competitionLevel: "high" },
+    };
+    const result = transformSimulationResult(raw);
+    expect(result.verdict).toBe("MEDIUM");
   });
 });
