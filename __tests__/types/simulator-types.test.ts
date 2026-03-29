@@ -4,23 +4,24 @@ import {
   type SimulationRequest,
   type SimulationResponse,
   type SimulationVerdict,
+  type SimulationResultResponse,
 } from "@/types/simulator";
 
 describe("Simulator Types", () => {
   it("유효한_시뮬레이션_요청을_파싱한다", () => {
     const input: SimulationRequest = {
-      desiredCount: 3,
+      desiredWorkers: 3,
       preferredNationality: "VIETNAM",
-      preferredPeriod: "2026_H2",
+      desiredTiming: "2026_H2",
     };
     const result = simulationRequestSchema.safeParse(input);
     expect(result.success).toBe(true);
   });
 
-  it("desiredCount가_0이면_실패한다", () => {
+  it("desiredWorkers가_0이면_실패한다", () => {
     const result = simulationRequestSchema.safeParse({
-      desiredCount: 0,
-      preferredPeriod: "2026_H2",
+      desiredWorkers: 0,
+      desiredTiming: "2026_H2",
     });
     expect(result.success).toBe(false);
   });
@@ -81,5 +82,33 @@ describe("Simulator Types", () => {
     };
     expect(response.verdict).toBe("HIGH");
     expect(response.analyses).toHaveLength(1);
+  });
+
+  it("SimulationResultResponse_BE_타입_구조가_올바르다", () => {
+    const raw: SimulationResultResponse = {
+      id: "sim-1",
+      companyId: 1,
+      desiredWorkers: 3,
+      desiredTiming: "2026_H2",
+      preferredNationality: "VIETNAM",
+      quotaAnalysis: {
+        industryQuota: 4200,
+        currentAllocated: 2856,
+        remainingQuota: 1344,
+        utilizationRate: 68.0,
+        quotaSufficient: true,
+      },
+      competitionAnalysis: {
+        regionApplicants: 127,
+        densityRank: 35,
+        avgApplicationRate: 1.4,
+        competitionLevel: "MEDIUM",
+      },
+      nationalityAnalysis: null,
+      aiReport: "분석 보고서",
+      createdAt: "2026-03-24T14:32:00Z",
+    };
+    expect(raw.quotaAnalysis.quotaSufficient).toBe(true);
+    expect(raw.competitionAnalysis.competitionLevel).toBe("MEDIUM");
   });
 });

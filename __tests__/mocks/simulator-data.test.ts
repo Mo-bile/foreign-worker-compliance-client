@@ -4,7 +4,7 @@ import { mockSimulationResponse } from "@/mocks/simulator-data";
 describe("mockSimulationResponse", () => {
   it("필수_필드가_존재한다", () => {
     expect(mockSimulationResponse.id).toBeDefined();
-    expect(mockSimulationResponse.verdict).toBe("HIGH");
+    expect(mockSimulationResponse.verdict).toBe("MEDIUM");
     expect(mockSimulationResponse.stats.allocation).toBeDefined();
     expect(mockSimulationResponse.stats.competition).toBeDefined();
     expect(mockSimulationResponse.stats.duration).toBeDefined();

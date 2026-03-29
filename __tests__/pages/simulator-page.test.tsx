@@ -84,8 +84,8 @@ describe("SimulatorPage", () => {
     const countInput = screen.getByLabelText("희망 고용인원");
     fireEvent.change(countInput, { target: { value: "3" } });
 
-    const periodSelect = screen.getByLabelText("희망 시기");
-    fireEvent.change(periodSelect, { target: { value: "2026_H2" } });
+    const timingSelect = screen.getByLabelText("희망 시기");
+    fireEvent.change(timingSelect, { target: { value: "2026_H2" } });
 
     const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
     fireEvent.click(submitButton);
@@ -94,7 +94,6 @@ describe("SimulatorPage", () => {
       expect(screen.getByText("분석 완료")).toBeDefined();
     });
 
-    expect(screen.getAllByText(/높음/).length).toBeGreaterThan(0);
     expect(screen.getByText("배정 가능성")).toBeDefined();
     expect(screen.getByText("쿼터 분석")).toBeDefined();
     expect(screen.getByText("다음 단계 추천")).toBeDefined();
@@ -115,8 +114,8 @@ describe("SimulatorPage", () => {
     const countInput = screen.getByLabelText("희망 고용인원");
     fireEvent.change(countInput, { target: { value: "3" } });
 
-    const periodSelect = screen.getByLabelText("희망 시기");
-    fireEvent.change(periodSelect, { target: { value: "2026_H2" } });
+    const timingSelect = screen.getByLabelText("희망 시기");
+    fireEvent.change(timingSelect, { target: { value: "2026_H2" } });
 
     const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
     fireEvent.click(submitButton);

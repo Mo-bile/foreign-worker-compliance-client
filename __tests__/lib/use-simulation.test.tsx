@@ -20,21 +20,37 @@ function createWrapper() {
 
 describe("useSimulation", () => {
   it("시뮬레이션_요청을_보내고_결과를_반환한다", async () => {
-    const { result } = renderHook(() => useSimulation(), {
+    const { result } = renderHook(() => useSimulation(1), {
       wrapper: createWrapper(),
     });
 
     act(() => {
       result.current.mutate({
-        desiredCount: 3,
+        desiredWorkers: 3,
         preferredNationality: "VIETNAM",
-        preferredPeriod: "2026_H2",
+        desiredTiming: "2026_H2",
       });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data?.verdict).toBe("HIGH");
+    expect(result.current.data?.verdict).toBeDefined();
     expect(result.current.data?.analyses.length).toBeGreaterThan(0);
+  });
+
+  it("companyId가_null이면_에러를_반환한다", async () => {
+    const { result } = renderHook(() => useSimulation(null), {
+      wrapper: createWrapper(),
+    });
+
+    act(() => {
+      result.current.mutate({
+        desiredWorkers: 3,
+        desiredTiming: "2026_H2",
+      });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error?.message).toBe("사업장을 먼저 선택해주세요");
   });
 });

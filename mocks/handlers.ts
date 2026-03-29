@@ -2,7 +2,7 @@ import { http, HttpResponse } from "msw";
 import type { CompanyResponse } from "@/types/api";
 import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies } from "./data";
 import { mockDashboard } from "@/mocks/dashboard-data";
-import { mockSimulationResponse } from "@/mocks/simulator-data";
+import { mockSimulationResultResponse, mockSimulationResponse } from "@/mocks/simulator-data";
 import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
 import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
 import { mockComplianceReport } from "./report-data";
@@ -108,7 +108,10 @@ const getComplianceByWorker: Parameters<typeof http.get>[1] = ({ params }) => {
 
 const getDashboard: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockDashboard);
 
-const postSimulation: Parameters<typeof http.post>[1] = () =>
+const postSimulationBackend: Parameters<typeof http.post>[1] = () =>
+  HttpResponse.json(mockSimulationResultResponse);
+
+const postSimulationBff: Parameters<typeof http.post>[1] = () =>
   HttpResponse.json(mockSimulationResponse);
 
 const getBenchmark: Parameters<typeof http.get>[1] = () =>
@@ -159,8 +162,8 @@ export const handlers = [
   http.get("*/api/dashboard", getDashboard),
 
   // Simulations
-  http.post(`${BACKEND}/api/simulations`, postSimulation),
-  http.post("*/api/simulations", postSimulation),
+  http.post(`${BACKEND}/api/simulations`, postSimulationBackend),
+  http.post("*/api/simulations", postSimulationBff),
 
   // Benchmarks
   http.get(`${BACKEND}/api/benchmarks`, getBenchmark),
