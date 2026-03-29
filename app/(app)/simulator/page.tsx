@@ -7,8 +7,8 @@ import { ResultStats } from "@/components/simulator/result-stats";
 import { AnalysisCard } from "@/components/simulator/analysis-card";
 import { RecommendationBox } from "@/components/simulator/recommendation-box";
 import { useSimulation } from "@/lib/queries/use-simulation";
+import { SimulationProgress } from "@/components/simulator/simulation-progress";
 import { useCompanyContext } from "@/lib/contexts/company-context";
-import { Skeleton } from "@/components/ui/skeleton";
 import type { NationalityAnalysis, AnalysisSection } from "@/types/simulator";
 
 function toNationalitySection(n: NationalityAnalysis): AnalysisSection {
@@ -60,7 +60,7 @@ export default function SimulatorPage() {
 
       {/* Right: Result area */}
       <div className="space-y-4">
-        {mutation.isPending && <ResultSkeleton />}
+        <SimulationProgress isPending={mutation.isPending} />
 
         {mutation.isError && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
@@ -98,21 +98,6 @@ export default function SimulatorPage() {
           </>
         )}
       </div>
-    </div>
-  );
-}
-
-function ResultSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="h-32 rounded-lg" />
-      <div className="grid grid-cols-3 gap-3">
-        <Skeleton className="h-24 rounded-lg" />
-        <Skeleton className="h-24 rounded-lg" />
-        <Skeleton className="h-24 rounded-lg" />
-      </div>
-      <Skeleton className="h-48 rounded-lg" />
-      <Skeleton className="h-48 rounded-lg" />
     </div>
   );
 }
