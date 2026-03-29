@@ -51,7 +51,7 @@ export function DeadlineMini({ deadlines }: DeadlineMiniProps) {
               </p>
             </div>
             <span className={cn("shrink-0 text-xs font-semibold", dDayColors[item.urgency])}>
-              D-{item.dDay}
+              D-{Math.abs(item.dDay)}
             </span>
           </div>
         ))}
