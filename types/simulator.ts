@@ -108,31 +108,36 @@ export interface SimulationResponse {
   readonly recommendations: readonly RecommendationItem[];
 }
 
-// ─── BE Response Types ───────────────────────────────────────────
+// ─── BE Response Types (source: /v3/api-docs) ───────────────────
 export interface QuotaAnalysis {
-  readonly industryQuota: number;
-  readonly currentAllocated: number;
+  readonly industry: string;
+  readonly annualQuota: number;
+  readonly currentWorkerCount: number;
+  readonly exhaustionRate: number;
   readonly remainingQuota: number;
-  readonly utilizationRate: number;
   readonly quotaSufficient: boolean;
 }
 
 export interface CompetitionAnalysis {
-  readonly regionApplicants: number;
-  readonly densityRank: number;
-  readonly avgApplicationRate: number;
-  readonly competitionLevel: "HIGH" | "MEDIUM" | "LOW";
+  readonly region: string;
+  readonly industry: string;
+  readonly regionalWorkerCount: number;
+  readonly nationalWorkerCount: number;
+  readonly regionalShare: number;
+  readonly competitionLevel: string;
 }
 
 export interface NationalityAnalysisResult {
   readonly nationality: string;
+  readonly industry: string;
+  readonly totalCount: number;
+  readonly maleCount: number;
+  readonly femaleCount: number;
   readonly industryShareRate: number;
-  readonly requestedShareRate: number;
-  readonly available: boolean;
 }
 
 export interface SimulationResultResponse {
-  readonly id: string;
+  readonly id: number;
   readonly companyId: number;
   readonly desiredWorkers: number;
   readonly desiredTiming: string;

@@ -16,19 +16,21 @@ import type { DataSource } from "@/types/shared";
 
 // ─── Constants ───────────────────────────────────────────────────
 
+type CompetitionLevel = "HIGH" | "MEDIUM" | "LOW";
+
 const VERDICT_TEXT: Record<SimulationVerdict, string> = {
   HIGH: "높음",
   MEDIUM: "보통",
   LOW: "낮음",
 };
 
-const COMPETITION_LABEL: Record<CompetitionAnalysis["competitionLevel"], string> = {
+const COMPETITION_LABEL: Record<CompetitionLevel, string> = {
   HIGH: "치열",
   MEDIUM: "보통",
   LOW: "낮음",
 };
 
-const COMPETITION_COLOR: Record<CompetitionAnalysis["competitionLevel"], SignalColor> = {
+const COMPETITION_COLOR: Record<CompetitionLevel, SignalColor> = {
   HIGH: "red",
   MEDIUM: "orange",
   LOW: "green",
@@ -47,11 +49,26 @@ const DATA_SOURCE_COUNT = new Set(
   [...QUOTA_DATA_SOURCES, ...COMPETITION_DATA_SOURCES].map((s) => s.dataId),
 ).size;
 
+const DURATION_MAP = {
+  HIGH_H1: "5~7개월",
+  HIGH_H2: "4~6개월",
+  OTHER_H1: "3~5개월",
+  OTHER_H2: "2~4개월",
+} as const;
+
+// ─── Helpers ─────────────────────────────────────────────────────
+
+function normalizeCompetitionLevel(level: string): CompetitionLevel {
+  const upper = level.toUpperCase();
+  if (upper === "HIGH" || upper === "MEDIUM" || upper === "LOW") return upper;
+  return "MEDIUM";
+}
+
 // ─── Verdict ─────────────────────────────────────────────────────
 
 function deriveVerdict(
   quotaSufficient: boolean,
-  competitionLevel: CompetitionAnalysis["competitionLevel"],
+  competitionLevel: CompetitionLevel,
 ): SimulationVerdict {
   if (!quotaSufficient) return "LOW";
   if (competitionLevel === "LOW") return "HIGH";
@@ -65,30 +82,29 @@ function buildAllocationStat(quota: QuotaAnalysis): SimStatItem {
   return {
     label: "배정 가능성",
     value: sufficient ? "높음" : "낮음",
-    subText: sufficient ? `쿼터 여유 ${quota.remainingQuota.toLocaleString("ko-KR")}명` : "쿼터 부족",
+    subText: sufficient
+      ? `쿼터 여유 ${quota.remainingQuota.toLocaleString("ko-KR")}명`
+      : "쿼터 부족",
     color: sufficient ? "green" : "red",
   };
 }
 
-function buildCompetitionStat(competition: CompetitionAnalysis): SimStatItem {
+function buildCompetitionStat(
+  competition: CompetitionAnalysis,
+  level: CompetitionLevel,
+): SimStatItem {
+  const sharePercent = Math.round(competition.regionalShare * 100);
   return {
     label: "지역 경쟁도",
-    value: COMPETITION_LABEL[competition.competitionLevel],
-    subText: `밀집도 상위 ${competition.densityRank}%`,
-    color: COMPETITION_COLOR[competition.competitionLevel],
+    value: COMPETITION_LABEL[level],
+    subText: `지역 점유율 ${sharePercent}%`,
+    color: COMPETITION_COLOR[level],
   };
 }
 
-const DURATION_MAP = {
-  HIGH_H1: "5~7개월",
-  HIGH_H2: "4~6개월",
-  OTHER_H1: "3~5개월",
-  OTHER_H2: "2~4개월",
-} as const;
-
-function buildDurationStat(competition: CompetitionAnalysis, desiredTiming: string): SimStatItem {
+function buildDurationStat(level: CompetitionLevel, desiredTiming: string): SimStatItem {
   const half = desiredTiming.endsWith("H1") ? "H1" : "H2";
-  const intensity = competition.competitionLevel === "HIGH" ? "HIGH" : "OTHER";
+  const intensity = level === "HIGH" ? "HIGH" : "OTHER";
   const key = `${intensity}_${half}` as keyof typeof DURATION_MAP;
 
   return {
@@ -112,14 +128,14 @@ function buildQuotaSection(quota: QuotaAnalysis, aiInsight: string): AnalysisSec
       color: sufficient ? "green" : "red",
     },
     dataRows: [
-      { key: "업종별 배정 쿼터", value: `${quota.industryQuota.toLocaleString("ko-KR")}명` },
-      { key: "현재 배정 인원", value: `${quota.currentAllocated.toLocaleString("ko-KR")}명` },
+      { key: "업종별 배정 쿼터", value: `${quota.annualQuota.toLocaleString("ko-KR")}명` },
+      { key: "현재 배정 인원", value: `${quota.currentWorkerCount.toLocaleString("ko-KR")}명` },
       { key: "잔여 쿼터", value: `${quota.remainingQuota.toLocaleString("ko-KR")}명` },
     ],
     progress: {
       label: "소진율",
-      value: Math.round(quota.utilizationRate),
-      level: quota.utilizationRate >= 80 ? "high" : quota.utilizationRate >= 50 ? "mid" : "low",
+      value: Math.round(quota.exhaustionRate),
+      level: quota.exhaustionRate >= 80 ? "high" : quota.exhaustionRate >= 50 ? "mid" : "low",
     },
     dataSources: QUOTA_DATA_SOURCES,
     aiInsight,
@@ -128,26 +144,33 @@ function buildQuotaSection(quota: QuotaAnalysis, aiInsight: string): AnalysisSec
 
 function buildCompetitionSection(
   competition: CompetitionAnalysis,
+  level: CompetitionLevel,
   aiInsight: string,
 ): AnalysisSection {
+  const sharePercent = Math.round(competition.regionalShare * 100);
   return {
     id: "competition",
     icon: "Factory",
     title: "지역 경쟁도 분석",
     badge: {
-      text: COMPETITION_LABEL[competition.competitionLevel],
-      color: COMPETITION_COLOR[competition.competitionLevel],
+      text: COMPETITION_LABEL[level],
+      color: COMPETITION_COLOR[level],
     },
     dataRows: [
-      { key: "동일 지역 신청 사업장", value: `${competition.regionApplicants.toLocaleString("ko-KR")}개` },
-      { key: "밀집도 순위", value: `상위 ${competition.densityRank}%` },
-      { key: "사업장당 평균 신청", value: `${competition.avgApplicationRate}배` },
+      {
+        key: "지역 외국인 근로자",
+        value: `${competition.regionalWorkerCount.toLocaleString("ko-KR")}명`,
+      },
+      {
+        key: "전국 외국인 근로자",
+        value: `${competition.nationalWorkerCount.toLocaleString("ko-KR")}명`,
+      },
+      { key: "지역 점유율", value: `${sharePercent}%` },
     ],
     progress: {
       label: "경쟁 강도",
-      value: competition.densityRank,
-      level:
-        competition.densityRank >= 70 ? "high" : competition.densityRank >= 40 ? "mid" : "low",
+      value: sharePercent,
+      level: sharePercent >= 70 ? "high" : sharePercent >= 40 ? "mid" : "low",
     },
     dataSources: COMPETITION_DATA_SOURCES,
     aiInsight,
@@ -156,19 +179,19 @@ function buildCompetitionSection(
 
 // ─── Nationality ─────────────────────────────────────────────────
 
-const TREND_THRESHOLD = 5;
+const AVG_INDUSTRY_SHARE = 10;
 
 function mapNationality(raw: NationalityAnalysisResult | null): NationalityAnalysis | null {
-  if (raw === null || !raw.available) return null;
+  if (raw === null) return null;
 
-  const diff = raw.industryShareRate - raw.requestedShareRate;
+  const diff = raw.industryShareRate - AVG_INDUSTRY_SHARE;
   const trend: "up" | "down" | "stable" =
-    diff > TREND_THRESHOLD ? "up" : diff < -TREND_THRESHOLD ? "down" : "stable";
+    diff > 5 ? "up" : diff < -5 ? "down" : "stable";
 
   return {
     nationality: raw.nationality as Nationality,
     percentage: raw.industryShareRate,
-    avgPercentage: raw.requestedShareRate,
+    avgPercentage: AVG_INDUSTRY_SHARE,
     trend,
   };
 }
@@ -182,7 +205,7 @@ interface ParsedReport {
 }
 
 function parseAiReport(aiReport: string): ParsedReport {
-  const sections = aiReport.split(/^##\s+/m).filter(Boolean);
+  const sections = aiReport.split(/^#{2,3}\s+/m).filter(Boolean);
 
   if (sections.length < 2) {
     console.warn(
@@ -193,17 +216,30 @@ function parseAiReport(aiReport: string): ParsedReport {
     return { summary: trimmed, quotaInsight: trimmed, competitionInsight: trimmed };
   }
 
-  const summarySection = sections[0]!;
-  const summaryLines = summarySection.split("\n").filter((l) => l.trim());
-  const summary = summaryLines.length > 1 ? summaryLines.slice(1).join(" ").trim() : summaryLines[0]?.trim() ?? aiReport.trim();
+  const firstContent = sections[0]!;
+  const contentLines = firstContent
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const summary =
+    contentLines.length > 0 ? contentLines.join(" ") : aiReport.trim();
 
-  const detailSection = sections[1] ?? "";
-  const detailText = detailSection.split("\n").filter((l) => l.trim()).slice(1).join(" ").trim();
+  const quotaSection = sections.find((s) => s.match(/쿼터|소진율|배정/));
+  const competitionSection = sections.find((s) => s.match(/경쟁|지역|점유/));
+
+  const extractContent = (section: string | undefined): string => {
+    if (!section) return summary;
+    const lines = section
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    return lines.slice(1).join(" ") || lines[0] || summary;
+  };
 
   return {
     summary,
-    quotaInsight: detailText || summary,
-    competitionInsight: detailText || summary,
+    quotaInsight: extractContent(quotaSection),
+    competitionInsight: extractContent(competitionSection),
   };
 }
 
@@ -211,7 +247,7 @@ function parseAiReport(aiReport: string): ParsedReport {
 
 function buildRecommendations(
   quota: QuotaAnalysis,
-  competition: CompetitionAnalysis,
+  level: CompetitionLevel,
 ): readonly RecommendationItem[] {
   const items: RecommendationItem[] = [
     {
@@ -227,7 +263,7 @@ function buildRecommendations(
     });
   }
 
-  if (competition.competitionLevel === "HIGH") {
+  if (level === "HIGH") {
     items.push({
       text: "경쟁이 치열한 지역입니다. 서류를 미리 준비하면 처리 기간을 단축할 수 있습니다",
       linkText: "서류 목록 보기",
@@ -259,11 +295,12 @@ function buildRecommendations(
 
 export function transformSimulationResult(raw: SimulationResultResponse): SimulationResponse {
   const { quotaAnalysis, competitionAnalysis, nationalityAnalysis, aiReport } = raw;
-  const verdict = deriveVerdict(quotaAnalysis.quotaSufficient, competitionAnalysis.competitionLevel);
+  const level = normalizeCompetitionLevel(competitionAnalysis.competitionLevel);
+  const verdict = deriveVerdict(quotaAnalysis.quotaSufficient, level);
   const parsed = parseAiReport(aiReport);
 
   return {
-    id: raw.id,
+    id: String(raw.id),
     verdict,
     verdictText: VERDICT_TEXT[verdict],
     summary: parsed.summary,
@@ -271,14 +308,14 @@ export function transformSimulationResult(raw: SimulationResultResponse): Simula
     dataSourceCount: DATA_SOURCE_COUNT,
     stats: {
       allocation: buildAllocationStat(quotaAnalysis),
-      competition: buildCompetitionStat(competitionAnalysis),
-      duration: buildDurationStat(competitionAnalysis, raw.desiredTiming),
+      competition: buildCompetitionStat(competitionAnalysis, level),
+      duration: buildDurationStat(level, raw.desiredTiming),
     },
     analyses: [
       buildQuotaSection(quotaAnalysis, parsed.quotaInsight),
-      buildCompetitionSection(competitionAnalysis, parsed.competitionInsight),
+      buildCompetitionSection(competitionAnalysis, level, parsed.competitionInsight),
     ],
     nationality: mapNationality(nationalityAnalysis),
-    recommendations: buildRecommendations(quotaAnalysis, competitionAnalysis),
+    recommendations: buildRecommendations(quotaAnalysis, level),
   };
 }

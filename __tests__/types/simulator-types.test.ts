@@ -86,22 +86,25 @@ describe("Simulator Types", () => {
 
   it("SimulationResultResponse_BE_타입_구조가_올바르다", () => {
     const raw: SimulationResultResponse = {
-      id: "sim-1",
+      id: 1,
       companyId: 1,
       desiredWorkers: 3,
       desiredTiming: "2026_H2",
       preferredNationality: "VIETNAM",
       quotaAnalysis: {
-        industryQuota: 4200,
-        currentAllocated: 2856,
+        industry: "MANUFACTURING",
+        annualQuota: 4200,
+        currentWorkerCount: 2856,
+        exhaustionRate: 68.0,
         remainingQuota: 1344,
-        utilizationRate: 68.0,
         quotaSufficient: true,
       },
       competitionAnalysis: {
-        regionApplicants: 127,
-        densityRank: 35,
-        avgApplicationRate: 1.4,
+        region: "GYEONGGI",
+        industry: "MANUFACTURING",
+        regionalWorkerCount: 15200,
+        nationalWorkerCount: 48000,
+        regionalShare: 0.317,
         competitionLevel: "MEDIUM",
       },
       nationalityAnalysis: null,

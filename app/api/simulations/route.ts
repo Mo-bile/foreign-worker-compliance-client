@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   let raw: SimulationResultResponse;
   try {
-    raw = await apiClient.post<SimulationResultResponse>(
+    raw = await apiClient.postAndFollow<SimulationResultResponse>(
       "/api/simulations",
       validated.data,
     );
