@@ -24,8 +24,8 @@ describe("Region enum", () => {
 });
 
 describe("IndustryCategory enum", () => {
-  it("8개_업종을_가진다", () => {
-    expect(INDUSTRY_CATEGORIES).toHaveLength(8);
+  it("9개_업종을_가진다", () => {
+    expect(INDUSTRY_CATEGORIES).toHaveLength(9);
   });
 
   it("모든_업종에_한글_라벨이_있다", () => {

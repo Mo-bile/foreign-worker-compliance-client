@@ -168,6 +168,7 @@ export const INDUSTRY_CATEGORIES = [
   "FISHING",
   "SERVICE",
   "MINING",
+  "TRANSPORTATION",
   "ACCOMMODATION",
   "OTHER",
 ] as const;
@@ -180,6 +181,7 @@ export const INDUSTRY_CATEGORY_LABELS: Record<IndustryCategory, string> = {
   FISHING: "어업",
   SERVICE: "서비스업",
   MINING: "광업",
+  TRANSPORTATION: "운수업",
   ACCOMMODATION: "숙박업",
   OTHER: "기타",
 };

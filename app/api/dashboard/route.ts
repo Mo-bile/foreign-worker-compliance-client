@@ -7,7 +7,7 @@ export async function GET(_request: NextRequest) {
     // TODO: Replace with actual backend call when BE is ready
     // const companyId = request.nextUrl.searchParams.get("companyId");
     // const data = await apiClient.get<DashboardResponse>(
-    //   `/api/companies/${companyId}/dashboard`,
+    //   `/api/dashboard?companyId=${companyId}`,
     // );
     return NextResponse.json(mockDashboard);
   } catch (error) {
