@@ -108,7 +108,7 @@ export default function DashboardPage() {
           <section>
             <div className="mb-3.5 flex items-center justify-between">
               <h2 className="text-[15px] font-semibold">⚡ 긴급 알림</h2>
-              <Link href="/deadlines" className="text-xs text-primary hover:underline">
+              <Link href="/compliance" className="text-xs text-primary hover:underline">
                 전체 보기 →
               </Link>
             </div>
