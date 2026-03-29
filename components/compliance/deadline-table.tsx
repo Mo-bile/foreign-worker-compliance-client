@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "./status-badge";
 import { paginateItems } from "@/lib/pagination";
@@ -26,6 +27,8 @@ interface DeadlineTableProps {
   readonly limit?: number;
   readonly pagination?: PaginationControlsProps;
   readonly hasUnfilteredData?: boolean;
+  readonly onComplete?: (id: number) => void;
+  readonly isCompleting?: boolean;
 }
 
 export function DeadlineTable({
@@ -36,6 +39,8 @@ export function DeadlineTable({
   limit,
   pagination,
   hasUnfilteredData,
+  onComplete,
+  isCompleting,
 }: DeadlineTableProps) {
   const [internalPage, setInternalPage] = useState(1);
 
@@ -95,6 +100,7 @@ export function DeadlineTable({
                   <TableHead>설명</TableHead>
                   <TableHead>기한</TableHead>
                   <TableHead>상태</TableHead>
+                  {onComplete && <TableHead>처리</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -106,6 +112,18 @@ export function DeadlineTable({
                     <TableCell>
                       <StatusBadge status={d.status} />
                     </TableCell>
+                    {onComplete && (
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={d.status === "COMPLETED" || isCompleting}
+                          onClick={() => onComplete(d.id)}
+                        >
+                          {d.status === "COMPLETED" ? "완료됨" : "완료"}
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

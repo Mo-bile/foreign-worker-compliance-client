@@ -15,6 +15,7 @@ import {
 import type { RegisterWorkerRequest } from "@/types/api";
 import { useRegisterWorker } from "@/lib/queries/use-workers";
 import { useCompanies } from "@/lib/queries/use-companies";
+import { useMetadata } from "@/lib/queries/use-metadata";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
@@ -38,6 +39,15 @@ export function WorkerForm() {
     isLoading: companiesLoading,
     isError: companiesError,
   } = useCompanies();
+  const { data: metadata } = useMetadata();
+
+  const nationalityOptions = metadata
+    ? metadata.nationalities.map((n) => ({ value: n.code, label: n.koreanName }))
+    : NATIONALITIES.map((n) => ({ value: n, label: NATIONALITY_LABELS[n] }));
+
+  const visaTypeOptions = metadata
+    ? metadata.visaTypes.map((v) => ({ value: v.code, label: v.description }))
+    : VISA_TYPES.map((v) => ({ value: v, label: VISA_TYPE_LABELS[v] }));
 
   const {
     register,
@@ -163,9 +173,9 @@ export function WorkerForm() {
                     <SelectValue placeholder="국적 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    {NATIONALITIES.map((nat) => (
-                      <SelectItem key={nat} value={nat}>
-                        {NATIONALITY_LABELS[nat]}
+                    {nationalityOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -194,9 +204,9 @@ export function WorkerForm() {
                     <SelectValue placeholder="비자 유형 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    {VISA_TYPES.map((visa) => (
-                      <SelectItem key={visa} value={visa}>
-                        {VISA_TYPE_LABELS[visa]}
+                    {visaTypeOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

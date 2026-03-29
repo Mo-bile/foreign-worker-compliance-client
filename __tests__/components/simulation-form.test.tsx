@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SimulationForm } from "@/components/simulator/simulation-form";
 import type { CompanyResponse } from "@/types/api";
 
@@ -21,22 +22,35 @@ const mockCompany: CompanyResponse = {
   updatedAt: "2026-01-01T00:00:00Z",
 };
 
+function renderWithQueryClient(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+}
+
 describe("SimulationForm", () => {
   it("자동입력_정보를_표시한다", () => {
-    render(<SimulationForm company={mockCompany} onSubmit={vi.fn()} isPending={false} />);
+    renderWithQueryClient(
+      <SimulationForm company={mockCompany} onSubmit={vi.fn()} isPending={false} />,
+    );
     expect(screen.getByText(/경기/)).toBeDefined();
     expect(screen.getByText(/제조업/)).toBeDefined();
   });
 
   it("필수_입력_필드가_존재한다", () => {
-    render(<SimulationForm company={mockCompany} onSubmit={vi.fn()} isPending={false} />);
+    renderWithQueryClient(
+      <SimulationForm company={mockCompany} onSubmit={vi.fn()} isPending={false} />,
+    );
     expect(screen.getByLabelText("희망 고용인원")).toBeDefined();
     expect(screen.getByLabelText("희망 시기")).toBeDefined();
   });
 
   it("제출_시_onSubmit을_호출한다", () => {
     const onSubmit = vi.fn();
-    render(<SimulationForm company={mockCompany} onSubmit={onSubmit} isPending={false} />);
+    renderWithQueryClient(
+      <SimulationForm company={mockCompany} onSubmit={onSubmit} isPending={false} />,
+    );
 
     const countInput = screen.getByLabelText("희망 고용인원");
     fireEvent.change(countInput, { target: { value: "3" } });
@@ -55,14 +69,18 @@ describe("SimulationForm", () => {
   });
 
   it("isPending이면_버튼이_비활성화된다", () => {
-    render(<SimulationForm company={mockCompany} onSubmit={vi.fn()} isPending={true} />);
+    renderWithQueryClient(
+      <SimulationForm company={mockCompany} onSubmit={vi.fn()} isPending={true} />,
+    );
     const button = screen.getByRole("button");
     expect(button).toHaveProperty("disabled", true);
     expect(screen.getByText("분석 중...")).toBeDefined();
   });
 
   it("company가_null이면_자동입력_박스를_숨긴다", () => {
-    render(<SimulationForm company={null} onSubmit={vi.fn()} isPending={false} />);
+    renderWithQueryClient(
+      <SimulationForm company={null} onSubmit={vi.fn()} isPending={false} />,
+    );
     expect(screen.queryByText(/자동 입력/)).toBeNull();
   });
 });

@@ -30,6 +30,20 @@ export async function fetchApi<T>(endpoint: string, errorMessage: string): Promi
   }
 }
 
+export async function patchApi(endpoint: string, errorMessage: string): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(endpoint, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    throw new Error(errorMessage, { cause: error });
+  }
+  if (!res.ok) return throwResponseError(res, errorMessage);
+  // 204 No Content → body 없음
+}
+
 export async function mutateApi<T>(
   endpoint: string,
   method: string,

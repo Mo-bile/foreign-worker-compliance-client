@@ -7,6 +7,7 @@ import { E9_NATIONALITIES, DESIRED_TIMINGS, DESIRED_TIMING_LABELS } from "@/type
 import { NATIONALITY_LABELS } from "@/types/api";
 import type { SimulationRequest } from "@/types/simulator";
 import type { CompanyResponse } from "@/types/api";
+import { useMetadata } from "@/lib/queries/use-metadata";
 
 interface SimulationFormProps {
   readonly company: CompanyResponse | null;
@@ -18,6 +19,11 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
   const [desiredWorkers, setDesiredWorkers] = useState<number>(1);
   const [preferredNationality, setPreferredNationality] = useState<string>("");
   const [desiredTiming, setDesiredTiming] = useState<(typeof DESIRED_TIMINGS)[number] | "">("");
+  const { data: metadata } = useMetadata();
+
+  const nationalityLabelMap = metadata
+    ? Object.fromEntries(metadata.nationalities.map((n) => [n.code, n.koreanName]))
+    : (NATIONALITY_LABELS as Record<string, string>);
 
   const isSubmitDisabled =
     isPending || !Number.isFinite(desiredWorkers) || desiredWorkers < 1 || desiredTiming === "";
@@ -87,7 +93,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
               <option value="">전체 (미지정)</option>
               {E9_NATIONALITIES.map((nat) => (
                 <option key={nat} value={nat}>
-                  {NATIONALITY_LABELS[nat]}
+                  {nationalityLabelMap[nat] ?? nat}
                 </option>
               ))}
             </select>

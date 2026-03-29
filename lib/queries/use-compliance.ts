@@ -1,7 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { fetchApi } from "./query-utils";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchApi, patchApi } from "./query-utils";
 import type {
   ComplianceDeadlineResponse,
   DeadlineType,
@@ -96,4 +96,16 @@ export function usePaginatedUpcomingDeadlines(
     : undefined;
 
   return { deadlines, isLoading: query.isLoading, isError: query.isError };
+}
+
+export function useCompleteDeadline() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, number>({
+    mutationFn: (deadlineId) =>
+      patchApi(`/api/compliance/${deadlineId}/complete`, "데드라인 완료 처리에 실패했습니다"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["compliance"] });
+    },
+  });
 }

@@ -16,6 +16,7 @@ import {
 import type { CreateCompanyRequest, UpdateCompanyRequest } from "@/types/api";
 import type { Resolver } from "react-hook-form";
 import { useCreateCompany, useUpdateCompany } from "@/lib/queries/use-companies";
+import { useMetadata } from "@/lib/queries/use-metadata";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,6 +54,15 @@ export function CompanyForm(props: CompanyFormProps) {
   const createMutation = useCreateCompany();
   const updateMutation = useUpdateCompany();
   const mutation = isEdit ? updateMutation : createMutation;
+  const { data: metadata } = useMetadata();
+
+  const regionOptions = metadata
+    ? metadata.regions.map((r) => ({ value: r.code, label: r.koreanName }))
+    : REGIONS.map((r) => ({ value: r, label: REGION_LABELS[r] }));
+
+  const industryCategoryOptions = metadata
+    ? metadata.industryCategories.map((c) => ({ value: c.code, label: c.koreanName }))
+    : INDUSTRY_CATEGORIES.map((c) => ({ value: c, label: INDUSTRY_CATEGORY_LABELS[c] }));
 
   const {
     register,
@@ -153,9 +163,9 @@ export function CompanyForm(props: CompanyFormProps) {
                     <SelectValue placeholder="지역 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    {REGIONS.map((r) => (
-                      <SelectItem key={r} value={r}>
-                        {REGION_LABELS[r]}
+                    {regionOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -189,9 +199,9 @@ export function CompanyForm(props: CompanyFormProps) {
                     <SelectValue placeholder="업종 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    {INDUSTRY_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {INDUSTRY_CATEGORY_LABELS[cat]}
+                    {industryCategoryOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

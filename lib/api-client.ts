@@ -79,4 +79,15 @@ async function put<T>(path: string, body: unknown): Promise<T> {
   return handleResponse<T>(response);
 }
 
-export const apiClient = { get, post, postAndFollow, put } as const;
+async function patch(path: string): Promise<void> {
+  const response = await fetch(`${getBaseUrl()}${path}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!response.ok) {
+    await handleResponse(response);
+  }
+  // 204 No Content → body 없음
+}
+
+export const apiClient = { get, post, postAndFollow, put, patch } as const;
