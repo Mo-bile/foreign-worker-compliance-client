@@ -1,74 +1,76 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
+import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
 import { server } from "@/mocks/server";
 import { POST } from "@/app/api/simulations/route";
+import { NextRequest } from "next/server";
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
+function makePostRequest(body: unknown) {
+  return new NextRequest(
+    new URL("http://localhost/api/simulations"),
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+    },
+  );
+}
+
+const validBody = {
+  companyId: 1,
+  desiredWorkers: 3,
+  desiredTiming: "2026_Q2",
+  domesticInsuredCount: 33,
+  appliedScoringCodes: ["DEPOPULATION_AREA"],
+  deductionScore: 0,
+};
+
 describe("POST /api/simulations", () => {
-  it("유효한_요청에_시뮬레이션_결과를_반환한다", async () => {
-    const body = JSON.stringify({
-      desiredWorkers: 3,
-      preferredNationality: "VIETNAM",
-      desiredTiming: "2026_H2",
-      companyId: 1,
-    });
-    const request = new Request("http://localhost:3000/api/simulations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body,
-    });
+  it("유효한_바디로_200과_변환된_응답을_반환한다", async () => {
+    const req = makePostRequest(validBody);
+    const res = await POST(req);
+    expect(res.status).toBe(200);
 
-    const response = await POST(request as unknown as Parameters<typeof POST>[0]);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data.verdict).toBeDefined();
-    expect(data.analyses.length).toBeGreaterThan(0);
-    expect(data.stats.allocation).toBeDefined();
-    expect(data.stats.competition).toBeDefined();
-    expect(data.stats.duration).toBeDefined();
+    const data = await res.json();
+    expect(data).toHaveProperty("verdict");
+    expect(data).toHaveProperty("scoring");
+    expect(data).toHaveProperty("quota");
+    expect(data).toHaveProperty("timeline");
   });
 
-  it("companyId가_누락되면_400을_반환한다", async () => {
-    const body = JSON.stringify({
-      desiredWorkers: 3,
-      desiredTiming: "2026_H2",
-    });
-    const request = new Request("http://localhost:3000/api/simulations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body,
-    });
-
-    const response = await POST(request as unknown as Parameters<typeof POST>[0]);
-    expect(response.status).toBe(400);
+  it("companyId가_없으면_400을_반환한다", async () => {
+    const { companyId: _omit, ...bodyWithoutCompanyId } = validBody;
+    const req = makePostRequest(bodyWithoutCompanyId);
+    const res = await POST(req);
+    expect(res.status).toBe(400);
   });
 
-  it("desiredWorkers가_누락되면_400을_반환한다", async () => {
-    const body = JSON.stringify({
-      desiredTiming: "2026_H2",
-      companyId: 1,
-    });
-    const request = new Request("http://localhost:3000/api/simulations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body,
-    });
-
-    const response = await POST(request as unknown as Parameters<typeof POST>[0]);
-    expect(response.status).toBe(400);
+  it("desiredWorkers가_없으면_400을_반환한다", async () => {
+    const { desiredWorkers: _omit, ...bodyWithoutDesiredWorkers } = validBody;
+    const req = makePostRequest(bodyWithoutDesiredWorkers);
+    const res = await POST(req);
+    expect(res.status).toBe(400);
   });
 
-  it("잘못된_JSON_형식이면_400을_반환한다", async () => {
-    const request = new Request("http://localhost:3000/api/simulations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: "not json",
-    });
+  it("domesticInsuredCount가_없으면_400을_반환한다", async () => {
+    const { domesticInsuredCount: _omit, ...bodyWithoutDomesticInsuredCount } = validBody;
+    const req = makePostRequest(bodyWithoutDomesticInsuredCount);
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+  });
 
-    const response = await POST(request as unknown as Parameters<typeof POST>[0]);
-    expect(response.status).toBe(400);
+  it("잘못된_JSON이면_400을_반환한다", async () => {
+    const req = new NextRequest(
+      new URL("http://localhost/api/simulations"),
+      {
+        method: "POST",
+        body: "not json",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+    const res = await POST(req);
+    expect(res.status).toBe(400);
   });
 });

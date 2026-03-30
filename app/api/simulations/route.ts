@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(
       { message: "시뮬레이션 결과 처리 중 오류가 발생했습니다" },
-      { status: 502 },
+      { status: 500 },
     );
   }
 }

@@ -1,35 +1,57 @@
-import { CheckCircle, ExternalLink } from "lucide-react";
-import type { RecommendationItem } from "@/types/simulator";
+import { CheckCircle, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { RecommendationDisplayData } from "@/types/simulator";
 
 interface RecommendationBoxProps {
-  readonly recommendations: readonly RecommendationItem[];
+  readonly data: RecommendationDisplayData;
 }
 
-export function RecommendationBox({ recommendations }: RecommendationBoxProps) {
+const VARIANT_STYLES = {
+  green: {
+    container: "bg-signal-green-bg border-signal-green/30",
+    title: "text-signal-green",
+    arrow: "text-signal-green",
+    Icon: CheckCircle,
+  },
+  yellow: {
+    container: "bg-signal-yellow-bg border-signal-orange/30",
+    title: "text-signal-orange",
+    arrow: "text-signal-orange",
+    Icon: AlertTriangle,
+  },
+} as const;
+
+export function RecommendationBox({ data }: RecommendationBoxProps) {
+  const style = VARIANT_STYLES[data.variant];
+
   return (
-    <div className="rounded-lg bg-signal-green-bg p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <CheckCircle className="h-5 w-5 text-signal-green" />
-        <span className="text-sm font-medium text-signal-green">다음 단계 추천</span>
+    <div className={cn("rounded-lg border p-4", style.container)}>
+      <div className={cn("mb-2 flex items-center gap-1.5 text-[13px] font-semibold", style.title)}>
+        <style.Icon className="h-4 w-4" />
+        {data.title}
       </div>
-      <ul className="space-y-2">
-        {recommendations.map((item) => (
-          <li key={item.text} className="flex items-start gap-2">
-            <span className="text-signal-green">→</span>
-            <div className="text-sm">
-              <span>{item.text}</span>
-              {item.href && item.linkText && (
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-0.5 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                >
-                  {item.linkText}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
+      <ul className="space-y-1.5">
+        {data.items.map((item) => (
+          <li key={item.text} className="flex items-start gap-2 pl-1 text-[13px]">
+            <span className={cn("mt-0.5 shrink-0", style.arrow)}>→</span>
+            <span>
+              {item.text}
+              {item.linkText && item.href && (
+                <>
+                  {" ("}
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border-b border-primary/30 font-medium text-primary transition-opacity hover:opacity-80"
+                  >
+                    {item.linkText}
+                    <span className="ml-0.5">→</span>
+                  </a>
+                  {")"}
+                </>
               )}
-            </div>
+            </span>
           </li>
         ))}
       </ul>
