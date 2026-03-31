@@ -3,12 +3,24 @@ import { z } from "zod";
 import { apiClient } from "@/lib/api-client";
 import { simulationRequestSchema } from "@/types/simulator";
 import type { SimulationResultResponse } from "@/types/simulator";
+import type { MetadataResponse } from "@/types/metadata";
 import { handleRouteError, parseRequestBody, validateSchema } from "@/lib/api-route-utils";
 import { transformSimulationResult } from "@/lib/transforms/simulation-transform";
 
 const bffRequestSchema = simulationRequestSchema.extend({
   companyId: z.number().int().positive(),
 });
+
+async function fetchDeductionCodes(): Promise<ReadonlySet<string>> {
+  try {
+    const metadata = await apiClient.get<MetadataResponse>("/api/metadata");
+    return new Set(
+      metadata.scoringPolicies.filter((p) => p.isDeduction).map((p) => p.code),
+    );
+  } catch {
+    return new Set();
+  }
+}
 
 export async function POST(request: NextRequest) {
   const bodyResult = await parseRequestBody(request);
@@ -28,7 +40,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const transformed = transformSimulationResult(raw);
+    const deductionCodes = await fetchDeductionCodes();
+    const transformed = transformSimulationResult(raw, deductionCodes);
     return NextResponse.json(transformed);
   } catch (transformError) {
     console.error(

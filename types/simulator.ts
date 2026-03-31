@@ -78,7 +78,6 @@ export interface ScoringBonusItem {
   readonly label: string;
   readonly score: number;
   readonly applied: boolean;
-  readonly isDeduction: boolean;
 }
 
 export interface ScoringResponse {
@@ -91,11 +90,10 @@ export interface ScoringResponse {
 
 export interface RoundHistoryItem {
   readonly round: string;
+  readonly year: number;
   readonly allocation: number;
   readonly industryAllocation: number;
   readonly competitionRate: number | null;
-  readonly isCurrent: boolean;
-  readonly isFuture: boolean;
 }
 
 export interface QuotaStatusResponse {

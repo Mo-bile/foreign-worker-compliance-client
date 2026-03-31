@@ -97,7 +97,10 @@ function buildVerdict(
 
 // ─── Scoring ─────────────────────────────────────────────────────
 
-function buildScoringRows(scoring: ScoringResponse): readonly ScoringTableRow[] {
+function buildScoringRows(
+  scoring: ScoringResponse,
+  deductionCodes: ReadonlySet<string>,
+): readonly ScoringTableRow[] {
   const rows: ScoringTableRow[] = [];
 
   rows.push({
@@ -108,20 +111,22 @@ function buildScoringRows(scoring: ScoringResponse): readonly ScoringTableRow[] 
   });
 
   for (const item of scoring.appliedBonusItems) {
+    const isDeduction = deductionCodes.has(item.code);
     rows.push({
       label: item.label,
-      score: item.isDeduction ? `-${item.score}점` : `+${item.score}점`,
+      score: isDeduction ? `-${item.score}점` : `+${item.score}점`,
       status: "✓",
-      isDeduction: item.isDeduction,
+      isDeduction,
     });
   }
 
   for (const item of scoring.availableBonusItems) {
+    const isDeduction = deductionCodes.has(item.code);
     rows.push({
       label: item.label,
       score: "0점",
       status: "미해당",
-      isDeduction: item.isDeduction,
+      isDeduction,
     });
   }
 
@@ -154,11 +159,14 @@ function buildScoringImprovement(scoring: ScoringResponse): ScoringImprovementDa
   };
 }
 
-function buildScoring(scoring: ScoringResponse): ScoringDisplayData {
+function buildScoring(
+  scoring: ScoringResponse,
+  deductionCodes: ReadonlySet<string>,
+): ScoringDisplayData {
   return {
     estimatedScore: scoring.estimatedScore,
     percentileText: estimatePercentile(scoring.estimatedScore),
-    tableRows: buildScoringRows(scoring),
+    tableRows: buildScoringRows(scoring, deductionCodes),
     improvement: buildScoringImprovement(scoring),
   };
 }
@@ -170,8 +178,12 @@ function buildQuota(quota: QuotaStatusResponse): QuotaDisplayData {
     ? Math.round((quota.industryAllocation / quota.roundAllocation) * 100)
     : 0;
 
+  const currentYear = new Date().getFullYear();
+
   const roundRows: QuotaRoundRow[] = quota.roundHistory.map((r) => {
-    const { isCurrent, isFuture } = r;
+    const isCurrent = r.round === quota.currentRound;
+    const isFuture = r.year > currentYear
+      || (r.year === currentYear && !isCurrent && r.allocation === 0);
     return {
       round: r.round,
       allocation: isFuture ? "미공개" : `${formatNumber(r.allocation)}명`,
@@ -282,13 +294,14 @@ function buildRecommendation(
 
 export function transformSimulationResult(
   raw: SimulationResultResponse,
+  deductionCodes: ReadonlySet<string> = new Set(),
 ): SimulationResponse {
   const { employmentLimit, scoring, quotaStatus, timeline, aiInsights } = raw;
 
   return {
     id: String(raw.id),
     verdict: buildVerdict(employmentLimit, raw.desiredWorkers),
-    scoring: buildScoring(scoring),
+    scoring: buildScoring(scoring, deductionCodes),
     quota: buildQuota(quotaStatus),
     timeline: buildTimeline(timeline),
     aiSummary: sanitize(aiInsights.overallVerdict),

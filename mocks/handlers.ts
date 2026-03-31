@@ -8,7 +8,7 @@ import { transformSimulationResult } from "@/lib/transforms/simulation-transform
 import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
 import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
 import { mockComplianceReport } from "./report-data";
-import { mockMetadata } from "./metadata-data";
+import { mockMetadata, MOCK_SCORING_POLICIES } from "./metadata-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
@@ -129,8 +129,12 @@ const postSimulationBackend: Parameters<typeof http.post>[1] = () =>
 const getSimulationBackend: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockWithinQuotaResponse);
 
+const mockDeductionCodes = new Set(
+  MOCK_SCORING_POLICIES.filter((p) => p.isDeduction).map((p) => p.code),
+);
+
 const postSimulationBff: Parameters<typeof http.post>[1] = () =>
-  HttpResponse.json(transformSimulationResult(mockWithinQuotaResponse));
+  HttpResponse.json(transformSimulationResult(mockWithinQuotaResponse, mockDeductionCodes));
 
 const getBenchmark: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockBenchmarkResponse);

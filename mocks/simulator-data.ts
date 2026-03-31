@@ -19,12 +19,12 @@ export const mockWithinQuotaResponse: SimulationResultResponse = {
   },
   scoring: {
     appliedBonusItems: [
-      { code: "DEPOPULATION_AREA", label: "인구감소지역 소재 사업장", score: 5, applied: true, isDeduction: false },
-      { code: "LABOR_LAW_COMPLIANCE", label: "최근 2년간 노동관계법 위반 없음", score: 3, applied: true, isDeduction: false },
+      { code: "DEPOPULATION_AREA", label: "인구감소지역 소재 사업장", score: 5, applied: true },
+      { code: "LABOR_LAW_COMPLIANCE", label: "최근 2년간 노동관계법 위반 없음", score: 3, applied: true },
     ],
     availableBonusItems: [
-      { code: "PREMIUM_DORMITORY", label: "우수 기숙사 제공", score: 5, applied: false, isDeduction: false },
-      { code: "NEW_WORKPLACE", label: "외국인 고용이 처음인 사업장", score: 3, applied: false, isDeduction: false },
+      { code: "PREMIUM_DORMITORY", label: "우수 기숙사 제공", score: 5, applied: false },
+      { code: "NEW_WORKPLACE", label: "외국인 고용이 처음인 사업장", score: 3, applied: false },
     ],
     totalBonusScore: 8,
     estimatedScore: 68,
@@ -32,14 +32,14 @@ export const mockWithinQuotaResponse: SimulationResultResponse = {
   },
   quotaStatus: {
     industry: "식료품제조업",
-    currentRound: "2026년 2차 (4~6월)",
+    currentRound: "2026년 2차",
     roundAllocation: 12500,
     industryAllocation: 2250,
     roundHistory: [
-      { round: "2025년 5차", allocation: 10200, industryAllocation: 1836, competitionRate: 1.8, isCurrent: false, isFuture: false },
-      { round: "2026년 1차", allocation: 11800, industryAllocation: 2124, competitionRate: 1.6, isCurrent: false, isFuture: false },
-      { round: "2026년 2차 (현재)", allocation: 12500, industryAllocation: 2250, competitionRate: null, isCurrent: true, isFuture: false },
-      { round: "2026년 3차 (예정)", allocation: 0, industryAllocation: 0, competitionRate: null, isCurrent: false, isFuture: true },
+      { round: "2025년 5차", year: 2025, allocation: 10200, industryAllocation: 1836, competitionRate: 1.8 },
+      { round: "2026년 1차", year: 2026, allocation: 11800, industryAllocation: 2124, competitionRate: 1.6 },
+      { round: "2026년 2차", year: 2026, allocation: 12500, industryAllocation: 2250, competitionRate: null },
+      { round: "2026년 3차", year: 2026, allocation: 0, industryAllocation: 0, competitionRate: null },
     ],
     industryTrend:
       "식료품제조업은 최근 3차수 연속 배정 비율 증가 추세 (16% → 18%). 전차수 대비 경쟁률 소폭 완화(1.8→1.6). 이번 차수에서 지원 시 유리한 시점입니다.",
@@ -105,12 +105,12 @@ export const mockExceededResponse: SimulationResultResponse = {
   },
   scoring: {
     appliedBonusItems: [
-      { code: "DEPOPULATION_AREA", label: "인구감소지역 소재 사업장", score: 5, applied: true, isDeduction: false },
-      { code: "LABOR_LAW_COMPLIANCE", label: "최근 2년간 노동관계법 위반 없음", score: 3, applied: true, isDeduction: false },
+      { code: "DEPOPULATION_AREA", label: "인구감소지역 소재 사업장", score: 5, applied: true },
+      { code: "LABOR_LAW_COMPLIANCE", label: "최근 2년간 노동관계법 위반 없음", score: 3, applied: true },
     ],
     availableBonusItems: [
-      { code: "PREMIUM_DORMITORY", label: "우수 기숙사 제공", score: 5, applied: false, isDeduction: false },
-      { code: "NEW_WORKPLACE", label: "외국인 고용이 처음인 사업장", score: 3, applied: false, isDeduction: false },
+      { code: "PREMIUM_DORMITORY", label: "우수 기숙사 제공", score: 5, applied: false },
+      { code: "NEW_WORKPLACE", label: "외국인 고용이 처음인 사업장", score: 3, applied: false },
     ],
     totalBonusScore: 8,
     estimatedScore: 68,
@@ -118,14 +118,14 @@ export const mockExceededResponse: SimulationResultResponse = {
   },
   quotaStatus: {
     industry: "식료품제조업",
-    currentRound: "2026년 2차 (4~6월)",
+    currentRound: "2026년 2차",
     roundAllocation: 12500,
     industryAllocation: 2250,
     roundHistory: [
-      { round: "2025년 5차", allocation: 10200, industryAllocation: 1836, competitionRate: 1.8, isCurrent: false, isFuture: false },
-      { round: "2026년 1차", allocation: 11800, industryAllocation: 2124, competitionRate: 1.6, isCurrent: false, isFuture: false },
-      { round: "2026년 2차 (현재)", allocation: 12500, industryAllocation: 2250, competitionRate: null, isCurrent: true, isFuture: false },
-      { round: "2026년 3차 (예정)", allocation: 0, industryAllocation: 0, competitionRate: null, isCurrent: false, isFuture: true },
+      { round: "2025년 5차", year: 2025, allocation: 10200, industryAllocation: 1836, competitionRate: 1.8 },
+      { round: "2026년 1차", year: 2026, allocation: 11800, industryAllocation: 2124, competitionRate: 1.6 },
+      { round: "2026년 2차", year: 2026, allocation: 12500, industryAllocation: 2250, competitionRate: null },
+      { round: "2026년 3차", year: 2026, allocation: 0, industryAllocation: 0, competitionRate: null },
     ],
     industryTrend:
       "식료품제조업은 최근 3차수 연속 배정 비율 증가 추세 (16% → 18%). 전차수 대비 경쟁률 소폭 완화(1.8→1.6).",
