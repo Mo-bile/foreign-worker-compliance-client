@@ -8,17 +8,16 @@ import {
 import type {
   SimulationVerdict,
   SimulationResultResponse,
-  EmploymentLimitResponse,
-  ScoringResponse,
-  QuotaStatusResponse,
-  TimelineResponse,
+  EmploymentLimitAnalysis,
+  ScoringAnalysis,
+  QuotaStatusResponseBE,
+  TimelineEstimateBE,
   AiInsightsResponse,
-  AdditionalBonus,
-  WhatIfScenario,
-  ScoringBonusItem,
-  RoundHistoryItem,
-  TimelineStep,
-  NationalityDuration,
+  AdditionalBonusBE,
+  WhatIfScenarioBE,
+  ScoringBonusItemBE,
+  QuotaHistoryItem,
+  TimelineStepBE,
 } from "@/types/simulator";
 
 // ─── simulationRequestSchema ─────────────────────────────────────────────────
@@ -277,80 +276,75 @@ describe("SimulationVerdict", () => {
 // ─── BE Response Type Shapes ──────────────────────────────────────────────────
 
 describe("SimulationResultResponse shape", () => {
-  const mockAdditionalBonus: AdditionalBonus = {
+  const mockAdditionalBonus: AdditionalBonusBE = {
     reason: "Priority industry bonus",
-    additionalCount: 2,
+    ratePercent: 10,
+    cappedByDomesticCount: false,
   };
 
-  const mockWhatIfScenario: WhatIfScenario = {
-    domesticInsuredCount: 15,
-    delta: 5,
-    newLimit: 7,
-    remainingCapacity: 3,
+  const mockWhatIfScenario: WhatIfScenarioBE = {
+    additionalDomesticCount: 5,
+    newDomesticTotal: 15,
+    newBaseLimit: 7,
+    newBaseLimitAfterCap: 7,
+    newTotalLimit: 8,
+    newRemainingCapacity: 3,
     feasibility: "POSSIBLE",
   };
 
-  const mockEmploymentLimit: EmploymentLimitResponse = {
+  const mockEmploymentLimit: EmploymentLimitAnalysis = {
     domesticInsuredCount: 10,
     baseLimit: 5,
+    doubleCap: null,
+    baseLimitAfterCap: 5,
     additionalBonuses: [mockAdditionalBonus],
+    additionalCount: 2,
     totalLimit: 7,
+    cappedByDomesticCount: false,
     currentForeignWorkerCount: 3,
     remainingCapacity: 4,
     limitExceeded: false,
     whatIfScenarios: [mockWhatIfScenario],
   };
 
-  const mockScoringBonusItem: ScoringBonusItem = {
+  const mockScoringBonusItem: ScoringBonusItemBE = {
     code: "PRIORITY_INDUSTRY",
-    label: "우선 지원 업종",
-    score: 5,
+    displayName: "우선 지원 업종",
+    points: 5,
     applied: true,
   };
 
-  const mockScoring: ScoringResponse = {
+  const mockScoring: ScoringAnalysis = {
     appliedBonusItems: [mockScoringBonusItem],
     availableBonusItems: [],
     totalBonusScore: 5,
+    totalDeductionScore: 0,
     estimatedScore: 72,
     maxPossibleScore: 100,
   };
 
-  const mockRoundHistoryItem: RoundHistoryItem = {
-    round: "2025_Q4",
-    allocation: 5000,
-    industryAllocation: 300,
-    competitionRate: 2.5,
+  const mockQuotaHistoryItem: QuotaHistoryItem = {
+    year: 2025,
+    quotaCount: 5000,
+    source: "고용부 고시",
   };
 
-  const mockQuotaStatus: QuotaStatusResponse = {
+  const mockQuotaStatus: QuotaStatusResponseBE = {
     industry: "제조업",
-    currentRound: "2026_Q2",
-    roundAllocation: 6000,
-    industryAllocation: 350,
-    roundHistory: [mockRoundHistoryItem],
-    industryTrend: "STABLE",
+    currentYearQuota: 6000,
+    recentHistory: [mockQuotaHistoryItem],
   };
 
-  const mockTimelineStep: TimelineStep = {
-    step: 1,
-    title: "구인 신청",
+  const mockTimelineStep: TimelineStepBE = {
+    stepName: "구인 신청",
+    estimatedDays: 10,
     description: "고용센터에 구인 신청서 제출",
-    duration: "1~2주",
   };
 
-  const mockNationalityDuration: NationalityDuration = {
-    nationality: "VIETNAM",
-    flag: "🇻🇳",
-    avgMonths: 3,
-    note: "평균 대기 3개월",
-  };
-
-  const mockTimeline: TimelineResponse = {
+  const mockTimeline: TimelineEstimateBE = {
     preferredNationality: "VIETNAM",
     estimatedMonths: 4,
     steps: [mockTimelineStep],
-    nationalityComparison: [mockNationalityDuration],
   };
 
   const mockAiInsights: AiInsightsResponse = {
@@ -369,10 +363,11 @@ describe("SimulationResultResponse shape", () => {
     desiredWorkers: 5,
     desiredTiming: "2026_Q2",
     preferredNationality: "VIETNAM",
-    employmentLimit: mockEmploymentLimit,
-    scoring: mockScoring,
+    domesticInsuredCount: 10,
+    employmentLimitAnalysis: mockEmploymentLimit,
+    scoringAnalysis: mockScoring,
     quotaStatus: mockQuotaStatus,
-    timeline: mockTimeline,
+    timelineEstimate: mockTimeline,
     aiInsights: mockAiInsights,
     createdAt: "2026-03-30T00:00:00Z",
   };
@@ -387,106 +382,113 @@ describe("SimulationResultResponse shape", () => {
     expect(typeof mockResult.createdAt).toBe("string");
   });
 
+  it("has top-level domesticInsuredCount", () => {
+    expect(typeof mockResult.domesticInsuredCount).toBe("number");
+  });
+
   it("allows preferredNationality to be null", () => {
     const withNull: SimulationResultResponse = { ...mockResult, preferredNationality: null };
     expect(withNull.preferredNationality).toBeNull();
   });
 
-  describe("employmentLimit sub-object", () => {
+  describe("employmentLimitAnalysis sub-object", () => {
     it("has required numeric fields", () => {
-      const el = mockResult.employmentLimit;
+      const el = mockResult.employmentLimitAnalysis;
       expect(typeof el.domesticInsuredCount).toBe("number");
       expect(typeof el.baseLimit).toBe("number");
+      expect(typeof el.baseLimitAfterCap).toBe("number");
+      expect(typeof el.additionalCount).toBe("number");
       expect(typeof el.totalLimit).toBe("number");
       expect(typeof el.currentForeignWorkerCount).toBe("number");
       expect(typeof el.remainingCapacity).toBe("number");
     });
 
-    it("has boolean limitExceeded field", () => {
-      expect(typeof mockResult.employmentLimit.limitExceeded).toBe("boolean");
+    it("has boolean fields", () => {
+      expect(typeof mockResult.employmentLimitAnalysis.limitExceeded).toBe("boolean");
+      expect(typeof mockResult.employmentLimitAnalysis.cappedByDomesticCount).toBe("boolean");
+    });
+
+    it("allows doubleCap to be null", () => {
+      expect(mockResult.employmentLimitAnalysis.doubleCap).toBeNull();
     });
 
     it("has additionalBonuses array with correct shape", () => {
-      const bonus = mockResult.employmentLimit.additionalBonuses[0];
+      const bonus = mockResult.employmentLimitAnalysis.additionalBonuses[0];
       expect(typeof bonus.reason).toBe("string");
-      expect(typeof bonus.additionalCount).toBe("number");
+      expect(typeof bonus.ratePercent).toBe("number");
+      expect(typeof bonus.cappedByDomesticCount).toBe("boolean");
     });
 
     it("has whatIfScenarios with all required fields", () => {
-      const scenario = mockResult.employmentLimit.whatIfScenarios[0];
-      expect(typeof scenario.domesticInsuredCount).toBe("number");
-      expect(typeof scenario.delta).toBe("number");
-      expect(typeof scenario.newLimit).toBe("number");
-      expect(typeof scenario.remainingCapacity).toBe("number");
+      const scenario = mockResult.employmentLimitAnalysis.whatIfScenarios[0];
+      expect(typeof scenario.additionalDomesticCount).toBe("number");
+      expect(typeof scenario.newDomesticTotal).toBe("number");
+      expect(typeof scenario.newBaseLimit).toBe("number");
+      expect(typeof scenario.newBaseLimitAfterCap).toBe("number");
+      expect(typeof scenario.newTotalLimit).toBe("number");
+      expect(typeof scenario.newRemainingCapacity).toBe("number");
       expect(["IMPOSSIBLE", "INSUFFICIENT", "POSSIBLE", "SURPLUS"]).toContain(
         scenario.feasibility
       );
     });
   });
 
-  describe("scoring sub-object", () => {
+  describe("scoringAnalysis sub-object", () => {
     it("has required numeric score fields", () => {
-      const s = mockResult.scoring;
+      const s = mockResult.scoringAnalysis;
       expect(typeof s.totalBonusScore).toBe("number");
+      expect(typeof s.totalDeductionScore).toBe("number");
       expect(typeof s.estimatedScore).toBe("number");
       expect(typeof s.maxPossibleScore).toBe("number");
     });
 
     it("has appliedBonusItems and availableBonusItems as arrays", () => {
-      expect(Array.isArray(mockResult.scoring.appliedBonusItems)).toBe(true);
-      expect(Array.isArray(mockResult.scoring.availableBonusItems)).toBe(true);
+      expect(Array.isArray(mockResult.scoringAnalysis.appliedBonusItems)).toBe(true);
+      expect(Array.isArray(mockResult.scoringAnalysis.availableBonusItems)).toBe(true);
     });
 
     it("bonus items have correct shape", () => {
-      const item = mockResult.scoring.appliedBonusItems[0];
+      const item = mockResult.scoringAnalysis.appliedBonusItems[0];
       expect(typeof item.code).toBe("string");
-      expect(typeof item.label).toBe("string");
-      expect(typeof item.score).toBe("number");
+      expect(typeof item.displayName).toBe("string");
+      expect(typeof item.points).toBe("number");
       expect(typeof item.applied).toBe("boolean");
     });
   });
 
   describe("quotaStatus sub-object", () => {
-    it("has industry and currentRound as strings", () => {
+    it("has industry and currentYearQuota fields", () => {
       expect(typeof mockResult.quotaStatus.industry).toBe("string");
-      expect(typeof mockResult.quotaStatus.currentRound).toBe("string");
+      expect(typeof mockResult.quotaStatus.currentYearQuota).toBe("number");
     });
 
-    it("has numeric allocation fields", () => {
-      expect(typeof mockResult.quotaStatus.roundAllocation).toBe("number");
-      expect(typeof mockResult.quotaStatus.industryAllocation).toBe("number");
+    it("has recentHistory as an array", () => {
+      expect(Array.isArray(mockResult.quotaStatus.recentHistory)).toBe(true);
     });
 
-    it("roundHistory items allow null competitionRate", () => {
-      const itemWithNull: RoundHistoryItem = { ...mockRoundHistoryItem, competitionRate: null };
-      expect(itemWithNull.competitionRate).toBeNull();
+    it("recentHistory items have year, quotaCount, and source", () => {
+      const item = mockResult.quotaStatus.recentHistory[0];
+      expect(typeof item.year).toBe("number");
+      expect(typeof item.quotaCount).toBe("number");
+      expect(typeof item.source).toBe("string");
     });
   });
 
-  describe("timeline sub-object", () => {
+  describe("timelineEstimate sub-object", () => {
     it("has estimatedMonths as a number", () => {
-      expect(typeof mockResult.timeline.estimatedMonths).toBe("number");
+      expect(typeof mockResult.timelineEstimate.estimatedMonths).toBe("number");
     });
 
     it("allows preferredNationality to be null", () => {
-      const tlWithNull: TimelineResponse = { ...mockTimeline, preferredNationality: null };
+      const tlWithNull: TimelineEstimateBE = { ...mockTimeline, preferredNationality: null };
       expect(tlWithNull.preferredNationality).toBeNull();
     });
 
     it("steps array items have all required fields", () => {
-      const step = mockResult.timeline.steps[0];
-      expect(typeof step.step).toBe("number");
-      expect(typeof step.title).toBe("string");
+      const step = mockResult.timelineEstimate.steps[0];
+      expect(typeof step.stepName).toBe("string");
+      expect(typeof step.estimatedDays).toBe("number");
       expect(typeof step.description).toBe("string");
-      expect(typeof step.duration).toBe("string");
-    });
-
-    it("nationalityComparison items have all required fields", () => {
-      const nc = mockResult.timeline.nationalityComparison[0];
-      expect(typeof nc.nationality).toBe("string");
-      expect(typeof nc.flag).toBe("string");
-      expect(typeof nc.avgMonths).toBe("number");
-      expect(typeof nc.note).toBe("string");
     });
   });
 

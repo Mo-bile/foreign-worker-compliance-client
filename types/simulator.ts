@@ -45,85 +45,79 @@ export type SimulationRequest = z.infer<typeof simulationRequestSchema>;
 // ─── Verdict (이진) ──────────────────────────────────────────────
 export type SimulationVerdict = "WITHIN_QUOTA" | "EXCEEDED";
 
-// ─── BE Response Types (새 도메인) ───────────────────────────────
+// ─── BE Response Types (실제 API shape) ──────────────────────────
 
-export interface AdditionalBonus {
+export interface AdditionalBonusBE {
   readonly reason: string;
-  readonly additionalCount: number;
+  readonly ratePercent: number;
+  readonly cappedByDomesticCount: boolean;
 }
 
 export type WhatIfFeasibility = "IMPOSSIBLE" | "INSUFFICIENT" | "POSSIBLE" | "SURPLUS";
 
-export interface WhatIfScenario {
-  readonly domesticInsuredCount: number;
-  readonly delta: number;
-  readonly newLimit: number;
-  readonly remainingCapacity: number;
+export interface WhatIfScenarioBE {
+  readonly additionalDomesticCount: number;
+  readonly newDomesticTotal: number;
+  readonly newBaseLimit: number;
+  readonly newBaseLimitAfterCap: number;
+  readonly newTotalLimit: number;
+  readonly newRemainingCapacity: number;
   readonly feasibility: WhatIfFeasibility;
 }
 
-export interface EmploymentLimitResponse {
+export interface EmploymentLimitAnalysis {
   readonly domesticInsuredCount: number;
   readonly baseLimit: number;
-  readonly additionalBonuses: readonly AdditionalBonus[];
+  readonly doubleCap: number | null;
+  readonly baseLimitAfterCap: number;
+  readonly additionalBonuses: readonly AdditionalBonusBE[];
+  readonly additionalCount: number;
   readonly totalLimit: number;
+  readonly cappedByDomesticCount: boolean;
   readonly currentForeignWorkerCount: number;
   readonly remainingCapacity: number;
   readonly limitExceeded: boolean;
-  readonly whatIfScenarios: readonly WhatIfScenario[];
+  readonly whatIfScenarios: readonly WhatIfScenarioBE[];
 }
 
-export interface ScoringBonusItem {
+export interface ScoringBonusItemBE {
   readonly code: string;
-  readonly label: string;
-  readonly score: number;
+  readonly displayName: string;
+  readonly points: number;
   readonly applied: boolean;
 }
 
-export interface ScoringResponse {
-  readonly appliedBonusItems: readonly ScoringBonusItem[];
-  readonly availableBonusItems: readonly ScoringBonusItem[];
+export interface ScoringAnalysis {
+  readonly appliedBonusItems: readonly ScoringBonusItemBE[];
+  readonly availableBonusItems: readonly ScoringBonusItemBE[];
   readonly totalBonusScore: number;
+  readonly totalDeductionScore: number;
   readonly estimatedScore: number;
   readonly maxPossibleScore: number;
 }
 
-export interface RoundHistoryItem {
-  readonly round: string;
+export interface QuotaHistoryItem {
   readonly year: number;
-  readonly allocation: number;
-  readonly industryAllocation: number;
-  readonly competitionRate: number | null;
+  readonly quotaCount: number;
+  readonly source: string;
 }
 
-export interface QuotaStatusResponse {
+export interface QuotaStatusResponseBE {
   readonly industry: string;
-  readonly currentRound: string;
-  readonly roundAllocation: number;
-  readonly industryAllocation: number;
-  readonly roundHistory: readonly RoundHistoryItem[];
-  readonly industryTrend: string;
+  readonly currentYearQuota: number;
+  readonly recentHistory: readonly QuotaHistoryItem[];
 }
 
-export interface TimelineStep {
-  readonly step: number;
-  readonly title: string;
+export interface TimelineStepBE {
+  readonly stepName: string;
+  readonly estimatedDays: number;
   readonly description: string;
-  readonly duration: string;
 }
 
-export interface NationalityDuration {
-  readonly nationality: string;
-  readonly flag: string;
-  readonly avgMonths: number;
-  readonly note: string;
-}
-
-export interface TimelineResponse {
+export interface TimelineEstimateBE {
   readonly preferredNationality: string | null;
   readonly estimatedMonths: number;
-  readonly steps: readonly TimelineStep[];
-  readonly nationalityComparison: readonly NationalityDuration[];
+  readonly steps: readonly TimelineStepBE[];
 }
 
 export interface AiInsightsResponse {
@@ -142,10 +136,11 @@ export interface SimulationResultResponse {
   readonly desiredWorkers: number;
   readonly desiredTiming: string;
   readonly preferredNationality: string | null;
-  readonly employmentLimit: EmploymentLimitResponse;
-  readonly scoring: ScoringResponse;
-  readonly quotaStatus: QuotaStatusResponse;
-  readonly timeline: TimelineResponse;
+  readonly domesticInsuredCount: number;
+  readonly employmentLimitAnalysis: EmploymentLimitAnalysis;
+  readonly scoringAnalysis: ScoringAnalysis;
+  readonly quotaStatus: QuotaStatusResponseBE;
+  readonly timelineEstimate: TimelineEstimateBE;
   readonly aiInsights: AiInsightsResponse;
   readonly createdAt: string;
 }
@@ -162,7 +157,7 @@ export interface VerdictDisplayData {
   readonly usagePercent: number;
   readonly progressLevel: "low" | "mid" | "high" | "critical";
   readonly summaryText: string;
-  readonly additionalBonuses: readonly AdditionalBonus[];
+  readonly additionalBonuses: readonly AdditionalBonusBE[];
 }
 
 export interface ScoringTableRow {
@@ -207,8 +202,13 @@ export interface QuotaDisplayData {
 
 export interface TimelineDisplayData {
   readonly estimatedMonths: number;
-  readonly steps: readonly TimelineStep[];
-  readonly nationalityComparison: readonly NationalityDuration[];
+  readonly steps: readonly TimelineStepBE[];
+  readonly nationalityComparison: readonly {
+    readonly nationality: string;
+    readonly flag: string;
+    readonly avgMonths: number;
+    readonly note: string;
+  }[];
   readonly preferredNationality: string | null;
 }
 
