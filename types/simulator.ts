@@ -147,6 +147,11 @@ export interface SimulationResultResponse {
 
 // ─── FE Display Types ────────────────────────────────────────────
 
+export interface AdditionalBonusDisplay {
+  readonly reason: string;
+  readonly additionalCount: number;
+}
+
 export interface VerdictDisplayData {
   readonly verdict: SimulationVerdict;
   readonly title: string;
@@ -157,7 +162,7 @@ export interface VerdictDisplayData {
   readonly usagePercent: number;
   readonly progressLevel: "low" | "mid" | "high" | "critical";
   readonly summaryText: string;
-  readonly additionalBonuses: readonly AdditionalBonusBE[];
+  readonly additionalBonuses: readonly AdditionalBonusDisplay[];
 }
 
 export interface ScoringTableRow {
@@ -183,33 +188,29 @@ export interface ScoringDisplayData {
   readonly improvement: ScoringImprovementData | null;
 }
 
-export interface QuotaRoundRow {
-  readonly round: string;
-  readonly allocation: string;
-  readonly industryAllocation: string;
-  readonly competitionRate: string;
+export interface QuotaYearRow {
+  readonly year: number;
+  readonly quotaCount: string;
+  readonly source: string;
   readonly isCurrent: boolean;
-  readonly isFuture: boolean;
 }
 
 export interface QuotaDisplayData {
-  readonly currentRound: string;
-  readonly roundAllocation: string;
-  readonly industryAllocationText: string;
-  readonly roundRows: readonly QuotaRoundRow[];
-  readonly industryTrend: string;
+  readonly industry: string;
+  readonly currentYearQuota: string;
+  readonly yearRows: readonly QuotaYearRow[];
+}
+
+export interface TimelineStepDisplay {
+  readonly title: string;
+  readonly duration: string;
+  readonly description: string;
 }
 
 export interface TimelineDisplayData {
   readonly estimatedMonths: number;
-  readonly steps: readonly TimelineStepBE[];
-  readonly nationalityComparison: readonly {
-    readonly nationality: string;
-    readonly flag: string;
-    readonly avgMonths: number;
-    readonly note: string;
-  }[];
   readonly preferredNationality: string | null;
+  readonly steps: readonly TimelineStepDisplay[];
 }
 
 export interface WhatIfRow {
