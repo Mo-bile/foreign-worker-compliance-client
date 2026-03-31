@@ -3,11 +3,12 @@ import type { CompanyResponse } from "@/types/api";
 import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies } from "./data";
 import { mockDashboardRaw } from "@/mocks/dashboard-data";
 import { transformDashboardResponse } from "@/lib/transforms/dashboard-transform";
-import { mockSimulationResultResponse, mockSimulationResponse } from "@/mocks/simulator-data";
+import { mockWithinQuotaResponse } from "@/mocks/simulator-data";
+import { transformSimulationResult } from "@/lib/transforms/simulation-transform";
 import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
 import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
 import { mockComplianceReport } from "./report-data";
-import { mockMetadata } from "./metadata-data";
+import { mockMetadata, MOCK_SCORING_POLICIES } from "./metadata-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
@@ -122,14 +123,18 @@ const getDashboardBff: Parameters<typeof http.get>[1] = () =>
 const postSimulationBackend: Parameters<typeof http.post>[1] = () =>
   new HttpResponse(null, {
     status: 201,
-    headers: { Location: `/api/simulations/${mockSimulationResultResponse.id}` },
+    headers: { Location: `/api/simulations/${mockWithinQuotaResponse.id}` },
   });
 
 const getSimulationBackend: Parameters<typeof http.get>[1] = () =>
-  HttpResponse.json(mockSimulationResultResponse);
+  HttpResponse.json(mockWithinQuotaResponse);
+
+const mockDeductionCodes = new Set(
+  MOCK_SCORING_POLICIES.filter((p) => p.isDeduction).map((p) => p.code),
+);
 
 const postSimulationBff: Parameters<typeof http.post>[1] = () =>
-  HttpResponse.json(mockSimulationResponse);
+  HttpResponse.json(transformSimulationResult(mockWithinQuotaResponse, mockDeductionCodes));
 
 const getBenchmark: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockBenchmarkResponse);

@@ -19,9 +19,17 @@ export interface VisaTypeItem {
   readonly description: string;
 }
 
+export interface ScoringPolicyItem {
+  readonly code: string;
+  readonly label: string;
+  readonly score: number;
+  readonly isDeduction: boolean;
+}
+
 export interface MetadataResponse {
   readonly nationalities: readonly NationalityItem[];
   readonly regions: readonly RegionItem[];
   readonly industryCategories: readonly IndustryCategoryItem[];
   readonly visaTypes: readonly VisaTypeItem[];
+  readonly scoringPolicies: readonly ScoringPolicyItem[];
 }

@@ -1,38 +1,25 @@
 "use client";
 
-import { Lightbulb } from "lucide-react";
+import { useState } from "react";
 import { SimulationForm } from "@/components/simulator/simulation-form";
-import { ResultVerdict } from "@/components/simulator/result-verdict";
-import { ResultStats } from "@/components/simulator/result-stats";
-import { AnalysisCard } from "@/components/simulator/analysis-card";
+import { InputGuide } from "@/components/simulator/input-guide";
+import { ResultSummarySidebar } from "@/components/simulator/result-summary-sidebar";
+import { VerdictCard } from "@/components/simulator/verdict-card";
+import { ScoringSection } from "@/components/simulator/scoring-section";
+import { QuotaSection } from "@/components/simulator/quota-section";
+import { TimelineSection } from "@/components/simulator/timeline-section";
+import { AiSummarySection } from "@/components/simulator/ai-summary-section";
+import { WhatIfSection } from "@/components/simulator/what-if-section";
 import { RecommendationBox } from "@/components/simulator/recommendation-box";
-import { useSimulation } from "@/lib/queries/use-simulation";
 import { SimulationProgress } from "@/components/simulator/simulation-progress";
+import { useSimulation } from "@/lib/queries/use-simulation";
 import { useCompanyContext } from "@/lib/contexts/company-context";
-import type { NationalityAnalysis, AnalysisSection } from "@/types/simulator";
-
-function toNationalitySection(n: NationalityAnalysis): AnalysisSection {
-  return {
-    id: "nationality",
-    icon: "Globe",
-    title: "국적별 현황 분석",
-    badge: {
-      text: n.trend === "up" ? "증가" : n.trend === "down" ? "감소" : "유지",
-      color: n.trend === "up" ? "green" : n.trend === "down" ? "red" : "gray",
-    },
-    dataRows: [
-      { key: "선호 국적 비율", value: `${n.percentage}%` },
-      { key: "전국 평균 비율", value: `${n.avgPercentage}%` },
-    ],
-    progress: null,
-    dataSources: [],
-    aiInsight: `선호 국적의 배정 비율이 전국 평균 대비 ${n.percentage > n.avgPercentage ? "높습니다" : "낮습니다"}.`,
-  };
-}
+import type { SimulationRequest } from "@/types/simulator";
 
 export default function SimulatorPage() {
   const { selectedCompanyId, selectedCompany } = useCompanyContext();
   const mutation = useSimulation(selectedCompanyId);
+  const [lastRequest, setLastRequest] = useState<SimulationRequest | null>(null);
 
   if (selectedCompanyId == null) {
     return (
@@ -46,55 +33,129 @@ export default function SimulatorPage() {
   }
 
   const result = mutation.data;
+  const isExceeded = result?.verdict.verdict === "EXCEEDED";
 
+  function handleSubmit(data: SimulationRequest) {
+    setLastRequest(data);
+    mutation.mutate(data);
+  }
+
+  function handleEdit() {
+    mutation.reset();
+    setLastRequest(null);
+  }
+
+  // ─── Input mode ───
+  if (!result && !mutation.isPending && !mutation.isError) {
+    return (
+      <div className="grid grid-cols-[380px_1fr] gap-6">
+        <div className="sticky top-6 self-start">
+          <SimulationForm
+            company={selectedCompany}
+            onSubmit={handleSubmit}
+            isPending={mutation.isPending}
+          />
+        </div>
+        <InputGuide />
+      </div>
+    );
+  }
+
+  // ─── Loading / Error / Result mode ───
   return (
     <div className="grid grid-cols-[380px_1fr] gap-6">
-      {/* Left: Form (sticky) */}
+      {/* Left sidebar */}
       <div className="sticky top-6 self-start">
-        <SimulationForm
-          company={selectedCompany}
-          onSubmit={(data) => mutation.mutate(data)}
-          isPending={mutation.isPending}
-        />
+        {result && lastRequest ? (
+          <ResultSummarySidebar
+            request={lastRequest}
+            company={selectedCompany}
+            estimatedScore={result.scoring.estimatedScore}
+            isExceeded={isExceeded ?? false}
+            onEdit={handleEdit}
+          />
+        ) : (
+          <SimulationForm
+            company={selectedCompany}
+            onSubmit={handleSubmit}
+            isPending={mutation.isPending}
+          />
+        )}
       </div>
 
-      {/* Right: Result area */}
+      {/* Right content */}
       <div className="space-y-4">
         <SimulationProgress isPending={mutation.isPending} />
 
         {mutation.isError && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-            <p className="text-sm font-medium text-destructive">시뮬레이션 분석에 실패했습니다</p>
-            <p className="mt-1 text-xs text-muted-foreground">{mutation.error?.message}</p>
-          </div>
-        )}
-
-        {!result && !mutation.isPending && !mutation.isError && (
-          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/20 py-20 text-center">
-            <Lightbulb className="mb-3 h-10 w-10 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">
-              시뮬레이션을 실행하면 분석 결과가 여기에 표시됩니다
+            <p className="text-sm font-medium text-destructive">
+              시뮬레이션 분석에 실패했습니다
             </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              잠시 후 다시 시도해주세요. 문제가 지속되면 관리자에게 문의하세요.
+            </p>
+            {lastRequest && (
+              <button
+                type="button"
+                onClick={() => mutation.mutate(lastRequest)}
+                disabled={mutation.isPending}
+                className="mt-3 rounded-md bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                다시 시도
+              </button>
+            )}
           </div>
         )}
 
         {result && (
           <>
-            <ResultVerdict
-              verdict={result.verdict}
-              verdictText={result.verdictText}
-              summary={result.summary}
-              analyzedAt={result.analyzedAt}
-              dataSourceCount={result.dataSourceCount}
-            />
-            <ResultStats stats={result.stats} />
-            {result.analyses.map((section) => (
-              <AnalysisCard key={section.id} section={section} defaultOpen />
-            ))}
-            {result.nationality !== null && (
-              <AnalysisCard section={toNationalitySection(result.nationality)} defaultOpen />
+            {/* ① Verdict Card */}
+            <VerdictCard data={result.verdict} />
+
+            {/* Exceeded info banner */}
+            {isExceeded && (
+              <div className="rounded-lg border-l-[3px] border-signal-orange bg-secondary p-4">
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  한도 초과로 현재 신청이 불가하지만, 참고용 정보를 확인할 수 있습니다
+                </p>
+              </div>
             )}
-            <RecommendationBox recommendations={result.recommendations} />
+
+            {/* ② Scoring */}
+            <ScoringSection
+              data={result.scoring}
+              defaultOpen={!isExceeded}
+              muted={isExceeded}
+            />
+
+            {/* ③ Quota */}
+            <QuotaSection
+              data={result.quota}
+              defaultOpen={!isExceeded}
+              muted={isExceeded}
+            />
+
+            {/* ④ Timeline */}
+            <TimelineSection
+              data={result.timeline}
+              defaultOpen={!isExceeded}
+              muted={isExceeded}
+            />
+
+            {/* ⑤ AI Summary */}
+            <AiSummarySection sanitizedHtml={result.aiSummary} />
+
+            {/* ⑥ What-if (exceeded only) */}
+            {result.whatIf && <WhatIfSection data={result.whatIf} />}
+
+            {/* Recommendation */}
+            <RecommendationBox data={result.recommendation} />
+
+            {/* Disclaimer */}
+            <div className="border-t border-border pt-3 text-center text-[10px] text-muted-foreground">
+              ⚖ {result.disclaimer}
+            </div>
           </>
         )}
       </div>

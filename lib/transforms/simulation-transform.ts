@@ -1,244 +1,323 @@
+import DOMPurify from "isomorphic-dompurify";
 import type {
   SimulationResultResponse,
   SimulationResponse,
   SimulationVerdict,
-  SimStatItem,
-  AnalysisSection,
-  NationalityAnalysis,
+  VerdictDisplayData,
+  AdditionalBonusDisplay,
+  ScoringDisplayData,
+  ScoringTableRow,
+  ScoringImprovementData,
+  QuotaDisplayData,
+  QuotaYearRow,
+  TimelineDisplayData,
+  TimelineStepDisplay,
+  WhatIfDisplayData,
+  WhatIfRow,
+  WhatIfFeasibility,
+  RecommendationDisplayData,
   RecommendationItem,
-  QuotaAnalysis,
-  CompetitionAnalysis,
-  NationalityAnalysisResult,
+  EmploymentLimitAnalysis,
+  ScoringAnalysis,
+  QuotaStatusResponseBE,
+  TimelineEstimateBE,
   AiInsightsResponse,
-  SignalColor,
 } from "@/types/simulator";
-import type { Nationality } from "@/types/api";
-import type { DataSource } from "@/types/shared";
 
 // ─── Constants ───────────────────────────────────────────────────
 
-type CompetitionLevel = "HIGH" | "MEDIUM" | "LOW";
+const SANITIZE_OPTIONS = { ALLOWED_TAGS: ["strong", "em", "br"] };
 
-const VERDICT_TEXT: Record<SimulationVerdict, string> = {
-  HIGH: "높음",
-  MEDIUM: "보통",
-  LOW: "낮음",
+const FEASIBILITY_LABELS: Record<WhatIfFeasibility, string> = {
+  IMPOSSIBLE: "불가",
+  INSUFFICIENT: "부족",
+  POSSIBLE: "가능",
+  SURPLUS: "여유",
 };
 
-const COMPETITION_LABEL: Record<CompetitionLevel, string> = {
-  HIGH: "치열",
-  MEDIUM: "보통",
-  LOW: "낮음",
-};
+const BASE_SCORE = 60;
 
-const COMPETITION_COLOR: Record<CompetitionLevel, SignalColor> = {
-  HIGH: "red",
-  MEDIUM: "orange",
-  LOW: "green",
-};
-
-const QUOTA_DATA_SOURCES: readonly DataSource[] = [
-  { name: "고용노동부", dataId: "15002263" },
-  { name: "한국산업인력공단", dataId: "AK102" },
-];
-
-const COMPETITION_DATA_SOURCES: readonly DataSource[] = [
-  { name: "고용노동부", dataId: "15002263" },
-];
-
-const DATA_SOURCE_COUNT = new Set(
-  [...QUOTA_DATA_SOURCES, ...COMPETITION_DATA_SOURCES].map((s) => s.dataId),
-).size;
-
-const DURATION_MAP = {
-  HIGH_H1: "5~7개월",
-  HIGH_H2: "4~6개월",
-  OTHER_H1: "3~5개월",
-  OTHER_H2: "2~4개월",
+const RECOMMENDATION_URLS = {
+  WORKNET: "https://www.work.go.kr",
+  EPS: "https://www.eps.go.kr",
+  WORKNET_CENTER: "https://www.work.go.kr/center",
 } as const;
 
 // ─── Helpers ─────────────────────────────────────────────────────
 
-function normalizeCompetitionLevel(level: string): CompetitionLevel {
-  const upper = level.toUpperCase();
-  if (upper === "HIGH" || upper === "MEDIUM" || upper === "LOW") return upper;
-  return "MEDIUM";
+function sanitize(html: string): string {
+  return DOMPurify.sanitize(html, SANITIZE_OPTIONS);
+}
+
+function formatNumber(n: number): string {
+  return n.toLocaleString("ko-KR");
+}
+
+function deriveProgressLevel(percent: number): "low" | "mid" | "high" | "critical" {
+  if (percent >= 100) return "critical";
+  if (percent >= 80) return "high";
+  if (percent >= 50) return "mid";
+  return "low";
+}
+
+function estimatePercentile(score: number): string {
+  if (score >= 80) return "상위 ~10%";
+  if (score >= 73) return "상위 ~20%";
+  if (score >= 65) return "상위 ~30%";
+  if (score >= 58) return "상위 ~50%";
+  return "상위 ~70%";
+}
+
+function formatDays(estimatedDays: number): string {
+  if (estimatedDays >= 30) return `약 ${Math.round(estimatedDays / 30)}개월`;
+  return `약 ${estimatedDays}일`;
 }
 
 // ─── Verdict ─────────────────────────────────────────────────────
 
-function deriveVerdict(
-  quotaSufficient: boolean,
-  competitionLevel: CompetitionLevel,
-): SimulationVerdict {
-  if (!quotaSufficient) return "LOW";
-  if (competitionLevel === "LOW") return "HIGH";
-  return "MEDIUM";
-}
+function buildVerdict(
+  limit: EmploymentLimitAnalysis,
+  desiredWorkers: number,
+): VerdictDisplayData {
+  const verdict: SimulationVerdict = limit.limitExceeded ? "EXCEEDED" : "WITHIN_QUOTA";
+  const usagePercent = limit.totalLimit > 0
+    ? Math.round((limit.currentForeignWorkerCount / limit.totalLimit) * 100)
+    : limit.currentForeignWorkerCount > 0 ? 100 : 0;
 
-// ─── Stats ───────────────────────────────────────────────────────
+  const title = limit.limitExceeded ? "추가 채용 불가" : "추가 채용 가능";
 
-function buildAllocationStat(quota: QuotaAnalysis): SimStatItem {
-  const sufficient = quota.quotaSufficient;
+  const additionalBonuses: readonly AdditionalBonusDisplay[] = limit.additionalBonuses.map((b) => ({
+    reason: b.reason,
+    additionalCount: Number.isFinite(b.ratePercent)
+      ? Math.floor(limit.baseLimitAfterCap * b.ratePercent / 100)
+      : 0,
+  }));
+
+  const summaryText = limit.limitExceeded
+    ? `현재 ${limit.currentForeignWorkerCount}명 고용 중으로 잔여 한도가 없습니다. 희망 인원 ${desiredWorkers}명은 한도를 초과합니다.`
+    : `희망 인원 ${desiredWorkers}명은 잔여 한도(${limit.remainingCapacity}명) 이내입니다.${
+        additionalBonuses.length > 0
+          ? ` ${additionalBonuses.map((b) => b.reason).join(", ")}으로 한도가 상향 적용되었습니다.`
+          : ""
+      }`;
+
   return {
-    label: "배정 가능성",
-    value: sufficient ? "높음" : "낮음",
-    subText: sufficient
-      ? `쿼터 여유 ${quota.remainingQuota.toLocaleString("ko-KR")}명`
-      : "쿼터 부족",
-    color: sufficient ? "green" : "red",
+    verdict,
+    title,
+    limitText: `귀사의 고용 한도: 외국인 ${limit.totalLimit}명 (내국인 ${limit.domesticInsuredCount}명 기준)`,
+    currentCount: limit.currentForeignWorkerCount,
+    totalLimit: limit.totalLimit,
+    remainingCapacity: limit.remainingCapacity,
+    usagePercent,
+    progressLevel: deriveProgressLevel(usagePercent),
+    summaryText,
+    additionalBonuses,
   };
 }
 
-function buildCompetitionStat(
-  competition: CompetitionAnalysis,
-  level: CompetitionLevel,
-): SimStatItem {
-  const sharePercent = Math.round(competition.regionalShare * 100);
+// ─── Scoring ─────────────────────────────────────────────────────
+
+function buildScoringRows(
+  scoring: ScoringAnalysis,
+  deductionCodes: ReadonlySet<string>,
+): readonly ScoringTableRow[] {
+  const rows: ScoringTableRow[] = [];
+
+  rows.push({
+    label: "기본 점수 (사업장 규모·업종)",
+    score: `${BASE_SCORE}점`,
+    status: "—",
+    isDeduction: false,
+  });
+
+  for (const item of scoring.appliedBonusItems) {
+    const isDeduction = deductionCodes.has(item.code);
+    rows.push({
+      label: item.displayName,
+      score: isDeduction ? `-${item.points}점` : `+${item.points}점`,
+      status: "✓",
+      isDeduction,
+    });
+  }
+
+  for (const item of scoring.availableBonusItems) {
+    const isDeduction = deductionCodes.has(item.code);
+    rows.push({
+      label: item.displayName,
+      score: "0점",
+      status: "미해당",
+      isDeduction,
+    });
+  }
+
+  rows.push({
+    label: "합계",
+    score: `${scoring.estimatedScore}점`,
+    status: "",
+    isDeduction: false,
+  });
+
+  return rows;
+}
+
+function buildScoringImprovement(
+  scoring: ScoringAnalysis,
+  deductionCodes: ReadonlySet<string>,
+): ScoringImprovementData | null {
+  const bonusCandidates = scoring.availableBonusItems.filter(
+    (item) => !deductionCodes.has(item.code),
+  );
+
+  const bestAvailable = bonusCandidates.reduce<typeof scoring.availableBonusItems[number] | null>(
+    (best, item) => (best === null || item.points > best.points ? item : best),
+    null,
+  );
+
+  if (bestAvailable === null) return null;
+
+  const improvedScore = scoring.estimatedScore + bestAvailable.points;
   return {
-    label: "지역 경쟁도",
-    value: COMPETITION_LABEL[level],
-    subText: `지역 점유율 ${sharePercent}%`,
-    color: COMPETITION_COLOR[level],
+    currentScore: scoring.estimatedScore,
+    currentPercentile: estimatePercentile(scoring.estimatedScore),
+    improvedScore,
+    improvedPercentile: estimatePercentile(improvedScore),
+    improvementLabel: `${bestAvailable.displayName} 시`,
+    improvementDescription: `${bestAvailable.displayName} 인증을 받으면 +${bestAvailable.points}점으로 배정 가능성이 크게 향상됩니다. 인증 기준은 관할 고용센터에 문의하세요.`,
   };
 }
 
-function buildDurationStat(level: CompetitionLevel, desiredTiming: string): SimStatItem {
-  const half = desiredTiming.endsWith("H1") ? "H1" : "H2";
-  const intensity = level === "HIGH" ? "HIGH" : "OTHER";
-  const key = `${intensity}_${half}` as keyof typeof DURATION_MAP;
-
+function buildScoring(
+  scoring: ScoringAnalysis,
+  deductionCodes: ReadonlySet<string>,
+): ScoringDisplayData {
   return {
-    label: "예상 소요기간",
-    value: DURATION_MAP[key],
-    subText: "내국인 구인노력 포함",
-    color: intensity === "HIGH" ? "orange" : "blue",
+    estimatedScore: scoring.estimatedScore,
+    percentileText: estimatePercentile(scoring.estimatedScore),
+    tableRows: buildScoringRows(scoring, deductionCodes),
+    improvement: buildScoringImprovement(scoring, deductionCodes),
   };
 }
 
-// ─── Analysis Sections ───────────────────────────────────────────
+// ─── Quota ───────────────────────────────────────────────────────
 
-function buildQuotaSection(quota: QuotaAnalysis, aiInsight: string): AnalysisSection {
-  const sufficient = quota.quotaSufficient;
+function buildQuota(
+  quota: QuotaStatusResponseBE,
+  currentYear: number = new Date().getFullYear(),
+): QuotaDisplayData {
+  const yearRows: QuotaYearRow[] = quota.recentHistory.map((h) => ({
+    year: h.year,
+    quotaCount: `${formatNumber(h.quotaCount)}명`,
+    source: h.source,
+    isCurrent: h.year === currentYear,
+  }));
+
   return {
-    id: "quota",
-    icon: "BarChart3",
-    title: "쿼터 분석",
-    badge: {
-      text: sufficient ? "여유" : "부족",
-      color: sufficient ? "green" : "red",
-    },
-    dataRows: [
-      { key: "업종별 배정 쿼터", value: `${quota.annualQuota.toLocaleString("ko-KR")}명` },
-      { key: "현재 배정 인원", value: `${quota.currentWorkerCount.toLocaleString("ko-KR")}명` },
-      { key: "잔여 쿼터", value: `${quota.remainingQuota.toLocaleString("ko-KR")}명` },
-    ],
-    progress: {
-      label: "소진율",
-      value: Math.round(quota.exhaustionRate),
-      level: quota.exhaustionRate >= 80 ? "high" : quota.exhaustionRate >= 50 ? "mid" : "low",
-    },
-    dataSources: QUOTA_DATA_SOURCES,
-    aiInsight,
+    industry: quota.industry,
+    currentYearQuota: `${formatNumber(quota.currentYearQuota)}명`,
+    yearRows,
   };
 }
 
-function buildCompetitionSection(
-  competition: CompetitionAnalysis,
-  level: CompetitionLevel,
-  aiInsight: string,
-): AnalysisSection {
-  const sharePercent = Math.round(competition.regionalShare * 100);
+// ─── Timeline ────────────────────────────────────────────────────
+
+function buildTimeline(timeline: TimelineEstimateBE): TimelineDisplayData {
+  const steps: readonly TimelineStepDisplay[] = timeline.steps.map((s) => ({
+    title: s.stepName,
+    duration: formatDays(s.estimatedDays),
+    description: s.description,
+  }));
+
   return {
-    id: "competition",
-    icon: "Factory",
-    title: "지역 경쟁도 분석",
-    badge: {
-      text: COMPETITION_LABEL[level],
-      color: COMPETITION_COLOR[level],
-    },
-    dataRows: [
-      {
-        key: "지역 외국인 근로자",
-        value: `${competition.regionalWorkerCount.toLocaleString("ko-KR")}명`,
-      },
-      {
-        key: "전국 외국인 근로자",
-        value: `${competition.nationalWorkerCount.toLocaleString("ko-KR")}명`,
-      },
-      { key: "지역 점유율", value: `${sharePercent}%` },
-    ],
-    progress: {
-      label: "경쟁 강도",
-      value: sharePercent,
-      level: sharePercent >= 70 ? "high" : sharePercent >= 40 ? "mid" : "low",
-    },
-    dataSources: COMPETITION_DATA_SOURCES,
-    aiInsight,
+    estimatedMonths: timeline.estimatedMonths,
+    preferredNationality: timeline.preferredNationality,
+    steps,
   };
 }
 
-// ─── Nationality ─────────────────────────────────────────────────
+// ─── What-if ─────────────────────────────────────────────────────
 
-const AVG_INDUSTRY_SHARE = 10;
+function buildWhatIf(limit: EmploymentLimitAnalysis): WhatIfDisplayData | null {
+  if (!limit.limitExceeded) return null;
 
-function mapNationality(raw: NationalityAnalysisResult | null): NationalityAnalysis | null {
-  if (raw === null) return null;
+  if (limit.whatIfScenarios.length === 0) {
+    console.warn(
+      "[buildWhatIf] limitExceeded=true but whatIfScenarios is empty — backend may have returned incomplete data",
+    );
+    return null;
+  }
 
-  const diff = raw.industryShareRate - AVG_INDUSTRY_SHARE;
-  const trend: "up" | "down" | "stable" =
-    diff > 5 ? "up" : diff < -5 ? "down" : "stable";
+  const rows: WhatIfRow[] = limit.whatIfScenarios.map((s) => ({
+    domesticInsuredCount: s.newDomesticTotal,
+    delta: s.additionalDomesticCount === 0 ? "현재" : `+${s.additionalDomesticCount}명`,
+    newLimit: s.newTotalLimit,
+    remainingCapacity: s.newRemainingCapacity,
+    feasibility: s.feasibility,
+    feasibilityLabel: FEASIBILITY_LABELS[s.feasibility] ?? s.feasibility,
+  }));
 
-  return {
-    nationality: raw.nationality as Nationality,
-    percentage: raw.industryShareRate,
-    avgPercentage: AVG_INDUSTRY_SHARE,
-    trend,
-  };
+  const minPossible = limit.whatIfScenarios.find(
+    (s) => s.additionalDomesticCount > 0 && (s.feasibility === "POSSIBLE" || s.feasibility === "SURPLUS"),
+  );
+
+  const minimumConditionText = minPossible
+    ? `내국인 피보험자를 현재 ${limit.domesticInsuredCount}명에서 ${minPossible.newDomesticTotal}명(+${minPossible.additionalDomesticCount}명)으로 늘리면 추가 채용이 가능해집니다.`
+    : "현재 시나리오에서는 추가 채용이 어렵습니다.";
+
+  return { rows, minimumConditionText };
 }
 
 // ─── Recommendations ─────────────────────────────────────────────
 
-function buildRecommendations(
+function buildRecommendation(
   insights: AiInsightsResponse,
-): readonly RecommendationItem[] {
-  const items: RecommendationItem[] = insights.actionItems.map((text) => ({ text }));
+  limitExceeded: boolean,
+): RecommendationDisplayData {
+  const variant = limitExceeded ? "yellow" : "green";
+  const title = limitExceeded ? "대안 조치" : "다음 단계 안내";
 
-  if (items.length === 0) {
-    items.push({
-      text: "내국인 구인노력 의무기간 14일을 우선 이행하세요",
-      linkText: "워크넷 바로가기",
-      href: "https://www.work.go.kr",
-    });
-  }
+  const items: readonly RecommendationItem[] = limitExceeded
+    ? (insights.actionItems.length > 0
+        ? insights.actionItems.map((text) => ({ text }))
+        : [{ text: "관할 고용센터에 문의하여 대안을 확인하세요." }])
+    : [
+        {
+          text: "내국인 구인노력 14일 이행",
+          linkText: "워크넷 바로가기",
+          href: RECOMMENDATION_URLS.WORKNET,
+        },
+        {
+          text: "고용허가 신청 구비서류 준비",
+          linkText: "서류목록 다운로드",
+          href: RECOMMENDATION_URLS.EPS,
+        },
+        {
+          text: "관할 고용센터 방문 또는 온라인 신청",
+          linkText: "고용센터 찾기",
+          href: RECOMMENDATION_URLS.WORKNET_CENTER,
+        },
+      ];
 
-  return items;
+  return { variant, title, items };
 }
 
 // ─── Main Transform ──────────────────────────────────────────────
 
-export function transformSimulationResult(raw: SimulationResultResponse): SimulationResponse {
-  const { quotaAnalysis, competitionAnalysis, nationalityAnalysis, aiInsights } = raw;
-  const level = normalizeCompetitionLevel(competitionAnalysis.competitionLevel);
-  const verdict = deriveVerdict(quotaAnalysis.quotaSufficient, level);
+export function transformSimulationResult(
+  raw: SimulationResultResponse,
+  deductionCodes: ReadonlySet<string> = new Set(),
+): SimulationResponse {
+  const { employmentLimitAnalysis, scoringAnalysis, quotaStatus, timelineEstimate, aiInsights } = raw;
 
   return {
     id: String(raw.id),
-    verdict,
-    verdictText: VERDICT_TEXT[verdict],
-    summary: aiInsights.overallVerdict,
-    analyzedAt: raw.createdAt,
-    dataSourceCount: DATA_SOURCE_COUNT,
-    stats: {
-      allocation: buildAllocationStat(quotaAnalysis),
-      competition: buildCompetitionStat(competitionAnalysis, level),
-      duration: buildDurationStat(level, raw.desiredTiming),
-    },
-    analyses: [
-      buildQuotaSection(quotaAnalysis, aiInsights.quotaInsight),
-      buildCompetitionSection(competitionAnalysis, level, aiInsights.competitionInsight),
-    ],
-    nationality: mapNationality(nationalityAnalysis),
-    recommendations: buildRecommendations(aiInsights),
+    verdict: buildVerdict(employmentLimitAnalysis, raw.desiredWorkers),
+    scoring: buildScoring(scoringAnalysis, deductionCodes),
+    quota: buildQuota(quotaStatus),
+    timeline: buildTimeline(timelineEstimate),
+    aiSummary: sanitize(aiInsights.overallVerdict),
+    whatIf: buildWhatIf(employmentLimitAnalysis),
+    recommendation: buildRecommendation(aiInsights, employmentLimitAnalysis.limitExceeded),
+    disclaimer: aiInsights.disclaimer,
+    createdAt: raw.createdAt,
   };
 }
