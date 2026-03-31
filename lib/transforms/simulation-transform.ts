@@ -88,7 +88,9 @@ function buildVerdict(
 
   const additionalBonuses: readonly AdditionalBonusDisplay[] = limit.additionalBonuses.map((b) => ({
     reason: b.reason,
-    additionalCount: Math.floor(limit.baseLimitAfterCap * b.ratePercent / 100),
+    additionalCount: Number.isFinite(b.ratePercent)
+      ? Math.floor(limit.baseLimitAfterCap * b.ratePercent / 100)
+      : 0,
   }));
 
   const summaryText = limit.limitExceeded
@@ -274,7 +276,9 @@ function buildRecommendation(
   const title = limitExceeded ? "대안 조치" : "다음 단계 안내";
 
   const items: readonly RecommendationItem[] = limitExceeded
-    ? insights.actionItems.map((text) => ({ text }))
+    ? (insights.actionItems.length > 0
+        ? insights.actionItems.map((text) => ({ text }))
+        : [{ text: "관할 고용센터에 문의하여 대안을 확인하세요." }])
     : [
         {
           text: "내국인 구인노력 14일 이행",

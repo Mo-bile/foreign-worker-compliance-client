@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Lightbulb } from "lucide-react";
 import { SimulationForm } from "@/components/simulator/simulation-form";
 import { InputGuide } from "@/components/simulator/input-guide";
 import { ResultSummarySidebar } from "@/components/simulator/result-summary-sidebar";
@@ -93,16 +92,19 @@ export default function SimulatorPage() {
             <p className="text-sm font-medium text-destructive">
               시뮬레이션 분석에 실패했습니다
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">{mutation.error?.message}</p>
-          </div>
-        )}
-
-        {!result && !mutation.isPending && !mutation.isError && (
-          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/20 py-20 text-center">
-            <Lightbulb className="mb-3 h-10 w-10 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">
-              시뮬레이션을 실행하면 분석 결과가 여기에 표시됩니다
+            <p className="mt-1 text-xs text-muted-foreground">
+              잠시 후 다시 시도해주세요. 문제가 지속되면 관리자에게 문의하세요.
             </p>
+            {lastRequest && (
+              <button
+                type="button"
+                onClick={() => mutation.mutate(lastRequest)}
+                disabled={mutation.isPending}
+                className="mt-3 rounded-md bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                다시 시도
+              </button>
+            )}
           </div>
         )}
 

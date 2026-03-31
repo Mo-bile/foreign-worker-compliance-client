@@ -428,6 +428,154 @@ describe("scoring improvement with deductionCodes", () => {
   });
 });
 
+// ─── additionalCount ratePercent calculation ─────────────────────────────────
+
+describe("additionalCount ratePercent 계산", () => {
+  it("baseLimitAfterCap × ratePercent / 100 으로 additionalCount를 계산한다", () => {
+    const result = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      employmentLimitAnalysis: {
+        ...mockWithinQuotaResponse.employmentLimitAnalysis,
+        baseLimitAfterCap: 20,
+        additionalBonuses: [
+          { reason: "인구감소지역", ratePercent: 20, cappedByDomesticCount: false },
+        ],
+      },
+    });
+    // Math.floor(20 * 20 / 100) = 4
+    expect(result.verdict.additionalBonuses[0].additionalCount).toBe(4);
+  });
+
+  it("ratePercent가 undefined이면 additionalCount가 0이다", () => {
+    const result = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      employmentLimitAnalysis: {
+        ...mockWithinQuotaResponse.employmentLimitAnalysis,
+        baseLimitAfterCap: 20,
+        additionalBonuses: [
+          { reason: "테스트", ratePercent: undefined as unknown as number, cappedByDomesticCount: false },
+        ],
+      },
+    });
+    expect(result.verdict.additionalBonuses[0].additionalCount).toBe(0);
+  });
+
+  it("소수 결과는 Math.floor로 내림한다", () => {
+    const result = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      employmentLimitAnalysis: {
+        ...mockWithinQuotaResponse.employmentLimitAnalysis,
+        baseLimitAfterCap: 15,
+        additionalBonuses: [
+          { reason: "테스트", ratePercent: 10, cappedByDomesticCount: false },
+        ],
+      },
+    });
+    // Math.floor(15 * 10 / 100) = Math.floor(1.5) = 1
+    expect(result.verdict.additionalBonuses[0].additionalCount).toBe(1);
+  });
+});
+
+// ─── buildTimeline output ────────────────────────────────────────────────────
+
+describe("buildTimeline 출력", () => {
+  const result = transformSimulationResult(mockWithinQuotaResponse);
+
+  it("estimatedMonths가 그대로 전달된다", () => {
+    expect(result.timeline.estimatedMonths).toBe(
+      mockWithinQuotaResponse.timelineEstimate.estimatedMonths,
+    );
+  });
+
+  it("preferredNationality가 그대로 전달된다", () => {
+    expect(result.timeline.preferredNationality).toBe(
+      mockWithinQuotaResponse.timelineEstimate.preferredNationality,
+    );
+  });
+
+  it("stepName이 title로 매핑된다", () => {
+    const firstStep = result.timeline.steps[0];
+    expect(firstStep.title).toBe(
+      mockWithinQuotaResponse.timelineEstimate.steps[0].stepName,
+    );
+  });
+
+  it("estimatedDays가 duration 문자열로 변환된다", () => {
+    const steps = result.timeline.steps;
+    // estimatedDays=14 → "약 14일"
+    expect(steps[0].duration).toBe("약 14일");
+    // estimatedDays=60 → "약 2개월"
+    expect(steps[1].duration).toBe("약 2개월");
+  });
+
+  it("description이 그대로 전달된다", () => {
+    const firstStep = result.timeline.steps[0];
+    expect(firstStep.description).toBe(
+      mockWithinQuotaResponse.timelineEstimate.steps[0].description,
+    );
+  });
+});
+
+// ─── formatDays boundary ─────────────────────────────────────────────────────
+
+describe("formatDays 경계값 (30일)", () => {
+  it("estimatedDays=30이면 '약 1개월'로 변환된다", () => {
+    const result = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      timelineEstimate: {
+        ...mockWithinQuotaResponse.timelineEstimate,
+        steps: [
+          { stepName: "테스트", estimatedDays: 30, description: "30일 경계" },
+        ],
+      },
+    });
+    expect(result.timeline.steps[0].duration).toBe("약 1개월");
+  });
+
+  it("estimatedDays=29이면 '약 29일'로 변환된다", () => {
+    const result = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      timelineEstimate: {
+        ...mockWithinQuotaResponse.timelineEstimate,
+        steps: [
+          { stepName: "테스트", estimatedDays: 29, description: "29일" },
+        ],
+      },
+    });
+    expect(result.timeline.steps[0].duration).toBe("약 29일");
+  });
+
+  it("estimatedDays=45이면 '약 2개월'로 변환된다 (반올림)", () => {
+    const result = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      timelineEstimate: {
+        ...mockWithinQuotaResponse.timelineEstimate,
+        steps: [
+          { stepName: "테스트", estimatedDays: 45, description: "45일" },
+        ],
+      },
+    });
+    // Math.round(45/30) = Math.round(1.5) = 2
+    expect(result.timeline.steps[0].duration).toBe("약 2개월");
+  });
+});
+
+// ─── Recommendation empty actionItems fallback ───────────────────────────────
+
+describe("recommendation empty actionItems fallback", () => {
+  it("EXCEEDED이고_actionItems가_빈_배열이면_기본_안내_항목을_표시한다", () => {
+    const result = transformSimulationResult({
+      ...mockExceededResponse,
+      aiInsights: {
+        ...mockExceededResponse.aiInsights,
+        actionItems: [],
+      },
+    });
+    expect(result.recommendation.items).toHaveLength(1);
+    expect(result.recommendation.items[0].text).toContain("고용센터");
+  });
+});
+
 // ─── totalLimit=0 edge cases ─────────────────────────────────────────────────
 
 describe("totalLimit=0 edge cases", () => {
