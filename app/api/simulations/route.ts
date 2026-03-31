@@ -17,7 +17,11 @@ async function fetchDeductionCodes(): Promise<ReadonlySet<string>> {
     return new Set(
       metadata.scoringPolicies.filter((p) => p.isDeduction).map((p) => p.code),
     );
-  } catch {
+  } catch (error) {
+    console.error(
+      "[fetchDeductionCodes] Failed to load metadata — deduction items will not be distinguished:",
+      error,
+    );
     return new Set();
   }
 }
@@ -37,6 +41,14 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     return handleRouteError(error, "POST /api/simulations");
+  }
+
+  if (!raw?.employmentLimitAnalysis || !raw?.scoringAnalysis || !raw?.quotaStatus || !raw?.timelineEstimate || !raw?.aiInsights) {
+    console.error("[POST /api/simulations] BE response missing required fields:", Object.keys(raw ?? {}));
+    return NextResponse.json(
+      { message: "시뮬레이션 결과 처리 중 오류가 발생했습니다" },
+      { status: 502 },
+    );
   }
 
   try {
