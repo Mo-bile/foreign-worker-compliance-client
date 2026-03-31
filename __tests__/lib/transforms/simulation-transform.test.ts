@@ -64,8 +64,8 @@ describe("progressLevel 경계값", () => {
   const makeResult = (current: number, total: number) =>
     transformSimulationResult({
       ...mockWithinQuotaResponse,
-      employmentLimit: {
-        ...mockWithinQuotaResponse.employmentLimit,
+      employmentLimitAnalysis: {
+        ...mockWithinQuotaResponse.employmentLimitAnalysis,
         currentForeignWorkerCount: current,
         totalLimit: total,
         remainingCapacity: total - current,
@@ -157,8 +157,8 @@ describe("scoring improvement", () => {
   it("availableBonusItems가_없으면_improvement는_null이다", () => {
     const noAvailable = transformSimulationResult({
       ...mockWithinQuotaResponse,
-      scoring: {
-        ...mockWithinQuotaResponse.scoring,
+      scoringAnalysis: {
+        ...mockWithinQuotaResponse.scoringAnalysis,
         availableBonusItems: [],
       },
     });
@@ -166,41 +166,37 @@ describe("scoring improvement", () => {
   });
 });
 
-// ─── Quota Round Rows ─────────────────────────────────────────────────────────
+// ─── Quota Year Rows ──────────────────────────────────────────────────────────
 
-describe("quota roundRows 포맷", () => {
+describe("quota yearRows 포맷", () => {
   const result = transformSimulationResult(mockWithinQuotaResponse);
-  const rows = result.quota.roundRows;
 
-  it("과거_차수는_allocation을_숫자_포맷으로_표시한다", () => {
-    // "2025년 5차": allocation=10200
-    expect(rows[0].allocation).toBe("10,200명");
-    expect(rows[0].industryAllocation).toBe("1,836명");
+  it("industry와 currentYearQuota가 올바르게 설정된다", () => {
+    expect(result.quota.industry).toBe("식료품제조업");
+    expect(result.quota.currentYearQuota).toBe("12,500명");
+  });
+
+  it("recentHistory를 yearRows로 변환한다", () => {
+    const rows = result.quota.yearRows;
+    expect(rows).toHaveLength(3);
+  });
+
+  it("각 yearRow가 올바른 형식이다", () => {
+    const rows = result.quota.yearRows;
+    expect(rows[0].year).toBe(2024);
+    expect(rows[0].quotaCount).toBe("9,800명");
+    expect(rows[0].source).toBe("고용노동부 고시");
     expect(rows[0].isCurrent).toBe(false);
-    expect(rows[0].isFuture).toBe(false);
   });
 
-  it("현재_차수는_industryAllocation에_≈_prefix가_붙는다", () => {
-    // "2026년 2차 (현재)"
-    expect(rows[2].isCurrent).toBe(true);
-    expect(rows[2].industryAllocation).toBe("≈2,250명");
+  it("현재 연도 row의 isCurrent가 true이다", () => {
+    const currentRow = result.quota.yearRows.find((r) => r.year === 2026);
+    expect(currentRow?.isCurrent).toBe(true);
   });
 
-  it("예정_차수는_allocation이_미공개_industryAllocation이_—이다", () => {
-    // "2026년 3차 (예정)"
-    expect(rows[3].isFuture).toBe(true);
-    expect(rows[3].allocation).toBe("미공개");
-    expect(rows[3].industryAllocation).toBe("—");
-  });
-
-  it("competitionRate가_null이면_—을_표시한다", () => {
-    expect(rows[2].competitionRate).toBe("—");
-    expect(rows[3].competitionRate).toBe("—");
-  });
-
-  it("competitionRate가_있으면_:1_형식으로_표시한다", () => {
-    expect(rows[0].competitionRate).toBe("1.8:1");
-    expect(rows[1].competitionRate).toBe("1.6:1");
+  it("quotaCount가 숫자 포맷(콤마)으로 표시된다", () => {
+    const rows = result.quota.yearRows;
+    expect(rows[2].quotaCount).toBe("12,500명");
   });
 });
 
@@ -217,7 +213,7 @@ describe("whatIf", () => {
     expect(result.whatIf).not.toBeNull();
   });
 
-  it("whatIf rows의_delta_0은_현재로_표시한다", () => {
+  it("whatIf rows의_additionalDomesticCount_0은_현재로_표시한다", () => {
     const result = transformSimulationResult(mockExceededResponse);
     const rows = result.whatIf!.rows;
     const currentRow = rows.find((r) => r.domesticInsuredCount === 33);
@@ -251,8 +247,8 @@ describe("whatIf", () => {
   it("EXCEEDED이지만_whatIfScenarios가_빈_배열이면_whatIf는_null이다", () => {
     const noScenarios = transformSimulationResult({
       ...mockExceededResponse,
-      employmentLimit: {
-        ...mockExceededResponse.employmentLimit,
+      employmentLimitAnalysis: {
+        ...mockExceededResponse.employmentLimitAnalysis,
         whatIfScenarios: [],
       },
     });
@@ -357,5 +353,103 @@ describe("top-level 필드", () => {
   it("createdAt이_그대로_전달된다", () => {
     const result = transformSimulationResult(mockWithinQuotaResponse);
     expect(result.createdAt).toBe("2026-03-30T14:32:00Z");
+  });
+});
+
+// ─── Scoring rows with deductionCodes ────────────────────────────────────────
+
+describe("scoring rows with deductionCodes", () => {
+  it("deductionCodes에_DEPOPULATION_AREA가_포함되면_해당_row의_isDeduction이_true이고_점수가_-5점이다", () => {
+    const deductionCodes = new Set(["DEPOPULATION_AREA"]);
+    const result = transformSimulationResult(mockWithinQuotaResponse, deductionCodes);
+    const rows = result.scoring.tableRows;
+
+    // DEPOPULATION_AREA는 appliedBonusItems 첫 번째 → rows[1]
+    expect(rows[1].isDeduction).toBe(true);
+    expect(rows[1].score).toBe("-5점");
+  });
+
+  it("deductionCodes에_PREMIUM_DORMITORY가_포함되면_해당_available_row의_isDeduction이_true이다", () => {
+    const deductionCodes = new Set(["PREMIUM_DORMITORY"]);
+    const result = transformSimulationResult(mockWithinQuotaResponse, deductionCodes);
+    const rows = result.scoring.tableRows;
+
+    // PREMIUM_DORMITORY는 availableBonusItems 첫 번째 → rows[3]
+    expect(rows[3].isDeduction).toBe(true);
+    expect(rows[3].score).toBe("0점"); // available 항목은 여전히 0점
+  });
+
+  it("복수의_deductionCodes가_올바르게_적용된다", () => {
+    const deductionCodes = new Set(["DEPOPULATION_AREA", "PREMIUM_DORMITORY"]);
+    const result = transformSimulationResult(mockWithinQuotaResponse, deductionCodes);
+    const rows = result.scoring.tableRows;
+
+    expect(rows[1].isDeduction).toBe(true);
+    expect(rows[1].score).toBe("-5점");
+
+    expect(rows[2].isDeduction).toBe(false); // LABOR_LAW_COMPLIANCE는 감점 아님
+    expect(rows[2].score).toBe("+3점");
+
+    expect(rows[3].isDeduction).toBe(true); // PREMIUM_DORMITORY
+    expect(rows[4].isDeduction).toBe(false); // NEW_WORKPLACE는 감점 아님
+  });
+});
+
+// ─── Scoring improvement with deductionCodes ─────────────────────────────────
+
+describe("scoring improvement with deductionCodes", () => {
+  it("deductionCodes에_PREMIUM_DORMITORY가_포함되면_NEW_WORKPLACE가_improvement_후보가_된다", () => {
+    const deductionCodes = new Set(["PREMIUM_DORMITORY"]);
+    const result = transformSimulationResult(mockWithinQuotaResponse, deductionCodes);
+    const improvement = result.scoring.improvement;
+
+    expect(improvement).not.toBeNull();
+    // PREMIUM_DORMITORY(5) 제외 → NEW_WORKPLACE(3)가 best
+    expect(improvement!.improvementLabel).toBe("외국인 고용이 처음인 사업장 시");
+    expect(improvement!.improvedScore).toBe(68 + 3);
+  });
+
+  it("모든_availableBonusItems가_deductionCodes에_포함되면_improvement는_null이다", () => {
+    const deductionCodes = new Set(["PREMIUM_DORMITORY", "NEW_WORKPLACE"]);
+    const result = transformSimulationResult(mockWithinQuotaResponse, deductionCodes);
+
+    expect(result.scoring.improvement).toBeNull();
+  });
+
+  it("improvementLabel이_감점이_아닌_항목을_정확히_반영한다", () => {
+    const deductionCodes = new Set(["NEW_WORKPLACE"]);
+    const result = transformSimulationResult(mockWithinQuotaResponse, deductionCodes);
+    const improvement = result.scoring.improvement;
+
+    expect(improvement).not.toBeNull();
+    // NEW_WORKPLACE(3) 제외 → PREMIUM_DORMITORY(5)가 best
+    expect(improvement!.improvementLabel).toBe("우수 기숙사 제공 시");
+    expect(improvement!.improvedScore).toBe(68 + 5);
+  });
+});
+
+// ─── totalLimit=0 edge cases ─────────────────────────────────────────────────
+
+describe("totalLimit=0 edge cases", () => {
+  const makeZeroLimitResult = (currentForeignWorkerCount: number) =>
+    transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      employmentLimitAnalysis: {
+        ...mockWithinQuotaResponse.employmentLimitAnalysis,
+        totalLimit: 0,
+        currentForeignWorkerCount,
+        remainingCapacity: 0,
+        limitExceeded: currentForeignWorkerCount > 0,
+      },
+    });
+
+  it("totalLimit=0이고_currentForeignWorkerCount=5이면_usagePercent가_100이다", () => {
+    const result = makeZeroLimitResult(5);
+    expect(result.verdict.usagePercent).toBe(100);
+  });
+
+  it("totalLimit=0이고_currentForeignWorkerCount=0이면_usagePercent가_0이다", () => {
+    const result = makeZeroLimitResult(0);
+    expect(result.verdict.usagePercent).toBe(0);
   });
 });
