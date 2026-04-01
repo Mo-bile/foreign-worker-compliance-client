@@ -534,6 +534,19 @@ describe("buildTimeline 출력", () => {
     });
     expect(noSourceResult.timeline.steps[0].source).toBeNull();
   });
+
+  it("source가 빈 문자열이면 null로 정규화된다", () => {
+    const emptySourceResult = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      timelineEstimate: {
+        ...mockWithinQuotaResponse.timelineEstimate,
+        steps: [
+          { stepName: "테스트", estimatedDays: 14, description: "빈 소스", source: "" },
+        ],
+      },
+    });
+    expect(emptySourceResult.timeline.steps[0].source).toBeNull();
+  });
 });
 
 // ─── formatDays boundary ─────────────────────────────────────────────────────

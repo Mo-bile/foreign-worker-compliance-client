@@ -225,7 +225,7 @@ function buildTimeline(timeline: TimelineEstimateBE): TimelineDisplayData {
     title: s.stepName,
     duration: formatDays(s.estimatedDays),
     description: s.description,
-    source: s.source ?? null,
+    source: s.source || null,
   }));
 
   return {

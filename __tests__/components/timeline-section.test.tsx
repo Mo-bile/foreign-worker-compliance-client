@@ -51,8 +51,7 @@ describe("TimelineSection", () => {
 
   it("source가 null이면 출처 텍스트를 렌더링하지 않는다", () => {
     const { container } = render(<TimelineSection data={mockData} defaultOpen />);
-    const sourceTexts = container.querySelectorAll("span");
-    const sourceContents = Array.from(sourceTexts).map((el) => el.textContent);
-    expect(sourceContents.filter((t) => t?.startsWith("출처:"))).toHaveLength(2);
+    const sourceElements = container.querySelectorAll("[data-testid='timeline-source']");
+    expect(sourceElements).toHaveLength(2);
   });
 });
