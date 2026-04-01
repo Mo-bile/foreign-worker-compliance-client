@@ -20,7 +20,10 @@ export function ScoringSection({ data, defaultOpen = true, muted = false }: Scor
       {/* Big score display */}
       <div className="mb-4">
         <span className="text-[28px] font-bold">{data.estimatedScore}점</span>
-        <span className="ml-2 text-[13px] text-muted-foreground">{data.percentileText} 수준</span>
+        <span className="ml-2 text-[13px] text-muted-foreground">
+          {data.percentileText} 수준
+          <span className="ml-1 text-[11px] text-muted-foreground/60">({data.percentileDisclaimer})</span>
+        </span>
       </div>
 
       {/* Score table */}

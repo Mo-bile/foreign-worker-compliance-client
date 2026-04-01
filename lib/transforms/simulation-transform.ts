@@ -35,7 +35,7 @@ const FEASIBILITY_LABELS: Record<WhatIfFeasibility, string> = {
   SURPLUS: "여유",
 };
 
-const BASE_SCORE = 60;
+const PERCENTILE_DISCLAIMER = "참고용 추정치, 실제와 다를 수 있음";
 
 const RECOMMENDATION_URLS = {
   WORKNET: "https://www.work.go.kr",
@@ -124,8 +124,8 @@ function buildScoringRows(
   const rows: ScoringTableRow[] = [];
 
   rows.push({
-    label: "기본 점수 (사업장 규모·업종)",
-    score: `${BASE_SCORE}점`,
+    label: "가점 만점",
+    score: `${scoring.maxPossibleScore}점`,
     status: "—",
     isDeduction: false,
   });
@@ -193,6 +193,7 @@ function buildScoring(
   return {
     estimatedScore: scoring.estimatedScore,
     percentileText: estimatePercentile(scoring.estimatedScore),
+    percentileDisclaimer: PERCENTILE_DISCLAIMER,
     tableRows: buildScoringRows(scoring, deductionCodes),
     improvement: buildScoringImprovement(scoring, deductionCodes),
   };

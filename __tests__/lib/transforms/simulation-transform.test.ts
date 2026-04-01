@@ -96,9 +96,10 @@ describe("scoring 테이블 rows", () => {
   const result = transformSimulationResult(mockWithinQuotaResponse);
   const rows = result.scoring.tableRows;
 
-  it("첫_번째_row가_기본점수_60점이다", () => {
-    expect(rows[0].label).toBe("기본 점수 (사업장 규모·업종)");
-    expect(rows[0].score).toBe("60점");
+  it("첫_번째_row가_가점만점이다", () => {
+    // mock maxPossibleScore = 84
+    expect(rows[0].label).toBe("가점 만점");
+    expect(rows[0].score).toBe("84점");
     expect(rows[0].status).toBe("—");
   });
 
@@ -131,6 +132,15 @@ describe("scoring 테이블 rows", () => {
   it("row 순서: 기본점수 → applied → available → 합계", () => {
     // 총 1 + 2 applied + 2 available + 1 합계 = 6
     expect(rows).toHaveLength(6);
+  });
+});
+
+// ─── Scoring percentileDisclaimer ────────────────────────────────────────────
+
+describe("scoring percentileDisclaimer", () => {
+  it("면책 문구가 포함된다", () => {
+    const result = transformSimulationResult(mockWithinQuotaResponse);
+    expect(result.scoring.percentileDisclaimer).toBe("참고용 추정치, 실제와 다를 수 있음");
   });
 });
 
