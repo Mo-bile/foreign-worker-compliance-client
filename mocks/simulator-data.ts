@@ -51,10 +51,10 @@ export const mockWithinQuotaResponse: SimulationResultResponse = {
     preferredNationality: "VIETNAM",
     estimatedMonths: 4,
     steps: [
-      { stepName: "내국인 구인노력", estimatedDays: 14, description: "워크넷 등록 후 14일 구인노력 의무 이행" },
-      { stepName: "고용허가 신청 → 배정", estimatedDays: 45, description: "서류 제출 후 점수 심사, 차수별 배정 결과 통보" },
-      { stepName: "근로계약 체결", estimatedDays: 18, description: "배정된 근로자와 표준근로계약서 체결" },
-      { stepName: "입국 및 취업교육", estimatedDays: 45, description: "비자 발급 → 입국 → 취업교육(20시간) 이수" },
+      { stepName: "내국인 구인노력", estimatedDays: 14, description: "워크넷 등록 후 14일 구인노력 의무 이행", source: "외국인고용법 시행령 제14조" },
+      { stepName: "고용허가 신청 → 배정", estimatedDays: 45, description: "서류 제출 후 점수 심사, 차수별 배정 결과 통보", source: "고용센터 처리 기준" },
+      { stepName: "근로계약 체결", estimatedDays: 18, description: "배정된 근로자와 표준근로계약서 체결", source: "실무 기준" },
+      { stepName: "입국 및 취업교육", estimatedDays: 45, description: "비자 발급 → 입국 → 취업교육(20시간) 이수", source: "외국인력지원센터 교육 일정" },
     ],
   },
   aiInsights: {
@@ -163,10 +163,10 @@ export const mockExceededResponse: SimulationResultResponse = {
     preferredNationality: "VIETNAM",
     estimatedMonths: 4,
     steps: [
-      { stepName: "내국인 구인노력", estimatedDays: 14, description: "워크넷 등록 후 14일 구인노력 의무 이행" },
-      { stepName: "고용허가 신청 → 배정", estimatedDays: 45, description: "서류 제출 후 점수 심사, 차수별 배정 결과 통보" },
-      { stepName: "근로계약 체결", estimatedDays: 18, description: "배정된 근로자와 표준근로계약서 체결" },
-      { stepName: "입국 및 취업교육", estimatedDays: 45, description: "비자 발급 → 입국 → 취업교육(20시간) 이수" },
+      { stepName: "내국인 구인노력", estimatedDays: 14, description: "워크넷 등록 후 14일 구인노력 의무 이행", source: "외국인고용법 시행령 제14조" },
+      { stepName: "고용허가 신청 → 배정", estimatedDays: 45, description: "서류 제출 후 점수 심사, 차수별 배정 결과 통보", source: "고용센터 처리 기준" },
+      { stepName: "근로계약 체결", estimatedDays: 18, description: "배정된 근로자와 표준근로계약서 체결", source: "실무 기준" },
+      { stepName: "입국 및 취업교육", estimatedDays: 45, description: "비자 발급 → 입국 → 취업교육(20시간) 이수", source: "외국인력지원센터 교육 일정" },
     ],
   },
   aiInsights: {

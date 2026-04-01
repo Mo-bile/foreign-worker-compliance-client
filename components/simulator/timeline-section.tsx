@@ -51,6 +51,11 @@ export function TimelineSection({ data, defaultOpen = true, muted = false }: Tim
                 >
                   {step.duration}
                 </span>
+                {step.source && (
+                  <span data-testid="timeline-source" className="text-[11px] text-muted-foreground/60">
+                    출처: {step.source}
+                  </span>
+                )}
               </div>
             </div>
           );
