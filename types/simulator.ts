@@ -112,6 +112,7 @@ export interface TimelineStepBE {
   readonly stepName: string;
   readonly estimatedDays: number;
   readonly description: string;
+  readonly source?: string;
 }
 
 export interface TimelineEstimateBE {
@@ -205,6 +206,7 @@ export interface TimelineStepDisplay {
   readonly title: string;
   readonly duration: string;
   readonly description: string;
+  readonly source: string | null;
 }
 
 export interface TimelineDisplayData {

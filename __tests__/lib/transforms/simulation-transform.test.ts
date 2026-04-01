@@ -514,6 +514,26 @@ describe("buildTimeline 출력", () => {
       mockWithinQuotaResponse.timelineEstimate.steps[0].description,
     );
   });
+
+  it("source가 있으면 그대로 전달된다", () => {
+    const firstStep = result.timeline.steps[0];
+    expect(firstStep.source).toBe(
+      mockWithinQuotaResponse.timelineEstimate.steps[0].source,
+    );
+  });
+
+  it("source가 없으면 null로 변환된다", () => {
+    const noSourceResult = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      timelineEstimate: {
+        ...mockWithinQuotaResponse.timelineEstimate,
+        steps: [
+          { stepName: "테스트", estimatedDays: 14, description: "소스 없음" },
+        ],
+      },
+    });
+    expect(noSourceResult.timeline.steps[0].source).toBeNull();
+  });
 });
 
 // ─── formatDays boundary ─────────────────────────────────────────────────────
