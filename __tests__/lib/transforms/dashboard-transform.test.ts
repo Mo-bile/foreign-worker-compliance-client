@@ -43,7 +43,7 @@ const baseRaw: DashboardRawResponse = {
       workerName: "Rahman C",
       deadlineType: "CONTRACT_RENEWAL",
       status: "APPROACHING",
-      dDay: 21,
+      dDay: -21,
       dueDate: "2026-04-19",
       description: "근로계약 갱신 필요",
     },
@@ -85,7 +85,7 @@ const baseRaw: DashboardRawResponse = {
       visaType: "E7",
       deadlineType: "CHANGE_REPORT",
       status: "PENDING",
-      dDay: 45,
+      dDay: -45,
       dueDate: "2026-05-13",
     },
   ],
@@ -157,7 +157,7 @@ describe("transformDashboardResponse", () => {
       expect(visaGroup?.urgency).toBe("warning");
     });
 
-    it("dDay가 -30 이상 -7 미만이면 urgency가 caution이다", () => {
+    it("dDay가 -7 미만이면 urgency가 caution이다", () => {
       const raw: DashboardRawResponse = {
         ...baseRaw,
         alerts: [{ ...baseRaw.alerts[0], dDay: -10 }],
@@ -180,7 +180,7 @@ describe("transformDashboardResponse", () => {
       expect(visaGroup?.urgency).toBe("critical");
     });
 
-    it("urgency 우선순위 내림차순 정렬 (critical > warning > caution)", () => {
+    it("가장 긴급한 순으로 정렬한다 (critical → warning → caution)", () => {
       const result = transformDashboardResponse(baseRaw);
       const urgencies = result.alertGroups.map((g) => g.urgency);
       const order = { critical: 0, warning: 1, caution: 2 };
@@ -205,6 +205,15 @@ describe("transformDashboardResponse", () => {
       const raw: DashboardRawResponse = { ...baseRaw, alerts: [] };
       const result = transformDashboardResponse(raw);
       expect(result.alertGroups).toEqual([]);
+    });
+
+    it("ALERT_TITLE_MAP에_없는_deadlineType은_raw_값을_label로_사용한다", () => {
+      const raw: DashboardRawResponse = {
+        ...baseRaw,
+        alerts: [{ ...baseRaw.alerts[0], deadlineType: "UNKNOWN_TYPE" as any, dDay: -4 }],
+      };
+      const result = transformDashboardResponse(raw);
+      expect(result.alertGroups[0].label).toBe("UNKNOWN_TYPE");
     });
   });
 
@@ -259,7 +268,7 @@ describe("transformDashboardResponse", () => {
       expect(result.complianceScore.total).toBe(73);
     });
 
-    it("알_수_없는_category는_매핑된_값을_사용한다", () => {
+    it("COMPLIANCE_CATEGORY_LABEL_MAP에_등록된_category는_한글_label로_변환한다", () => {
       const raw: DashboardRawResponse = {
         ...baseRaw,
         complianceScore: {
@@ -300,10 +309,10 @@ describe("transformDashboardResponse", () => {
       expect(result.timeline).toHaveLength(5);
     });
 
-    it('dueDate를 M월 D일 형식으로 변환한다 ("2026-04-02" → "4월 2일")', () => {
+    it('dueDate를 M월 D일 형식으로 변환한다 ("2026-05-13" → "5월 13일")', () => {
       const result = transformDashboardResponse(baseRaw);
       const firstItem = result.timeline[0];
-      expect(firstItem.date).toBe("4월 2일");
+      expect(firstItem.date).toBe("5월 13일");
     });
 
     it('deadlineLabel에 한글 레이블을 사용한다 ("비자 만료")', () => {
@@ -322,6 +331,33 @@ describe("transformDashboardResponse", () => {
       const raw: DashboardRawResponse = { ...baseRaw, upcomingDeadlines: [] };
       const result = transformDashboardResponse(raw);
       expect(result.timeline).toEqual([]);
+    });
+
+    it("알_수_없는_status는_overdue로_매핑한다", () => {
+      const raw: DashboardRawResponse = {
+        ...baseRaw,
+        upcomingDeadlines: [{ ...baseRaw.upcomingDeadlines[0], status: "UNKNOWN" as any }],
+      };
+      const result = transformDashboardResponse(raw);
+      expect(result.timeline[0].urgency).toBe("overdue");
+    });
+
+    it("잘못된_날짜_형식은_원본을_반환한다", () => {
+      const raw: DashboardRawResponse = {
+        ...baseRaw,
+        upcomingDeadlines: [{ ...baseRaw.upcomingDeadlines[0], dueDate: "invalid-date" }],
+      };
+      const result = transformDashboardResponse(raw);
+      expect(result.timeline[0].date).toBe("invalid-date");
+    });
+
+    it("0_패딩_날짜를_올바르게_변환한다", () => {
+      const raw: DashboardRawResponse = {
+        ...baseRaw,
+        upcomingDeadlines: [{ ...baseRaw.upcomingDeadlines[0], dueDate: "2026-01-09" }],
+      };
+      const result = transformDashboardResponse(raw);
+      expect(result.timeline[0].date).toBe("1월 9일");
     });
   });
 });

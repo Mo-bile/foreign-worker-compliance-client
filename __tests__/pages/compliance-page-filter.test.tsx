@@ -29,26 +29,33 @@ describe("CompliancePage 쿼리파라미터 필터", () => {
     mockSearchParams.delete("type");
   });
 
-  it("type_파라미터_없이_진입하면_페이지가_정상_렌더링된다", async () => {
+  it("type_파라미터_없이_진입하면_전체_필터가_기본값이다", async () => {
     render(<CompliancePage />, { wrapper: createWrapper() });
     await waitFor(() => {
-      expect(screen.getByText("컴플라이언스 현황")).toBeDefined();
+      // shadcn Select는 hidden input에 선택된 값을 저장한다
+      const triggers = screen.getAllByRole("combobox");
+      const hiddenInput = triggers[0].nextElementSibling as HTMLInputElement;
+      expect(hiddenInput.value).toBe("ALL");
     });
   });
 
-  it("type=VISA_EXPIRY로_진입하면_페이지가_정상_렌더링된다", async () => {
+  it("type=VISA_EXPIRY로_진입하면_비자_만료_필터가_선택된다", async () => {
     mockSearchParams.set("type", "VISA_EXPIRY");
     render(<CompliancePage />, { wrapper: createWrapper() });
     await waitFor(() => {
-      expect(screen.getByText("컴플라이언스 현황")).toBeDefined();
+      const triggers = screen.getAllByRole("combobox");
+      const hiddenInput = triggers[0].nextElementSibling as HTMLInputElement;
+      expect(hiddenInput.value).toBe("VISA_EXPIRY");
     });
   });
 
-  it("유효하지_않은_type_파라미터는_무시하고_페이지가_정상_렌더링된다", async () => {
+  it("유효하지_않은_type_파라미터는_무시하고_ALL이_기본값이다", async () => {
     mockSearchParams.set("type", "INVALID_TYPE");
     render(<CompliancePage />, { wrapper: createWrapper() });
     await waitFor(() => {
-      expect(screen.getByText("컴플라이언스 현황")).toBeDefined();
+      const triggers = screen.getAllByRole("combobox");
+      const hiddenInput = triggers[0].nextElementSibling as HTMLInputElement;
+      expect(hiddenInput.value).toBe("ALL");
     });
   });
 });

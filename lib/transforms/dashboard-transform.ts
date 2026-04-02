@@ -19,6 +19,11 @@ import { DEADLINE_TYPE_LABELS } from "@/types/api";
 
 // ─── Constants ───────────────────────────────────────────────────
 
+// dDay 규약: 양수 = N일 초과(overdue), 0 = 당일, 음수 = N일 남음
+const CRITICAL_DDAY_THRESHOLD = 0;
+const WARNING_DDAY_THRESHOLD = -7;
+const TIMELINE_MAX_ITEMS = 5;
+
 const URGENCY_PRIORITY: Record<AlertGroupUrgency, number> = {
   critical: 0,
   warning: 1,
@@ -30,6 +35,7 @@ const STATUS_TO_URGENCY: Record<string, DeadlineUrgency> = {
   URGENT: "d7",
   APPROACHING: "d30",
   PENDING: "safe",
+  COMPLETED: "safe",
 };
 
 const ALERT_TITLE_MAP: Record<DeadlineType, string> = {
@@ -55,8 +61,8 @@ const COMPLIANCE_CATEGORY_LABEL_MAP: Record<string, string> = {
 // ─── Helpers ─────────────────────────────────────────────────────
 
 function toAlertGroupUrgency(dDay: number): AlertGroupUrgency {
-  if (dDay >= 0) return "critical";
-  if (dDay >= -7) return "warning";
+  if (dDay >= CRITICAL_DDAY_THRESHOLD) return "critical";
+  if (dDay >= WARNING_DDAY_THRESHOLD) return "warning";
   return "caution";
 }
 
@@ -67,13 +73,19 @@ function higherUrgency(a: AlertGroupUrgency, b: AlertGroupUrgency): AlertGroupUr
 function toDeadlineUrgency(status: string): DeadlineUrgency {
   const mapped = STATUS_TO_URGENCY[status];
   if (mapped !== undefined) return mapped;
-  console.warn(`[transformDeadline] Unexpected deadline status: "${status}". Defaulting to "safe".`);
-  return "safe";
+  console.error(`[toDeadlineUrgency] Unknown status: "${status}". Defaulting to "overdue".`);
+  return "overdue";
 }
 
 function formatDateKorean(isoDate: string): string {
-  const [, month, day] = isoDate.split("-");
-  return `${Number(month)}월 ${Number(day)}일`;
+  const parts = isoDate.split("-");
+  const month = Number(parts[1]);
+  const day = Number(parts[2]);
+  if (Number.isNaN(month) || Number.isNaN(day)) {
+    console.warn(`[formatDateKorean] Invalid date format: "${isoDate}"`);
+    return isoDate;
+  }
+  return `${month}월 ${day}일`;
 }
 
 // ─── Section Transforms ──────────────────────────────────────────
@@ -112,7 +124,7 @@ function transformAlertGroups(alerts: readonly DashboardRawAlert[]): readonly Al
 function transformTimeline(deadlines: readonly DashboardRawDeadline[]): readonly TimelineItem[] {
   return [...deadlines]
     .sort((a, b) => a.dDay - b.dDay)
-    .slice(0, 5)
+    .slice(0, TIMELINE_MAX_ITEMS)
     .map((d) => ({
       id: String(d.deadlineId),
       date: formatDateKorean(d.dueDate),
