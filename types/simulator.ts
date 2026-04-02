@@ -185,6 +185,7 @@ export interface ScoringImprovementData {
 export interface ScoringDisplayData {
   readonly estimatedScore: number;
   readonly percentileText: string;
+  readonly percentileDisclaimer: string;
   readonly tableRows: readonly ScoringTableRow[];
   readonly improvement: ScoringImprovementData | null;
 }
