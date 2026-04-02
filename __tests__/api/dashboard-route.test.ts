@@ -24,12 +24,12 @@ describe("GET /api/dashboard", () => {
     const data: DashboardResponse = await response.json();
     expect(data.stats.totalWorkers).toBe(12);
     expect(data.stats.insuranceRateChange).toBeNull();
-    expect(data.alerts).toHaveLength(3);
-    expect(data.alerts[0].level).toBeDefined();
-    expect(data.alerts[0].badgeText).toBeDefined();
+    expect(data.alertGroups.length).toBeGreaterThan(0);
+    expect(data.alertGroups[0].urgency).toBeDefined();
+    expect(data.alertGroups[0].label).toBeDefined();
     expect(data.complianceScore.total).toBe(73);
     expect(data.insuranceSummary[0].label).toBeDefined();
-    expect(data.upcomingDeadlines[0].urgency).toBeDefined();
+    expect(data.timeline[0].urgency).toBeDefined();
   });
 
   it("companyId가_없으면_400을_반환한다", async () => {

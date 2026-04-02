@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -29,7 +30,13 @@ import {
 import type { DeadlineType, DeadlineStatus } from "@/types/api";
 
 export default function CompliancePage() {
-  const [deadlineTypeFilter, setDeadlineTypeFilter] = useState<DeadlineType | "ALL">("ALL");
+  const searchParams = useSearchParams();
+  const typeFromUrl = searchParams.get("type") as DeadlineType | null;
+  const [deadlineTypeFilter, setDeadlineTypeFilter] = useState<DeadlineType | "ALL">(
+    typeFromUrl != null && (DEADLINE_TYPES as readonly string[]).includes(typeFromUrl)
+      ? typeFromUrl
+      : "ALL"
+  );
   const [statusFilter, setStatusFilter] = useState<DeadlineStatus | "ALL">("ALL");
   const [overduePage, setOverduePage] = useState(1);
   const [upcomingPage, setUpcomingPage] = useState(1);

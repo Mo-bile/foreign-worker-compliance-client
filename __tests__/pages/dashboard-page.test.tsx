@@ -51,7 +51,7 @@ describe("DashboardPage", () => {
     expect(screen.getByText("4대보험 현황")).toBeDefined();
     expect(screen.getByText("AI 인사이트")).toBeDefined();
     expect(screen.getByText("컴플라이언스 점수")).toBeDefined();
-    expect(screen.getAllByText("다가오는 데드라인").length).toBeGreaterThan(0);
+    expect(screen.getByText("30일 타임라인")).toBeDefined();
   });
 
   it("사업장_미선택_시_선택_안내를_렌더링한다", () => {

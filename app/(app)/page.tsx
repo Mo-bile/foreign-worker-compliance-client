@@ -3,16 +3,15 @@
 import { VISA_TYPE_SHORT } from "@/types/api";
 import { Users, Shield, Clock, AlertTriangle } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { AlertCard } from "@/components/dashboard/alert-card";
+import { AlertGroupCard } from "@/components/dashboard/alert-group-card";
 import { ComplianceGauge } from "@/components/dashboard/compliance-gauge";
 import { VisaDistribution } from "@/components/dashboard/visa-distribution";
 import { InsuranceSummary } from "@/components/dashboard/insurance-summary";
 import { AiInsightBlock } from "@/components/common/ai-insight-block";
-import { DeadlineMini } from "@/components/dashboard/deadline-mini";
+import { DeadlineTimeline } from "@/components/dashboard/deadline-timeline";
 import { useDashboard } from "@/lib/queries/use-dashboard";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 
 export default function DashboardPage() {
   const { selectedCompanyId } = useCompanyContext();
@@ -106,17 +105,10 @@ export default function DashboardPage() {
         <div className="space-y-4">
           {/* Urgent Alerts */}
           <section>
-            <div className="mb-3.5 flex items-center justify-between">
+            <div className="mb-3.5">
               <h2 className="text-[15px] font-semibold">⚡ 긴급 알림</h2>
-              <Link href="/compliance" className="text-xs text-primary hover:underline">
-                전체 보기 →
-              </Link>
             </div>
-            <div className="space-y-2.5">
-              {data.alerts.map((alert) => (
-                <AlertCard key={alert.id} alert={alert} />
-              ))}
-            </div>
+            <AlertGroupCard alertGroups={data.alertGroups} />
           </section>
 
           {/* Visa Distribution + Insurance Summary */}
@@ -132,7 +124,7 @@ export default function DashboardPage() {
         {/* Right Column */}
         <div className="space-y-4">
           <ComplianceGauge data={data.complianceScore} />
-          <DeadlineMini deadlines={data.upcomingDeadlines} />
+          <DeadlineTimeline items={data.timeline} />
         </div>
       </div>
     </div>
