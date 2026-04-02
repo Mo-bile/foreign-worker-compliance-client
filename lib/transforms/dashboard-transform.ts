@@ -6,24 +6,23 @@ import type {
   DashboardRawDeadline,
   VisaRawDistributionItem,
   DashboardResponse,
-  DashboardAlert,
-  AlertLevel,
+  AlertGroup,
+  AlertGroupUrgency,
   InsuranceSummaryItem,
   ComplianceBreakdownItem,
-  DashboardDeadline,
   DeadlineUrgency,
-  AlertAction,
   VisaDistributionItem,
+  TimelineItem,
 } from "@/types/dashboard";
 import type { DeadlineType } from "@/types/api";
 import { DEADLINE_TYPE_LABELS } from "@/types/api";
 
 // ─── Constants ───────────────────────────────────────────────────
 
-const STATUS_TO_LEVEL: Record<string, AlertLevel> = {
-  OVERDUE: "critical",
-  URGENT: "warning",
-  APPROACHING: "info",
+const URGENCY_PRIORITY: Record<AlertGroupUrgency, number> = {
+  critical: 0,
+  warning: 1,
+  caution: 2,
 };
 
 const STATUS_TO_URGENCY: Record<string, DeadlineUrgency> = {
@@ -55,11 +54,14 @@ const COMPLIANCE_CATEGORY_LABEL_MAP: Record<string, string> = {
 
 // ─── Helpers ─────────────────────────────────────────────────────
 
-function toAlertLevel(status: string): AlertLevel {
-  const mapped = STATUS_TO_LEVEL[status];
-  if (mapped !== undefined) return mapped;
-  console.warn(`[transformAlert] Unexpected alert status: "${status}". Defaulting to "info".`);
-  return "info";
+function toAlertGroupUrgency(dDay: number): AlertGroupUrgency {
+  if (dDay >= 0) return "critical";
+  if (dDay >= -7) return "warning";
+  return "caution";
+}
+
+function higherUrgency(a: AlertGroupUrgency, b: AlertGroupUrgency): AlertGroupUrgency {
+  return URGENCY_PRIORITY[a] <= URGENCY_PRIORITY[b] ? a : b;
 }
 
 function toDeadlineUrgency(status: string): DeadlineUrgency {
@@ -69,54 +71,55 @@ function toDeadlineUrgency(status: string): DeadlineUrgency {
   return "safe";
 }
 
-function formatBadgeText(dDay: number): string {
-  if (dDay > 0) return `D+${dDay}`;
-  if (dDay === 0) return "D-0";
-  return `D${dDay}`;
-}
-
-function buildAlertActions(workerId: number, deadlineType: DeadlineType): readonly AlertAction[] {
-  const workerHref = `/workers/${workerId}`;
-
-  switch (deadlineType) {
-    case "VISA_EXPIRY":
-      return [
-        { label: "비자 연장 신청", href: workerHref },
-        { label: "근로자 상세", href: workerHref },
-      ];
-    case "INSURANCE_ENROLLMENT":
-      return [
-        { label: "조치하기", href: workerHref },
-        { label: "근로자 상세", href: workerHref },
-      ];
-    case "CONTRACT_RENEWAL":
-      return [
-        { label: "계약 갱신", href: workerHref },
-        { label: "근로자 상세", href: workerHref },
-      ];
-    case "CHANGE_REPORT":
-      return [
-        { label: "신고하기", href: workerHref },
-        { label: "근로자 상세", href: workerHref },
-      ];
-    default:
-      console.warn(`[buildAlertActions] Unknown deadlineType: "${deadlineType as string}"`);
-      return [{ label: "근로자 상세", href: workerHref }];
-  }
+function formatDateKorean(isoDate: string): string {
+  const [, month, day] = isoDate.split("-");
+  return `${Number(month)}월 ${Number(day)}일`;
 }
 
 // ─── Section Transforms ──────────────────────────────────────────
 
-function transformAlert(raw: DashboardRawAlert): DashboardAlert {
-  return {
-    id: String(raw.deadlineId),
-    level: toAlertLevel(raw.status),
-    title: `${ALERT_TITLE_MAP[raw.deadlineType] ?? raw.deadlineType} — ${raw.workerName}`,
-    description: raw.description,
-    dDay: raw.dDay,
-    badgeText: formatBadgeText(raw.dDay),
-    actions: buildAlertActions(raw.workerId, raw.deadlineType),
-  };
+function transformAlertGroups(alerts: readonly DashboardRawAlert[]): readonly AlertGroup[] {
+  const grouped = new Map<
+    string,
+    { alerts: readonly DashboardRawAlert[]; maxUrgency: AlertGroupUrgency }
+  >();
+
+  for (const alert of alerts) {
+    const key = alert.deadlineType;
+    const urgency = toAlertGroupUrgency(alert.dDay);
+    const existing = grouped.get(key);
+    if (existing) {
+      grouped.set(key, {
+        alerts: [...existing.alerts, alert],
+        maxUrgency: higherUrgency(existing.maxUrgency, urgency),
+      });
+    } else {
+      grouped.set(key, { alerts: [alert], maxUrgency: urgency });
+    }
+  }
+
+  return [...grouped.entries()]
+    .map(([type, { alerts: groupAlerts, maxUrgency }]) => ({
+      deadlineType: type as DeadlineType,
+      label: ALERT_TITLE_MAP[type as DeadlineType] ?? type,
+      count: groupAlerts.length,
+      urgency: maxUrgency,
+      href: `/compliance?type=${type}`,
+    }))
+    .sort((a, b) => URGENCY_PRIORITY[a.urgency] - URGENCY_PRIORITY[b.urgency]);
+}
+
+function transformTimeline(deadlines: readonly DashboardRawDeadline[]): readonly TimelineItem[] {
+  return [...deadlines]
+    .sort((a, b) => a.dDay - b.dDay)
+    .slice(0, 5)
+    .map((d) => ({
+      id: String(d.deadlineId),
+      date: formatDateKorean(d.dueDate),
+      deadlineLabel: DEADLINE_TYPE_LABELS[d.deadlineType] ?? d.deadlineType,
+      workerName: d.workerName,
+      urgency: toDeadlineUrgency(d.status),
+    }));
 }
 
 function transformVisaDistribution(raw: VisaRawDistributionItem): VisaDistributionItem {
@@ -146,17 +149,6 @@ function transformComplianceBreakdown(raw: ComplianceRawBreakdownItem): Complian
   };
 }
 
-function transformDeadline(raw: DashboardRawDeadline): DashboardDeadline {
-  return {
-    id: String(raw.deadlineId),
-    title: DEADLINE_TYPE_LABELS[raw.deadlineType] ?? raw.deadlineType,
-    workerName: raw.workerName,
-    visaType: raw.visaType,
-    dDay: raw.dDay,
-    urgency: toDeadlineUrgency(raw.status),
-  };
-}
-
 // ─── Main Transform ──────────────────────────────────────────────
 
 export function transformDashboardResponse(raw: DashboardRawResponse): DashboardResponse {
@@ -174,7 +166,7 @@ export function transformDashboardResponse(raw: DashboardRawResponse): Dashboard
       urgentActions: raw.stats.urgentActions,
       urgentBreakdown: raw.stats.urgentBreakdown,
     },
-    alerts: raw.alerts.map(transformAlert),
+    alertGroups: transformAlertGroups(raw.alerts),
     visaDistribution: raw.visaDistribution.map(transformVisaDistribution),
     insuranceSummary: raw.insuranceSummary.map(transformInsuranceSummary),
     complianceScore: {
@@ -182,6 +174,6 @@ export function transformDashboardResponse(raw: DashboardRawResponse): Dashboard
       breakdown: raw.complianceScore.breakdown.map(transformComplianceBreakdown),
     },
     aiInsight: raw.aiInsight,
-    upcomingDeadlines: raw.upcomingDeadlines.map(transformDeadline),
+    timeline: transformTimeline(raw.upcomingDeadlines),
   };
 }

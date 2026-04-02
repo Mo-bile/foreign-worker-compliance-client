@@ -96,12 +96,12 @@ describe("transformDashboardResponse", () => {
     const result = transformDashboardResponse(baseRaw);
 
     expect(result.stats).toBeDefined();
-    expect(result.alerts).toBeDefined();
+    expect(result.alertGroups).toBeDefined();
     expect(result.visaDistribution).toBeDefined();
     expect(result.insuranceSummary).toBeDefined();
     expect(result.complianceScore).toBeDefined();
     expect(result.aiInsight).toBe("AI 인사이트 텍스트");
-    expect(result.upcomingDeadlines).toBeDefined();
+    expect(result.timeline).toBeDefined();
   });
 
   describe("stats 변환", () => {
@@ -127,60 +127,84 @@ describe("transformDashboardResponse", () => {
     });
   });
 
-  describe("alerts 변환", () => {
-    it("status를_level로_매핑한다_URGENT_→_warning", () => {
+  describe("transformAlertGroups", () => {
+    it("deadlineType별로 그룹핑한다 (3 types → 3 groups)", () => {
       const result = transformDashboardResponse(baseRaw);
-      expect(result.alerts[0].level).toBe("warning");
+      expect(result.alertGroups).toHaveLength(3);
+      const types = result.alertGroups.map((g) => g.deadlineType);
+      expect(types).toContain("VISA_EXPIRY");
+      expect(types).toContain("INSURANCE_ENROLLMENT");
+      expect(types).toContain("CONTRACT_RENEWAL");
     });
 
-    it("status를_level로_매핑한다_OVERDUE_→_critical", () => {
+    it("그룹별 count가 해당 유형 알림 수와 일치한다", () => {
       const result = transformDashboardResponse(baseRaw);
-      expect(result.alerts[1].level).toBe("critical");
+      const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
+      expect(visaGroup?.count).toBe(1);
     });
 
-    it("status를_level로_매핑한다_APPROACHING_→_info", () => {
+    it("dDay >= 0이면 urgency가 critical이다 (INSURANCE_ENROLLMENT dDay: 3)", () => {
       const result = transformDashboardResponse(baseRaw);
-      expect(result.alerts[2].level).toBe("info");
+      const insuranceGroup = result.alertGroups.find(
+        (g) => g.deadlineType === "INSURANCE_ENROLLMENT",
+      );
+      expect(insuranceGroup?.urgency).toBe("critical");
     });
 
-    it("id를_문자열로_변환한다", () => {
+    it("dDay가 -7 이상 0 미만이면 urgency가 warning이다 (VISA_EXPIRY dDay: -4)", () => {
       const result = transformDashboardResponse(baseRaw);
-      expect(result.alerts[0].id).toBe("1");
+      const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
+      expect(visaGroup?.urgency).toBe("warning");
     });
 
-    it("deadlineType과_workerName으로_title을_생성한다", () => {
-      const result = transformDashboardResponse(baseRaw);
-      expect(result.alerts[0].title).toBe("비자 만료 임박 — Nguyen Van A");
-      expect(result.alerts[1].title).toBe("보험 가입 필요 — Pham Thi B");
-      expect(result.alerts[2].title).toBe("근로계약 갱신 — Rahman C");
-    });
-
-    it("dDay로_badgeText를_생성한다", () => {
-      const result = transformDashboardResponse(baseRaw);
-      expect(result.alerts[0].badgeText).toBe("D-4");
-      expect(result.alerts[1].badgeText).toBe("D+3");
-      expect(result.alerts[2].badgeText).toBe("D+21");
-    });
-
-    it("dDay_0일때_badgeText가_D-0이다", () => {
+    it("dDay가 -30 이상 -7 미만이면 urgency가 caution이다", () => {
       const raw: DashboardRawResponse = {
         ...baseRaw,
-        alerts: [{ ...baseRaw.alerts[0], dDay: 0 }],
+        alerts: [{ ...baseRaw.alerts[0], dDay: -10 }],
       };
       const result = transformDashboardResponse(raw);
-      expect(result.alerts[0].badgeText).toBe("D-0");
+      const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
+      expect(visaGroup?.urgency).toBe("caution");
     });
 
-    it("workerId_기반으로_actions를_생성한다", () => {
-      const result = transformDashboardResponse(baseRaw);
-      expect(result.alerts[0].actions).toEqual(
-        expect.arrayContaining([expect.objectContaining({ href: "/workers/3" })]),
-      );
+    it("그룹 내 가장 높은 urgency를 사용한다", () => {
+      const raw: DashboardRawResponse = {
+        ...baseRaw,
+        alerts: [
+          { ...baseRaw.alerts[0], deadlineType: "VISA_EXPIRY", dDay: -10 }, // caution
+          { ...baseRaw.alerts[1], deadlineType: "VISA_EXPIRY", dDay: 3 }, // critical
+        ],
+      };
+      const result = transformDashboardResponse(raw);
+      const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
+      expect(visaGroup?.urgency).toBe("critical");
     });
 
-    it("description을_그대로_전달한다", () => {
+    it("urgency 우선순위 내림차순 정렬 (critical > warning > caution)", () => {
       const result = transformDashboardResponse(baseRaw);
-      expect(result.alerts[0].description).toBe("비자 갱신 필요");
+      const urgencies = result.alertGroups.map((g) => g.urgency);
+      const order = { critical: 0, warning: 1, caution: 2 };
+      for (let i = 0; i < urgencies.length - 1; i++) {
+        expect(order[urgencies[i]]).toBeLessThanOrEqual(order[urgencies[i + 1]]);
+      }
+    });
+
+    it("label에 ALERT_TITLE_MAP 값을 사용한다 (\"비자 만료 임박\")", () => {
+      const result = transformDashboardResponse(baseRaw);
+      const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
+      expect(visaGroup?.label).toBe("비자 만료 임박");
+    });
+
+    it("href가 /compliance?type={deadlineType} 형태이다", () => {
+      const result = transformDashboardResponse(baseRaw);
+      const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
+      expect(visaGroup?.href).toBe("/compliance?type=VISA_EXPIRY");
+    });
+
+    it("alerts가 빈 배열이면 빈 배열을 반환한다", () => {
+      const raw: DashboardRawResponse = { ...baseRaw, alerts: [] };
+      const result = transformDashboardResponse(raw);
+      expect(result.alertGroups).toEqual([]);
     });
   });
 
@@ -248,46 +272,56 @@ describe("transformDashboardResponse", () => {
     });
   });
 
-  describe("upcomingDeadlines 변환", () => {
-    it("id를_문자열로_변환한다", () => {
+  describe("timeline 변환", () => {
+    it("dDay 오름차순으로 정렬한다", () => {
       const result = transformDashboardResponse(baseRaw);
-      expect(result.upcomingDeadlines[0].id).toBe("1");
+      const dDays = result.timeline.map((item) => {
+        const raw = baseRaw.upcomingDeadlines.find((d) => String(d.deadlineId) === item.id);
+        return raw?.dDay ?? 0;
+      });
+      for (let i = 0; i < dDays.length - 1; i++) {
+        expect(dDays[i]).toBeLessThanOrEqual(dDays[i + 1]);
+      }
     });
 
-    it("deadlineType을_한글_title로_변환한다", () => {
-      const result = transformDashboardResponse(baseRaw);
-      expect(result.upcomingDeadlines[0].title).toBe("비자 만료");
-      expect(result.upcomingDeadlines[1].title).toBe("변경 신고");
-    });
-
-    it("status를_urgency로_매핑한다", () => {
-      const result = transformDashboardResponse(baseRaw);
-      expect(result.upcomingDeadlines[0].urgency).toBe("d7");
-      expect(result.upcomingDeadlines[1].urgency).toBe("safe");
-    });
-
-    it("workerName과_visaType을_그대로_전달한다", () => {
-      const result = transformDashboardResponse(baseRaw);
-      expect(result.upcomingDeadlines[0].workerName).toBe("Nguyen Van A");
-      expect(result.upcomingDeadlines[0].visaType).toBe("E9");
-    });
-
-    it("OVERDUE_status는_overdue_urgency로_매핑한다", () => {
+    it("최대 5개만 반환한다", () => {
       const raw: DashboardRawResponse = {
         ...baseRaw,
-        upcomingDeadlines: [{ ...baseRaw.upcomingDeadlines[0], status: "OVERDUE" }],
+        upcomingDeadlines: [
+          { ...baseRaw.upcomingDeadlines[0], deadlineId: 1, dDay: 1 },
+          { ...baseRaw.upcomingDeadlines[0], deadlineId: 2, dDay: 2 },
+          { ...baseRaw.upcomingDeadlines[0], deadlineId: 3, dDay: 3 },
+          { ...baseRaw.upcomingDeadlines[0], deadlineId: 4, dDay: 4 },
+          { ...baseRaw.upcomingDeadlines[0], deadlineId: 5, dDay: 5 },
+          { ...baseRaw.upcomingDeadlines[0], deadlineId: 6, dDay: 6 },
+        ],
       };
       const result = transformDashboardResponse(raw);
-      expect(result.upcomingDeadlines[0].urgency).toBe("overdue");
+      expect(result.timeline).toHaveLength(5);
     });
 
-    it("APPROACHING_status는_d30_urgency로_매핑한다", () => {
-      const raw: DashboardRawResponse = {
-        ...baseRaw,
-        upcomingDeadlines: [{ ...baseRaw.upcomingDeadlines[0], status: "APPROACHING" }],
-      };
+    it('dueDate를 M월 D일 형식으로 변환한다 ("2026-04-02" → "4월 2일")', () => {
+      const result = transformDashboardResponse(baseRaw);
+      const firstItem = result.timeline[0];
+      expect(firstItem.date).toBe("4월 2일");
+    });
+
+    it('deadlineLabel에 한글 레이블을 사용한다 ("비자 만료")', () => {
+      const result = transformDashboardResponse(baseRaw);
+      const visaItem = result.timeline.find((item) => item.id === "1");
+      expect(visaItem?.deadlineLabel).toBe("비자 만료");
+    });
+
+    it("status를 urgency로 매핑한다 (URGENT → d7)", () => {
+      const result = transformDashboardResponse(baseRaw);
+      const visaItem = result.timeline.find((item) => item.id === "1");
+      expect(visaItem?.urgency).toBe("d7");
+    });
+
+    it("빈 배열이면 빈 배열을 반환한다", () => {
+      const raw: DashboardRawResponse = { ...baseRaw, upcomingDeadlines: [] };
       const result = transformDashboardResponse(raw);
-      expect(result.upcomingDeadlines[0].urgency).toBe("d30");
+      expect(result.timeline).toEqual([]);
     });
   });
 });
