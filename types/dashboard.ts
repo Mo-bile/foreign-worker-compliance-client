@@ -1,21 +1,22 @@
 import type { VisaType, DeadlineType, DeadlineStatus } from "./api";
 
-export type AlertLevel = "critical" | "warning" | "info";
 export type DeadlineUrgency = "overdue" | "d7" | "d30" | "safe";
+export type AlertGroupUrgency = "critical" | "warning" | "caution";
 
-export interface AlertAction {
+export interface AlertGroup {
+  readonly deadlineType: DeadlineType;
   readonly label: string;
+  readonly count: number;
+  readonly urgency: AlertGroupUrgency;
   readonly href: string;
 }
 
-export interface DashboardAlert {
+export interface TimelineItem {
   readonly id: string;
-  readonly level: AlertLevel;
-  readonly title: string;
-  readonly description: string;
-  readonly dDay: number | null;
-  readonly badgeText: string;
-  readonly actions: readonly AlertAction[];
+  readonly date: string;
+  readonly deadlineLabel: string;
+  readonly workerName: string;
+  readonly urgency: DeadlineUrgency;
 }
 
 export interface VisaDistributionItem {
@@ -42,15 +43,6 @@ export interface ComplianceScoreData {
   readonly breakdown: readonly ComplianceBreakdownItem[];
 }
 
-export interface DashboardDeadline {
-  readonly id: string;
-  readonly title: string;
-  readonly workerName: string;
-  readonly visaType: VisaType;
-  readonly dDay: number;
-  readonly urgency: DeadlineUrgency;
-}
-
 export interface DashboardStats {
   readonly totalWorkers: number;
   readonly visaBreakdown: readonly { readonly type: VisaType; readonly count: number }[];
@@ -64,12 +56,12 @@ export interface DashboardStats {
 
 export interface DashboardResponse {
   readonly stats: DashboardStats;
-  readonly alerts: readonly DashboardAlert[];
+  readonly alertGroups: readonly AlertGroup[];
   readonly visaDistribution: readonly VisaDistributionItem[];
   readonly insuranceSummary: readonly InsuranceSummaryItem[];
   readonly complianceScore: Readonly<ComplianceScoreData>;
   readonly aiInsight: string;
-  readonly upcomingDeadlines: readonly DashboardDeadline[];
+  readonly timeline: readonly TimelineItem[];
 }
 
 // ─── BE Raw Response Types ──────────────────────────────────

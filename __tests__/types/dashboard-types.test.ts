@@ -1,15 +1,45 @@
 import { describe, it, expect } from "vitest";
-import type { DashboardResponse, AlertLevel, DeadlineUrgency } from "@/types/dashboard";
+import type {
+  DashboardResponse,
+  DeadlineUrgency,
+  AlertGroupUrgency,
+  AlertGroup,
+  TimelineItem,
+} from "@/types/dashboard";
 
 describe("Dashboard Types", () => {
-  it("AlertLevel_유니온이_3가지_값을_허용한다", () => {
-    const levels: AlertLevel[] = ["critical", "warning", "info"];
-    expect(levels).toHaveLength(3);
+  it("AlertGroupUrgency_유니온이_3가지_값을_허용한다", () => {
+    const urgencies: AlertGroupUrgency[] = ["critical", "warning", "caution"];
+    expect(urgencies).toHaveLength(3);
   });
 
   it("DeadlineUrgency_유니온이_4가지_값을_허용한다", () => {
     const urgencies: DeadlineUrgency[] = ["overdue", "d7", "d30", "safe"];
     expect(urgencies).toHaveLength(4);
+  });
+
+  it("AlertGroup_구조가_올바르다", () => {
+    const alertGroup: AlertGroup = {
+      deadlineType: "VISA_EXPIRY",
+      label: "비자 만료 임박",
+      count: 3,
+      urgency: "critical",
+      href: "/alerts/visa",
+    };
+    expect(alertGroup.count).toBe(3);
+    expect(alertGroup.urgency).toBe("critical");
+  });
+
+  it("TimelineItem_구조가_올바르다", () => {
+    const timelineItem: TimelineItem = {
+      id: "1",
+      date: "2026-04-15",
+      deadlineLabel: "비자 만료",
+      workerName: "John Doe",
+      urgency: "d7",
+    };
+    expect(timelineItem.workerName).toBe("John Doe");
+    expect(timelineItem.urgency).toBe("d7");
   });
 
   it("DashboardResponse_구조가_올바르다", () => {
@@ -24,14 +54,16 @@ describe("Dashboard Types", () => {
         urgentActions: 3,
         urgentBreakdown: { visa: 1, insurance: 2 },
       },
-      alerts: [],
+      alertGroups: [],
       visaDistribution: [],
       insuranceSummary: [],
       complianceScore: { total: 73, breakdown: [] },
       aiInsight: "test",
-      upcomingDeadlines: [],
+      timeline: [],
     };
     expect(response.stats.totalWorkers).toBe(12);
     expect(response.complianceScore.total).toBe(73);
+    expect(response.alertGroups).toHaveLength(0);
+    expect(response.timeline).toHaveLength(0);
   });
 });
