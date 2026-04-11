@@ -5,7 +5,7 @@ import { mockDashboardRaw } from "@/mocks/dashboard-data";
 import { transformDashboardResponse } from "@/lib/transforms/dashboard-transform";
 import { mockWithinQuotaResponse } from "@/mocks/simulator-data";
 import { transformSimulationResult } from "@/lib/transforms/simulation-transform";
-import { mockBenchmarkResponse } from "@/mocks/benchmark-data";
+import { mockBenchmarkResponse, mockBenchmarkList } from "@/mocks/benchmark-data";
 import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
 import { mockComplianceReport } from "./report-data";
 import { mockMetadata, MOCK_SCORING_POLICIES } from "./metadata-data";
@@ -136,9 +136,24 @@ const mockDeductionCodes = new Set(
 const postSimulationBff: Parameters<typeof http.post>[1] = () =>
   HttpResponse.json(transformSimulationResult(mockWithinQuotaResponse, mockDeductionCodes));
 
-const getBenchmark: Parameters<typeof http.get>[1] = () =>
-  HttpResponse.json(mockBenchmarkResponse);
+const getBenchmarks: Parameters<typeof http.get>[1] = () =>
+  HttpResponse.json(mockBenchmarkList);
 
+const getBenchmarkById: Parameters<typeof http.get>[1] = ({ params }) => {
+  const id = Number(params.id);
+  const found = mockBenchmarkList.find((b) => b.id === id);
+  if (!found) return new HttpResponse(null, { status: 404 });
+  return HttpResponse.json(found);
+};
+
+const postBenchmark: Parameters<typeof http.post>[1] = async ({ request }) => {
+  const body = (await request.json()) as { companyId: number };
+  const created = { ...mockBenchmarkResponse, id: Date.now(), companyId: body.companyId };
+  return HttpResponse.json(created, {
+    status: 201,
+    headers: { Location: `/api/benchmarks/${created.id}` },
+  });
+};
 const getLegalChanges: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockLegalChangesResponse);
 
@@ -195,9 +210,12 @@ export const handlers = [
   http.post("*/api/simulations", postSimulationBff),
 
   // Benchmarks
-  http.get(`${BACKEND}/api/benchmarks`, getBenchmark),
-  http.get("*/api/benchmarks", getBenchmark),
-
+  http.get(`${BACKEND}/api/benchmarks/:id`, getBenchmarkById),
+  http.get("*/api/benchmarks/:id", getBenchmarkById),
+  http.get(`${BACKEND}/api/benchmarks`, getBenchmarks),
+  http.get("*/api/benchmarks", getBenchmarks),
+  http.post(`${BACKEND}/api/benchmarks`, postBenchmark),
+  http.post("*/api/benchmarks", postBenchmark),
   // Legal Changes (impacts BEFORE legal-changes for correct matching)
   http.get(`${BACKEND}/api/legal-changes/:id/impacts`, getLegalImpact),
   http.get("*/api/legal-changes/:id/impacts", getLegalImpact),
