@@ -65,7 +65,7 @@ export default function SimulatorPage() {
   return (
     <div className="grid grid-cols-[380px_1fr] gap-6">
       {/* Left sidebar */}
-      <div className="sticky top-6 self-start">
+      <div className="sticky top-6 max-h-[calc(100vh-3rem)] self-start space-y-4 overflow-y-auto">
         {result && lastRequest ? (
           <ResultSummarySidebar
             request={lastRequest}
@@ -81,6 +81,7 @@ export default function SimulatorPage() {
             isPending={mutation.isPending}
           />
         )}
+        {result && lastRequest && <AiSummarySection sanitizedHtml={result.aiSummary} />}
       </div>
 
       {/* Right content */}
@@ -142,9 +143,6 @@ export default function SimulatorPage() {
               defaultOpen={!isExceeded}
               muted={isExceeded}
             />
-
-            {/* ⑤ AI Summary */}
-            <AiSummarySection sanitizedHtml={result.aiSummary} />
 
             {/* ⑥ What-if (exceeded only) */}
             {result.whatIf && <WhatIfSection data={result.whatIf} />}
