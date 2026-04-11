@@ -268,6 +268,71 @@ export function CompanyForm(props: CompanyFormProps) {
             type="tel"
             placeholder="02-1234-5678"
           />
+
+          {/* 벤치마크 진단용 (선택) */}
+          <div className="space-y-4 rounded-lg border border-dashed p-4 md:col-span-2">
+            <p className="text-sm font-medium text-muted-foreground">
+              벤치마크 진단용 (선택)
+            </p>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="averageForeignWorkerWage">외국인 근로자 평균 월임금</Label>
+                <Controller
+                  name="averageForeignWorkerWage"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="averageForeignWorkerWage"
+                      type="number"
+                      placeholder="만원 단위"
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === "" ? undefined : Number(e.target.value),
+                        )
+                      }
+                      aria-invalid={!!errors.averageForeignWorkerWage}
+                    />
+                  )}
+                />
+                <p className="text-sm text-muted-foreground">
+                  미입력 시 임금 포지셔닝 진단이 생략됩니다
+                </p>
+                {errors.averageForeignWorkerWage && (
+                  <p className="text-sm text-destructive">{errors.averageForeignWorkerWage.message}</p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="recentYearTerminationCount">최근 1년 퇴사 외국인 수</Label>
+                <Controller
+                  name="recentYearTerminationCount"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="recentYearTerminationCount"
+                      type="number"
+                      placeholder="명"
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === "" ? undefined : Number(e.target.value),
+                        )
+                      }
+                      aria-invalid={!!errors.recentYearTerminationCount}
+                    />
+                  )}
+                />
+                <p className="text-sm text-muted-foreground">
+                  미입력 시 고용 안정성 진단이 생략됩니다
+                </p>
+                {errors.recentYearTerminationCount && (
+                  <p className="text-sm text-destructive">{errors.recentYearTerminationCount.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
         </CardContent>
 
         <CardFooter className="flex justify-end gap-2">
