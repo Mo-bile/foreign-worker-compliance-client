@@ -23,7 +23,7 @@ export function ScoreRing({ score, size = 180 }: ScoreRingProps) {
         aria-valuenow={score}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="컴플라이언스 점수"
+        aria-label="관리 수준 점수"
       >
         <defs>
           <linearGradient id={`${id}-gradient`} x1="0%" y1="0%" x2="100%" y2="100%">
