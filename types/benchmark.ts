@@ -1,98 +1,96 @@
-import type { SignalColor, DataSource, DataRow } from "./shared";
-
-export type { SignalColor, DataSource, DataRow } from "./shared";
-
-// ─── Score ──────────────────────────────────────────────────
-export interface ScoreCategory {
-  readonly label: string;
-  readonly score: number;
-  readonly color: SignalColor;
-}
-
-export interface BenchmarkScore {
-  readonly total: number;
-  readonly grade: string;
-  readonly change: number;
-  readonly categories: readonly ScoreCategory[];
-}
-
-// ─── Quick Actions ──────────────────────────────────────────
-export interface QuickActionItem {
-  readonly text: string;
-  readonly href?: string;
-}
-
-export interface QuickActionCard {
-  readonly count: number;
-  readonly items: readonly QuickActionItem[];
-}
-
-export interface QuickActions {
-  readonly urgent: QuickActionCard;
-  readonly improvement: QuickActionCard;
-}
-
-// ─── Benchmark Data Row (extends shared DataRow with color) ─
-export interface BenchmarkDataRow extends DataRow {
-  readonly color?: SignalColor;
-}
-
-// ─── Analysis Base ──────────────────────────────────────────
-export interface AnalysisBase {
-  readonly title: string;
-  readonly icon: string;
-  readonly badge: { readonly text: string; readonly color: SignalColor };
-  readonly dataRows: readonly BenchmarkDataRow[];
-  readonly dataSources: readonly DataSource[];
-  readonly aiInsight: string;
-}
+import { z } from "zod";
 
 // ─── Wage Analysis ──────────────────────────────────────────
-export interface WageAnalysis extends AnalysisBase {
-  readonly percentile: number;
-  readonly medianPercentile: number;
-  readonly percentileLabel: string;
-}
 
-// ─── Attrition Analysis ─────────────────────────────────────
-export type RiskLevel = "low" | "caution" | "moderate" | "high";
+/** 체류자격별 임금구간 분포. 모든 값은 천 명 단위 인원수 (KOSIS 원시값) */
+export const wageDistributionSchema = z.object({
+  under100: z.number(),
+  from100to200: z.number(),
+  from200to300: z.number(),
+  over300: z.number(),
+});
+export type WageDistribution = z.infer<typeof wageDistributionSchema>;
 
-export interface AttritionAnalysis extends AnalysisBase {
-  readonly riskLevel: RiskLevel;
-}
+export const wageAnalysisSchema = z.object({
+  companyAvgWage: z.number().nullable(),
+  visaType: z.string(),
+  distribution: wageDistributionSchema,
+  companyBracket: z.string().nullable(),
+});
+export type WageAnalysis = z.infer<typeof wageAnalysisSchema>;
 
-// ─── Dependency Analysis ────────────────────────────────────
-export interface DependencyAnalysis extends AnalysisBase {
-  readonly companyRatio: number;
-  readonly industryRatio: number;
-  readonly companyCount: number;
-  readonly totalCount: number;
-}
+// ─── Stability Analysis ─────────────────────────────────────
 
-// ─── Trend Analysis ─────────────────────────────────────────
-export interface TrendMonth {
-  readonly month: string;
-  readonly total: number;
-  readonly insurance: number;
-  readonly deadline: number;
-  readonly wage: number;
-}
+/** E-9 퇴사사유 분포. 모든 값은 퍼센트 단위 (24.5 = 24.5%). KOSIS 원시값 */
+export const terminationReasonsSchema = z.object({
+  lowWage: z.number(),
+  companyIssue: z.number(),
+  dangerous: z.number(),
+  betterJob: z.number(),
+  environment: z.number(),
+  wageDelay: z.number(),
+  other: z.number(),
+});
+export type TerminationReasons = z.infer<typeof terminationReasonsSchema>;
 
-export interface TrendAnalysis extends AnalysisBase {
-  readonly months: readonly TrendMonth[];
-}
+export const stabilityAnalysisSchema = z.object({
+  turnoverRate: z.number().nullable(),
+  terminationCount: z.number(),
+  foreignWorkerCount: z.number(),
+  nationalTurnoverDesireRate: z.number(),
+  terminationReasons: terminationReasonsSchema,
+});
+export type StabilityAnalysis = z.infer<typeof stabilityAnalysisSchema>;
 
-// ─── Response ───────────────────────────────────────────────
-export interface BenchmarkResponse {
-  readonly id: string;
-  readonly reportPeriod: string;
-  readonly analyzedAt: string;
-  readonly dataSourceCount: number;
-  readonly score: BenchmarkScore;
-  readonly aiSummary: string;
-  readonly quickActions: QuickActions;
-  readonly wage: WageAnalysis;
-  readonly attrition: AttritionAnalysis;
-  readonly dependency: DependencyAnalysis;
-  readonly trend: TrendAnalysis;
-}
+// ─── Management Check ───────────────────────────────────────
+
+export const managementCheckItemSchema = z.object({
+  category: z.string(),
+  label: z.string(),
+  passed: z.boolean(),
+  required: z.boolean(),
+});
+export type ManagementCheckItem = z.infer<typeof managementCheckItemSchema>;
+
+export const managementCheckSchema = z.object({
+  totalItems: z.number(),
+  passedItems: z.number(),
+  score: z.number(),
+  items: z.array(managementCheckItemSchema),
+});
+export type ManagementCheck = z.infer<typeof managementCheckSchema>;
+
+// ─── Positioning Analysis ───────────────────────────────────
+
+export const positioningAnalysisSchema = z.object({
+  region: z.string(),
+  industryCategory: z.string(),
+  regionalTotal: z.number(),
+  industryTotal: z.number(),
+  companyForeignWorkerCount: z.number(),
+  companyShare: z.number(),
+  sizeCategory: z.string(),
+});
+export type PositioningAnalysis = z.infer<typeof positioningAnalysisSchema>;
+
+// ─── Benchmark Response ─────────────────────────────────────
+
+export const benchmarkResponseSchema = z.object({
+  id: z.number(),
+  companyId: z.number(),
+  analyzedAt: z.string(),
+  managementScore: z.number(),
+  aiReport: z.string(),
+  wageAnalysis: wageAnalysisSchema.nullable(),
+  stabilityAnalysis: stabilityAnalysisSchema.nullable(),
+  managementCheck: managementCheckSchema,
+  positioningAnalysis: positioningAnalysisSchema,
+});
+export type BenchmarkResponse = z.infer<typeof benchmarkResponseSchema>;
+
+// ─── Create Request ─────────────────────────────────────────
+
+export const createBenchmarkRequestSchema = z.object({
+  companyId: z.number().int().positive(),
+});
+export type CreateBenchmarkRequest = z.infer<typeof createBenchmarkRequestSchema>;
