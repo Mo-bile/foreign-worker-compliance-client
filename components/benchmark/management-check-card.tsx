@@ -6,14 +6,23 @@ import { DataSourceMeta } from "./data-source-meta";
 
 interface ManagementCheckCardProps {
   readonly managementCheck: ManagementCheck;
+  readonly filterCategory?: string | null;
+  readonly onClearFilter?: () => void;
 }
 
-export function ManagementCheckCard({ managementCheck }: ManagementCheckCardProps) {
+export function ManagementCheckCard({
+  managementCheck,
+  filterCategory,
+  onClearFilter,
+}: ManagementCheckCardProps) {
   const { totalItems, passedItems, score, items } = managementCheck;
   const failedRequired = items.filter((i) => i.required && !i.passed).length;
+  const filteredItems = filterCategory
+    ? items.filter((i) => i.category === filterCategory)
+    : items;
 
   return (
-    <Card>
+    <Card id="management-check-card">
       <CardContent className="space-y-4 p-5">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold">✅ 관리 수준 체크리스트</h3>
@@ -38,8 +47,22 @@ export function ManagementCheckCard({ managementCheck }: ManagementCheckCardProp
         </div>
 
         {/* 체크리스트 */}
+        {filterCategory && (
+          <div className="flex items-center justify-between rounded-lg bg-[oklch(0.96_0.02_255)] px-3 py-2">
+            <span className="text-xs font-medium text-[oklch(0.4_0.12_255)]">
+              &quot;{filterCategory}&quot; 카테고리 필터 적용 중
+            </span>
+            <button
+              type="button"
+              onClick={onClearFilter}
+              className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+            >
+              전체 보기
+            </button>
+          </div>
+        )}
         <div className="space-y-1">
-          {items.map((item, idx) => (
+          {filteredItems.map((item, idx) => (
             <div
               key={idx}
               className="flex items-center gap-2 border-b border-[oklch(0.95_0.01_260)] py-1.5 text-xs last:border-b-0"
