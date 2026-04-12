@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import { useBenchmarkList, useCreateBenchmark } from "@/lib/queries/use-benchmark";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +19,12 @@ export default function BenchmarkPage() {
   const { selectedCompanyId } = useCompanyContext();
   const { data: benchmarks, isLoading, isError, error } = useBenchmarkList(selectedCompanyId);
   const createBenchmark = useCreateBenchmark();
+  const [activeChecklistCategory, setActiveChecklistCategory] = useState<string | null>(null);
+
+  const handleReasonClick = (category: string) => {
+    setActiveChecklistCategory(category);
+    document.getElementById("management-check-card")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleCreateBenchmark = () => {
     if (selectedCompanyId == null) return;
@@ -92,7 +99,10 @@ export default function BenchmarkPage() {
         )}
 
         {latest.stabilityAnalysis ? (
-          <StabilityAnalysisCard stabilityAnalysis={latest.stabilityAnalysis} />
+          <StabilityAnalysisCard
+            stabilityAnalysis={latest.stabilityAnalysis}
+            onReasonClick={handleReasonClick}
+          />
         ) : (
           <NullableAxisPlaceholder
             title="고용 안정성"
@@ -101,7 +111,11 @@ export default function BenchmarkPage() {
           />
         )}
 
-        <ManagementCheckCard managementCheck={latest.managementCheck} />
+        <ManagementCheckCard
+          managementCheck={latest.managementCheck}
+          filterCategory={activeChecklistCategory}
+          onClearFilter={() => setActiveChecklistCategory(null)}
+        />
         <PositioningCard positioningAnalysis={latest.positioningAnalysis} />
       </div>
 
