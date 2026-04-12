@@ -1,22 +1,27 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  LabelList,
-} from "recharts";
 import type { StabilityAnalysis } from "@/types/benchmark";
 import { DataSourceMeta } from "./data-source-meta";
 
 interface StabilityAnalysisCardProps {
   readonly stabilityAnalysis: StabilityAnalysis;
+  readonly onReasonClick?: (category: string) => void;
 }
 
-export function StabilityAnalysisCard({ stabilityAnalysis }: StabilityAnalysisCardProps) {
+const REASON_TO_CHECKLIST: Record<string, string | null> = {
+  lowWage: "계약",
+  wageDelay: "계약",
+  dangerous: "안전",
+  environment: "복지",
+  companyIssue: "신고",
+  betterJob: null,
+};
+
+export function StabilityAnalysisCard({
+  stabilityAnalysis,
+  onReasonClick,
+}: StabilityAnalysisCardProps) {
   const { turnoverRate, terminationCount, foreignWorkerCount, terminationReasons } =
     stabilityAnalysis;
 
@@ -27,12 +32,16 @@ export function StabilityAnalysisCard({ stabilityAnalysis }: StabilityAnalysisCa
       : "bg-[oklch(0.94_0.04_155)] text-[oklch(0.4_0.12_155)]";
 
   const reasonData = [
-    { reason: "임금 낮음", pct: terminationReasons.lowWage },
-    { reason: "회사 사정", pct: terminationReasons.companyIssue },
-    { reason: "위험", pct: terminationReasons.dangerous },
-    { reason: "더 좋은 일자리", pct: terminationReasons.betterJob },
-    { reason: "환경", pct: terminationReasons.environment },
-    { reason: "임금 체불", pct: terminationReasons.wageDelay },
+    { key: "lowWage", reason: "임금이 낮아서", pct: terminationReasons.lowWage },
+    {
+      key: "companyIssue",
+      reason: "회사사정이 안 좋아서",
+      pct: terminationReasons.companyIssue,
+    },
+    { key: "dangerous", reason: "일이 힘들거나 위험해서", pct: terminationReasons.dangerous },
+    { key: "betterJob", reason: "더 좋은 일자리", pct: terminationReasons.betterJob },
+    { key: "environment", reason: "근무환경 불만", pct: terminationReasons.environment },
+    { key: "wageDelay", reason: "임금체불", pct: terminationReasons.wageDelay },
   ];
 
   return (
@@ -64,31 +73,38 @@ export function StabilityAnalysisCard({ stabilityAnalysis }: StabilityAnalysisCa
             E-9 이전 직장 퇴사 사유 (2025.5, 직장 이동 경험자)
           </p>
 
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart
-              data={reasonData}
-              layout="vertical"
-              margin={{ top: 0, right: 40, left: 70, bottom: 0 }}
-            >
-              <XAxis type="number" hide />
-              <YAxis
-                type="category"
-                dataKey="reason"
-                tick={{ fontSize: 11, fill: "oklch(0.4 0.01 260)" }}
-                axisLine={false}
-                tickLine={false}
-                width={70}
-              />
-              <Bar dataKey="pct" radius={[0, 3, 3, 0]} maxBarSize={14} fill="oklch(0.65 0.18 55)">
-                <LabelList
-                  dataKey="pct"
-                  position="right"
-                  formatter={(v: number) => `${v}%`}
-                  style={{ fontSize: 10, fontWeight: 600, fill: "oklch(0.4 0.01 260)" }}
-                />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div className='space-y-2'>
+            {reasonData.map((item) => {
+              const targetCategory = REASON_TO_CHECKLIST[item.key];
+              const clickable = targetCategory != null && onReasonClick != null;
+              return (
+                <button
+                  key={item.key}
+                  type='button'
+                  disabled={!clickable}
+                  onClick={() => clickable && onReasonClick(targetCategory)}
+                  className={`flex w-full items-center gap-2 rounded px-1 py-0.5 text-left transition-colors ${
+                    clickable
+                      ? "cursor-pointer hover:bg-[oklch(0.97_0.02_55)]"
+                      : "cursor-default opacity-50"
+                  }`}
+                >
+                  <span className='w-[100px] shrink-0 truncate text-xs text-[oklch(0.4_0.01_260)]'>
+                    {item.reason}
+                  </span>
+                  <div className='h-4 flex-1 overflow-hidden rounded bg-[oklch(0.95_0.01_260)]'>
+                    <div
+                      className='h-full rounded bg-[oklch(0.65_0.18_55)]'
+                      style={{ width: `${item.pct}%` }}
+                    />
+                  </div>
+                  <span className='w-10 shrink-0 text-right text-[11px] font-semibold text-[oklch(0.4_0.01_260)]'>
+                    {item.pct}%
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* 면책 안내 */}
