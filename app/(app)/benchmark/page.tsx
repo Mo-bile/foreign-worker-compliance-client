@@ -104,6 +104,8 @@ export default function BenchmarkPage() {
           </div>
         </div>
 
+        <hr className="border-border" />
+
         <div className="space-y-2">
           <p className="text-xs font-bold tracking-wide text-muted-foreground">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[oklch(0.65_0.18_55)]" />
