@@ -1,15 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Cell,
-  ResponsiveContainer,
-  LabelList,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Cell, ResponsiveContainer, LabelList } from "recharts";
 import type { WageAnalysis } from "@/types/benchmark";
 import { DataSourceMeta } from "./data-source-meta";
 
@@ -20,7 +12,7 @@ interface WageAnalysisCardProps {
 function formatCount(thousands: number): string {
   if (thousands === 0) return "0명";
   if (thousands < 10) return `${thousands}천명`;
-  return `${(thousands / 1000).toFixed(1)}만명`.replace(".0만명", "만명");
+  return `${(thousands / 10).toFixed(1)}만명`.replace(".0만명", "만명");
 }
 
 export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
@@ -75,9 +67,7 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
                 <Cell
                   key={entry.key}
                   fill={
-                    entry.key === activeBracketKey
-                      ? "oklch(0.6 0.15 255)"
-                      : "oklch(0.85 0.04 255)"
+                    entry.key === activeBracketKey ? "oklch(0.6 0.15 255)" : "oklch(0.85 0.04 255)"
                   }
                   stroke={entry.key === activeBracketKey ? "oklch(0.6 0.15 255)" : "none"}
                   strokeWidth={entry.key === activeBracketKey ? 2 : 0}
