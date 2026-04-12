@@ -10,6 +10,7 @@ import {
   LabelList,
 } from "recharts";
 import type { StabilityAnalysis } from "@/types/benchmark";
+import { DataSourceMeta } from "./data-source-meta";
 
 interface StabilityAnalysisCardProps {
   readonly stabilityAnalysis: StabilityAnalysis;
@@ -47,7 +48,7 @@ export function StabilityAnalysisCard({ stabilityAnalysis }: StabilityAnalysisCa
         {/* 귀사 현황 — 독립 박스 */}
         <div className="rounded-lg border border-[oklch(0.85_0.04_55)] bg-[oklch(0.97_0.02_55)] p-3">
           <p className="text-[10px] font-medium text-[oklch(0.45_0.12_55)]">
-            귀사 이직률
+            귀사 최근 1년 이직률
           </p>
           <p className="text-xl font-extrabold text-[oklch(0.35_0.12_55)]">
             {turnoverRate != null ? `${turnoverRate}%` : "—"}
@@ -59,11 +60,8 @@ export function StabilityAnalysisCard({ stabilityAnalysis }: StabilityAnalysisCa
 
         {/* 전국 E-9 퇴사사유 분포 — 별도 박스 */}
         <div>
-          <p className="mb-2 text-[10px] font-semibold text-muted-foreground">
-            전국 E-9 퇴사사유 분포 (참고)
-          </p>
-          <p className="mb-3 text-[10px] text-muted-foreground">
-            출처: KOSIS 이민자체류실태조사 2025
+          <p className="mb-3 text-[10px] font-semibold text-muted-foreground">
+            E-9 이전 직장 퇴사 사유 (2025.5, 직장 이동 경험자)
           </p>
 
           <ResponsiveContainer width="100%" height={140}>
@@ -98,6 +96,12 @@ export function StabilityAnalysisCard({ stabilityAnalysis }: StabilityAnalysisCa
           귀사 이직률과 전국 퇴사사유는 별개 지표입니다. 퇴사사유는 업종 전반의 경향 파악
           참고용으로 제공됩니다.
         </p>
+        <DataSourceMeta
+          source="KOSIS 이민자체류실태및고용조사(D_23)"
+          baseDate="2025.5"
+          population="비전문취업(E-9) 입국 후 직장을 옮긴 경험이 있는 자"
+          caution="복수응답 아님, 주된 사유 1개 선택"
+        />
       </CardContent>
     </Card>
   );
