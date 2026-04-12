@@ -21,7 +21,12 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
 
   const items = [
     { label: "지역 외국인 총수", value: regionalTotal.toLocaleString("ko-KR"), unit: "명" },
-    { label: "업종 외국인 수", value: industryTotal.toLocaleString("ko-KR"), unit: "명", sub: industryCategory },
+    {
+      label: "업종 외국인 수",
+      value: industryTotal.toLocaleString("ko-KR"),
+      unit: "명",
+      sub: industryCategory,
+    },
     { label: "귀사 고용", value: companyForeignWorkerCount.toLocaleString("ko-KR"), unit: "명" },
     { label: "귀사 점유율", value: String(companyShare), unit: "%" },
   ];
@@ -31,7 +36,7 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
       <CardContent className="space-y-4 p-5">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold">📍 지역·업종 포지셔닝</h3>
-          <span className="rounded-full bg-[oklch(0.95_0.03_300)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_300)]">
+          <span className="rounded-full bg-[oklch(0.95_0.03_255)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_255)]">
             {region}
           </span>
         </div>
@@ -47,9 +52,7 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
                 {item.value}
                 <span className="text-xs font-medium text-muted-foreground">{item.unit}</span>
               </p>
-              {item.sub && (
-                <p className="text-[11px] text-muted-foreground">{item.sub}</p>
-              )}
+              {item.sub && <p className="text-[11px] text-muted-foreground">{item.sub}</p>}
             </div>
           ))}
         </div>
@@ -57,9 +60,7 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
         {/* 규모 등급 하이라이트 */}
         <div className="rounded-lg border border-[oklch(0.85_0.04_280)] bg-gradient-to-r from-[oklch(0.97_0.02_300)] to-[oklch(0.96_0.02_260)] p-3 text-center">
           <p className="text-[11px] text-muted-foreground">규모 등급</p>
-          <p className="text-sm font-bold text-[oklch(0.4_0.12_300)]">
-            {sizeCategory} 사업장
-          </p>
+          <p className="text-sm font-bold text-[oklch(0.4_0.12_300)]">{sizeCategory} 사업장</p>
         </div>
         <DataSourceMeta
           source="한국고용정보원 EIS(15105236)"

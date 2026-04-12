@@ -26,7 +26,7 @@ export function ManagementCheckCard({
       <CardContent className="space-y-4 p-5">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold">✅ 관리 수준 체크리스트</h3>
-          <span className="rounded-full bg-[oklch(0.94_0.04_155)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.4_0.12_155)]">
+          <span className="rounded-full bg-[oklch(0.93_0.04_55)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_55)]">
             {passedItems}/{totalItems}
           </span>
         </div>
