@@ -56,9 +56,7 @@ export function StabilityAnalysisCard({
 
         {/* 귀사 현황 — 독립 박스 */}
         <div className="rounded-lg border border-[oklch(0.85_0.04_55)] bg-[oklch(0.97_0.02_55)] p-3">
-          <p className="text-[10px] font-medium text-[oklch(0.45_0.12_55)]">
-            귀사 최근 1년 이직률
-          </p>
+          <p className="text-[10px] font-medium text-[oklch(0.45_0.12_55)]">귀사 최근 1년 이직률</p>
           <p className="text-xl font-extrabold text-[oklch(0.35_0.12_55)]">
             {turnoverRate != null ? `${turnoverRate}%` : "—"}
           </p>
@@ -73,14 +71,14 @@ export function StabilityAnalysisCard({
             E-9 이전 직장 퇴사 사유 (2025.5, 직장 이동 경험자)
           </p>
 
-          <div className='space-y-2'>
+          <div className="space-y-2">
             {reasonData.map((item) => {
               const targetCategory = REASON_TO_CHECKLIST[item.key];
               const clickable = targetCategory != null && onReasonClick != null;
               return (
                 <button
                   key={item.key}
-                  type='button'
+                  type="button"
                   disabled={!clickable}
                   onClick={() => clickable && onReasonClick(targetCategory)}
                   className={`flex w-full items-center gap-2 rounded px-1 py-0.5 text-left transition-colors ${
@@ -89,16 +87,16 @@ export function StabilityAnalysisCard({
                       : "cursor-default opacity-50"
                   }`}
                 >
-                  <span className='w-[100px] shrink-0 truncate text-xs text-[oklch(0.4_0.01_260)]'>
+                  <span className="w-[100px] shrink-0 truncate text-xs text-[oklch(0.4_0.01_260)]">
                     {item.reason}
                   </span>
-                  <div className='h-4 flex-1 overflow-hidden rounded bg-[oklch(0.95_0.01_260)]'>
+                  <div className="h-4 flex-1 overflow-hidden rounded bg-[oklch(0.95_0.01_260)]">
                     <div
-                      className='h-full rounded bg-[oklch(0.65_0.18_55)]'
+                      className="h-full rounded bg-[oklch(0.65_0.18_55)]"
                       style={{ width: `${item.pct}%` }}
                     />
                   </div>
-                  <span className='w-10 shrink-0 text-right text-[11px] font-semibold text-[oklch(0.4_0.01_260)]'>
+                  <span className="w-10 shrink-0 text-right text-[11px] font-semibold text-[oklch(0.4_0.01_260)]">
                     {item.pct}%
                   </span>
                 </button>
@@ -109,8 +107,8 @@ export function StabilityAnalysisCard({
 
         {/* 면책 안내 */}
         <p className="text-[10px] text-muted-foreground">
-          귀사 이직률과 전국 퇴사사유는 별개 지표입니다. 퇴사사유는 업종 전반의 경향 파악
-          참고용으로 제공됩니다.
+          귀사 이직률과 전국 퇴사사유는 별개 지표입니다. 퇴사사유는 업종 전반의 경향 파악 참고용으로
+          제공됩니다.
         </p>
         <DataSourceMeta
           source="KOSIS 이민자체류실태및고용조사(D_23)"

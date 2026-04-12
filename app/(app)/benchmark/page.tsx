@@ -23,6 +23,7 @@ export default function BenchmarkPage() {
 
   const handleReasonClick = (category: string) => {
     setActiveChecklistCategory(category);
+    // intentional DOM access — id is defined in ManagementCheckCard, couples via string
     document.getElementById("management-check-card")?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -47,9 +48,7 @@ export default function BenchmarkPage() {
   if (isError) {
     return (
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-        <p className="text-sm font-medium text-destructive">
-          벤치마크 조회에 실패했습니다
-        </p>
+        <p className="text-sm font-medium text-destructive">벤치마크 조회에 실패했습니다</p>
         <p className="mt-1 text-xs text-muted-foreground">{error?.message}</p>
       </div>
     );
@@ -76,10 +75,7 @@ export default function BenchmarkPage() {
 
       {/* 상단: Score Ring + 4축 요약 Stat Cards */}
       <div className="grid grid-cols-[240px_1fr] gap-4">
-        <ScoreRingCard
-          managementScore={latest.managementScore}
-          analyzedAt={latest.analyzedAt}
-        />
+        <ScoreRingCard managementScore={latest.managementScore} analyzedAt={latest.analyzedAt} />
         <BenchmarkStatCards benchmark={latest} />
       </div>
 
@@ -120,8 +116,7 @@ export default function BenchmarkPage() {
       </div>
 
       <p className="text-center text-xs text-muted-foreground">
-        본 서비스는 법률 자문이 아닌 관리 보조 도구입니다. 정확한 법률 판단은
-        전문가와 상담하세요.
+        본 서비스는 법률 자문이 아닌 관리 보조 도구입니다. 정확한 법률 판단은 전문가와 상담하세요.
       </p>
     </div>
   );

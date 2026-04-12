@@ -17,9 +17,7 @@ export function ManagementCheckCard({
 }: ManagementCheckCardProps) {
   const { totalItems, passedItems, score, items } = managementCheck;
   const failedRequired = items.filter((i) => i.required && !i.passed).length;
-  const filteredItems = filterCategory
-    ? items.filter((i) => i.category === filterCategory)
-    : items;
+  const filteredItems = filterCategory ? items.filter((i) => i.category === filterCategory) : items;
 
   return (
     <Card id="management-check-card">
@@ -33,15 +31,13 @@ export function ManagementCheckCard({
 
         {/* 요약 */}
         <div className="flex items-center gap-3 rounded-lg border border-[oklch(0.82_0.06_155)] bg-[oklch(0.96_0.02_155)] p-3">
-          <span className="text-xl font-extrabold text-[oklch(0.4_0.12_155)]">
-            {score}점
-          </span>
+          <span className="text-xl font-extrabold text-[oklch(0.4_0.12_155)]">{score}점</span>
           <div className="text-xs text-[oklch(0.35_0.08_155)]">
-            <p>{totalItems}개 항목 중 {passedItems}개 충족</p>
+            <p>
+              {totalItems}개 항목 중 {passedItems}개 충족
+            </p>
             {failedRequired > 0 && (
-              <p className="text-[oklch(0.5_0.18_25)]">
-                법적의무 {failedRequired}건 미충족
-              </p>
+              <p className="text-[oklch(0.5_0.18_25)]">법적의무 {failedRequired}건 미충족</p>
             )}
           </div>
         </div>
@@ -62,9 +58,9 @@ export function ManagementCheckCard({
           </div>
         )}
         <div className="space-y-1">
-          {filteredItems.map((item, idx) => (
+          {filteredItems.map((item) => (
             <div
-              key={idx}
+              key={`${item.category}-${item.label}`}
               className="flex items-center gap-2 border-b border-[oklch(0.95_0.01_260)] py-1.5 text-xs last:border-b-0"
             >
               <span

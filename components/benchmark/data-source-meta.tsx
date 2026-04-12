@@ -10,18 +10,14 @@ interface DataSourceMetaProps {
   readonly caution?: string;
 }
 
-export function DataSourceMeta({
-  source,
-  baseDate,
-  population,
-  caution,
-}: DataSourceMetaProps) {
+export function DataSourceMeta({ source, baseDate, population, caution }: DataSourceMetaProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="mt-4 border-t border-dashed pt-3">
       <button
         type="button"
+        aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
         className="flex w-full items-center gap-1.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
       >
