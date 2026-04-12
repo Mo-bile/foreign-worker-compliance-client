@@ -86,8 +86,8 @@ export default function BenchmarkPage() {
 
       <div className="space-y-7">
         <div className="space-y-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[oklch(0.6_0.15_255)]" />
+          <p className="text-xs font-bold tracking-wide text-muted-foreground">
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[oklch(0.6_0.15_255)]" />
             포지셔닝
           </p>
           <div className="grid grid-cols-2 gap-4">
@@ -105,8 +105,8 @@ export default function BenchmarkPage() {
         </div>
 
         <div className="space-y-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[oklch(0.65_0.18_55)]" />
+          <p className="text-xs font-bold tracking-wide text-muted-foreground">
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[oklch(0.65_0.18_55)]" />
             진단 &amp; 개선
           </p>
           <div className="grid grid-cols-2 gap-4">
