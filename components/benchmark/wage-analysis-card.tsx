@@ -11,6 +11,7 @@ import {
   LabelList,
 } from "recharts";
 import type { WageAnalysis } from "@/types/benchmark";
+import { DataSourceMeta } from "./data-source-meta";
 
 interface WageAnalysisCardProps {
   readonly wageAnalysis: WageAnalysis;
@@ -49,6 +50,10 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
             {visaType}
           </span>
         </div>
+
+        <p className="text-[11px] text-muted-foreground">
+          E-9 임금근로자 월평균 임금 구간 (2025.5)
+        </p>
 
         <ResponsiveContainer width="100%" height={160}>
           <BarChart data={data} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
@@ -94,6 +99,12 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
             귀사 평균 <strong className="text-foreground">{companyAvgWage}만원</strong>
           </div>
         )}
+        <DataSourceMeta
+          source="KOSIS 이민자체류실태및고용조사(D_23)"
+          baseDate="2025.5"
+          population="비전문취업(E-9) 임금근로자"
+          caution="4구간 분포, 반올림으로 합계 불일치 가능"
+        />
       </CardContent>
     </Card>
   );
