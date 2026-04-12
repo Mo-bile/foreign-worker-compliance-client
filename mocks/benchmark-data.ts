@@ -125,6 +125,9 @@ export const mockBenchmarkList: BenchmarkResponse[] = [
       ...mockBenchmarkResponse.managementCheck,
       passedItems: 7,
       score: 70,
+      items: mockBenchmarkResponse.managementCheck.items.map((item, i) =>
+        i === 5 ? { ...item, passed: false } : item,
+      ),
     },
   },
 ];

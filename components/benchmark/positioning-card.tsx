@@ -28,7 +28,7 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
       sub: industryCategory,
     },
     { label: "귀사 고용", value: companyForeignWorkerCount.toLocaleString("ko-KR"), unit: "명" },
-    { label: "귀사 점유율", value: String(companyShare), unit: "%" },
+    { label: "귀사 점유율", value: (companyShare * 100).toFixed(1), unit: "%" },
   ];
 
   return (

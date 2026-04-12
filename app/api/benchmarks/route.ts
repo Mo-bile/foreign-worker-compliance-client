@@ -1,7 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { apiClient } from "@/lib/api-client";
 import { handleRouteError, parseRequestBody, validateSchema } from "@/lib/api-route-utils";
-import { transformBenchmarkList, transformBenchmarkResponse } from "@/lib/transforms/benchmark-transform";
+import {
+  transformBenchmarkList,
+  transformBenchmarkResponse,
+} from "@/lib/transforms/benchmark-transform";
 import { createBenchmarkRequestSchema, type BenchmarkResponse } from "@/types/benchmark";
 
 export async function GET(request: NextRequest) {
@@ -41,12 +44,9 @@ export async function POST(request: NextRequest) {
   const validated = validateSchema(createBenchmarkRequestSchema, bodyResult.data);
   if (validated instanceof NextResponse) return validated;
 
-  let raw: BenchmarkResponse;
+  let raw: unknown;
   try {
-    raw = await apiClient.postAndFollow<BenchmarkResponse>(
-      "/api/benchmarks",
-      validated.data,
-    );
+    raw = await apiClient.postAndFollow<BenchmarkResponse>("/api/benchmarks", validated.data);
   } catch (error) {
     return handleRouteError(error, "POST /api/benchmarks");
   }

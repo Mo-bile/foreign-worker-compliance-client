@@ -1,18 +1,18 @@
 "use client";
 
 import Markdown from "react-markdown";
-import DOMPurify from "isomorphic-dompurify";
 
 interface AiReportSectionProps {
   readonly aiReport: string;
 }
 
-export function AiReportSection({ aiReport }: AiReportSectionProps) {
-  const sanitized = DOMPurify.sanitize(aiReport);
+const ALLOWED_ELEMENTS = [
+  "p", "strong", "em", "ul", "ol", "li", "h1", "h2", "h3", "h4", "br", "hr",
+];
 
+export function AiReportSection({ aiReport }: AiReportSectionProps) {
   return (
     <div className="relative overflow-hidden rounded-xl border border-[oklch(0.85_0.04_280)] bg-gradient-to-br from-[oklch(0.97_0.02_280)] to-[oklch(0.96_0.02_260)] p-5 pl-7">
-      {/* 좌측 그라데이션 바 */}
       <div className="absolute left-0 top-0 h-full w-1 rounded-l-xl bg-gradient-to-b from-[oklch(0.6_0.15_255)] to-[oklch(0.55_0.18_300)]" />
 
       <div className="mb-3 flex items-center gap-2.5">
@@ -28,7 +28,7 @@ export function AiReportSection({ aiReport }: AiReportSectionProps) {
       </div>
 
       <div className="prose prose-sm max-w-none text-[oklch(0.35_0.02_260)] prose-strong:text-[oklch(0.25_0.03_260)]">
-        <Markdown>{sanitized}</Markdown>
+        <Markdown allowedElements={ALLOWED_ELEMENTS}>{aiReport}</Markdown>
       </div>
     </div>
   );

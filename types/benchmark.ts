@@ -52,12 +52,21 @@ export const managementCheckItemSchema = z.object({
 });
 export type ManagementCheckItem = z.infer<typeof managementCheckItemSchema>;
 
-export const managementCheckSchema = z.object({
-  totalItems: z.number(),
-  passedItems: z.number(),
-  score: z.number(),
-  items: z.array(managementCheckItemSchema),
-});
+export const managementCheckSchema = z
+  .object({
+    totalItems: z.number(),
+    passedItems: z.number(),
+    score: z.number(),
+    items: z.array(managementCheckItemSchema),
+  })
+  .refine((d) => d.totalItems === d.items.length, {
+    message: "totalItems must match items array length",
+    path: ["totalItems"],
+  })
+  .refine((d) => d.passedItems === d.items.filter((i) => i.passed).length, {
+    message: "passedItems must match actual passed count",
+    path: ["passedItems"],
+  });
 export type ManagementCheck = z.infer<typeof managementCheckSchema>;
 
 // ─── Positioning Analysis ───────────────────────────────────
@@ -75,17 +84,22 @@ export type PositioningAnalysis = z.infer<typeof positioningAnalysisSchema>;
 
 // ─── Benchmark Response ─────────────────────────────────────
 
-export const benchmarkResponseSchema = z.object({
-  id: z.number(),
-  companyId: z.number(),
-  analyzedAt: z.string(),
-  managementScore: z.number(),
-  aiReport: z.string(),
-  wageAnalysis: wageAnalysisSchema.nullable(),
-  stabilityAnalysis: stabilityAnalysisSchema.nullable(),
-  managementCheck: managementCheckSchema,
-  positioningAnalysis: positioningAnalysisSchema,
-});
+export const benchmarkResponseSchema = z
+  .object({
+    id: z.number(),
+    companyId: z.number(),
+    analyzedAt: z.string(),
+    managementScore: z.number(),
+    aiReport: z.string(),
+    wageAnalysis: wageAnalysisSchema.nullable(),
+    stabilityAnalysis: stabilityAnalysisSchema.nullable(),
+    managementCheck: managementCheckSchema,
+    positioningAnalysis: positioningAnalysisSchema,
+  })
+  .refine((d) => d.managementScore === d.managementCheck.score, {
+    message: "managementScore must equal managementCheck.score",
+    path: ["managementScore"],
+  });
 export type BenchmarkResponse = z.infer<typeof benchmarkResponseSchema>;
 
 // ─── Create Request ─────────────────────────────────────────

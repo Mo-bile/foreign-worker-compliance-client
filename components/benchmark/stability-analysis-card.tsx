@@ -42,6 +42,7 @@ export function StabilityAnalysisCard({
     { key: "betterJob", reason: "더 좋은 일자리", pct: terminationReasons.betterJob },
     { key: "environment", reason: "근무환경 불만", pct: terminationReasons.environment },
     { key: "wageDelay", reason: "임금체불", pct: terminationReasons.wageDelay },
+    { key: "other", reason: "기타", pct: terminationReasons.other },
   ];
 
   return (
