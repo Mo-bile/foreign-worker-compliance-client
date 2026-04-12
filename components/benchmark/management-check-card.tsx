@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { ManagementCheck } from "@/types/benchmark";
+import { DataSourceMeta } from "./data-source-meta";
 
 interface ManagementCheckCardProps {
   readonly managementCheck: ManagementCheck;
@@ -64,6 +65,11 @@ export function ManagementCheckCard({ managementCheck }: ManagementCheckCardProp
             </div>
           ))}
         </div>
+        <DataSourceMeta
+          source="자체 산출"
+          baseDate="진단 실행 시점"
+          population="귀사 등록 정보 기반"
+        />
       </CardContent>
     </Card>
   );

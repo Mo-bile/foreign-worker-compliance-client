@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { PositioningAnalysis } from "@/types/benchmark";
+import { DataSourceMeta } from "./data-source-meta";
 
 interface PositioningCardProps {
   readonly positioningAnalysis: PositioningAnalysis;
@@ -60,6 +61,12 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
             {sizeCategory} 사업장
           </p>
         </div>
+        <DataSourceMeta
+          source="한국고용정보원 EIS(15105236)"
+          baseDate="2024.12"
+          population="해당 지역·업종 사업장"
+          caution="고용보험 피보험자 기준"
+        />
       </CardContent>
     </Card>
   );
