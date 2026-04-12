@@ -7,12 +7,14 @@ import { DataSourceMeta } from "./data-source-meta";
 interface ManagementCheckCardProps {
   readonly managementCheck: ManagementCheck;
   readonly filterCategory?: string | null;
+  readonly filterReasonLabel?: string | null;
   readonly onClearFilter?: () => void;
 }
 
 export function ManagementCheckCard({
   managementCheck,
   filterCategory,
+  filterReasonLabel,
   onClearFilter,
 }: ManagementCheckCardProps) {
   const { totalItems, passedItems, score, items } = managementCheck;
@@ -46,7 +48,9 @@ export function ManagementCheckCard({
         {filterCategory && (
           <div className="flex items-center justify-between rounded-lg bg-[oklch(0.96_0.02_255)] px-3 py-2">
             <span className="text-xs font-medium text-[oklch(0.4_0.12_255)]">
-              &quot;{filterCategory}&quot; 카테고리 필터 적용 중
+              {filterReasonLabel
+                ? `퇴사사유 '${filterReasonLabel}'와 관련된 관리 항목입니다`
+                : `"${filterCategory}" 카테고리 필터 적용 중`}
             </span>
             <button
               type="button"

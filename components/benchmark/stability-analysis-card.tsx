@@ -6,7 +6,7 @@ import { DataSourceMeta } from "./data-source-meta";
 
 interface StabilityAnalysisCardProps {
   readonly stabilityAnalysis: StabilityAnalysis;
-  readonly onReasonClick?: (category: string) => void;
+  readonly onReasonClick?: (category: string, reasonLabel: string) => void;
 }
 
 const REASON_TO_CHECKLIST: Record<string, string | null> = {
@@ -80,7 +80,7 @@ export function StabilityAnalysisCard({
                   key={item.key}
                   type="button"
                   disabled={!clickable}
-                  onClick={() => clickable && onReasonClick(targetCategory)}
+                  onClick={() => clickable && onReasonClick(targetCategory, item.reason)}
                   className={`flex w-full items-center gap-2 rounded px-1 py-0.5 text-left transition-colors ${
                     clickable
                       ? "cursor-pointer hover:bg-[oklch(0.97_0.02_55)]"

@@ -20,9 +20,11 @@ export default function BenchmarkPage() {
   const { data: benchmarks, isLoading, isError, error } = useBenchmarkList(selectedCompanyId);
   const createBenchmark = useCreateBenchmark();
   const [activeChecklistCategory, setActiveChecklistCategory] = useState<string | null>(null);
+  const [activeReasonLabel, setActiveReasonLabel] = useState<string | null>(null);
 
-  const handleReasonClick = (category: string) => {
+  const handleReasonClick = (category: string, reasonLabel: string) => {
     setActiveChecklistCategory(category);
+    setActiveReasonLabel(reasonLabel);
     // intentional DOM access — id is defined in ManagementCheckCard, couples via string
     document.getElementById("management-check-card")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -82,37 +84,53 @@ export default function BenchmarkPage() {
       {/* AI 종합 분석 */}
       <AiReportSection aiReport={latest.aiReport} />
 
-      {/* 4축 상세 카드 2x2 */}
-      <div className="grid grid-cols-2 gap-4">
-        {latest.wageAnalysis ? (
-          <WageAnalysisCard wageAnalysis={latest.wageAnalysis} />
-        ) : (
-          <NullableAxisPlaceholder
-            title="임금 구간 포지셔닝"
-            fieldLabel="평균 월임금"
-            companyId={selectedCompanyId}
-          />
-        )}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            포지셔닝
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            {latest.wageAnalysis ? (
+              <WageAnalysisCard wageAnalysis={latest.wageAnalysis} />
+            ) : (
+              <NullableAxisPlaceholder
+                title="임금 구간 포지셔닝"
+                fieldLabel="평균 월임금"
+                companyId={selectedCompanyId}
+              />
+            )}
+            <PositioningCard positioningAnalysis={latest.positioningAnalysis} />
+          </div>
+        </div>
 
-        {latest.stabilityAnalysis ? (
-          <StabilityAnalysisCard
-            stabilityAnalysis={latest.stabilityAnalysis}
-            onReasonClick={handleReasonClick}
-          />
-        ) : (
-          <NullableAxisPlaceholder
-            title="고용 안정성"
-            fieldLabel="최근 1년 퇴사 외국인 수"
-            companyId={selectedCompanyId}
-          />
-        )}
-
-        <ManagementCheckCard
-          managementCheck={latest.managementCheck}
-          filterCategory={activeChecklistCategory}
-          onClearFilter={() => setActiveChecklistCategory(null)}
-        />
-        <PositioningCard positioningAnalysis={latest.positioningAnalysis} />
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            진단 &amp; 개선
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            {latest.stabilityAnalysis ? (
+              <StabilityAnalysisCard
+                stabilityAnalysis={latest.stabilityAnalysis}
+                onReasonClick={handleReasonClick}
+              />
+            ) : (
+              <NullableAxisPlaceholder
+                title="고용 안정성"
+                fieldLabel="최근 1년 퇴사 외국인 수"
+                companyId={selectedCompanyId}
+              />
+            )}
+            <ManagementCheckCard
+              managementCheck={latest.managementCheck}
+              filterCategory={activeChecklistCategory}
+              filterReasonLabel={activeReasonLabel}
+              onClearFilter={() => {
+                setActiveChecklistCategory(null);
+                setActiveReasonLabel(null);
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       <p className="text-center text-xs text-muted-foreground">

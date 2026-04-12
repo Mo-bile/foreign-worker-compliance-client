@@ -42,25 +42,15 @@ describe("StabilityAnalysisCard", () => {
 
   it("CTA 클릭 가능 항목이 onReasonClick을 호출한다", () => {
     const onReasonClick = vi.fn();
-    render(
-      <StabilityAnalysisCard
-        stabilityAnalysis={stability}
-        onReasonClick={onReasonClick}
-      />,
-    );
+    render(<StabilityAnalysisCard stabilityAnalysis={stability} onReasonClick={onReasonClick} />);
 
     fireEvent.click(screen.getByText(/임금이 낮아서/));
-    expect(onReasonClick).toHaveBeenCalledWith("계약");
+    expect(onReasonClick).toHaveBeenCalledWith("계약", "임금이 낮아서");
   });
 
   it("betterJob은 클릭 불가이다", () => {
     const onReasonClick = vi.fn();
-    render(
-      <StabilityAnalysisCard
-        stabilityAnalysis={stability}
-        onReasonClick={onReasonClick}
-      />,
-    );
+    render(<StabilityAnalysisCard stabilityAnalysis={stability} onReasonClick={onReasonClick} />);
 
     const betterJobBtn = screen.getByText(/더 좋은 일자리/).closest("button");
     expect(betterJobBtn).toBeDisabled();
