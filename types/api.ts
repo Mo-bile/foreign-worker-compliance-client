@@ -217,6 +217,8 @@ const companyBaseFields = z.object({
   foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
   address: z.string().min(1, "주소를 입력해주세요"),
   contactPhone: z.string().min(1, "연락처를 입력해주세요"),
+  averageForeignWorkerWage: z.number().positive("양수를 입력해주세요").optional(),
+  recentYearTerminationCount: z.number().int().min(0, "0 이상이어야 합니다").optional(),
 });
 
 function refineWorkerCount<
@@ -277,6 +279,8 @@ export interface CompanyResponse {
   readonly foreignWorkerCount: number;
   readonly address: string;
   readonly contactPhone: string;
+  readonly averageForeignWorkerWage: number | null;
+  readonly recentYearTerminationCount: number | null;
   readonly createdAt: string;
   readonly updatedAt: string;
 }

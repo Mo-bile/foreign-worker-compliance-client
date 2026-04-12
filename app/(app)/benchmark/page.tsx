@@ -1,20 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import { useCompanyContext } from "@/lib/contexts/company-context";
-import { useBenchmark } from "@/lib/queries/use-benchmark";
+import { useBenchmarkList, useCreateBenchmark } from "@/lib/queries/use-benchmark";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BenchmarkHeader } from "@/components/benchmark/benchmark-header";
 import { ScoreRingCard } from "@/components/benchmark/score-ring-card";
-import { AiSummaryBlock } from "@/components/benchmark/ai-summary-block";
-import { QuickActionCards } from "@/components/benchmark/quick-action-cards";
-import { WageCard } from "@/components/benchmark/wage-card";
-import { AttritionCard } from "@/components/benchmark/attrition-card";
-import { DependencyCard } from "@/components/benchmark/dependency-card";
-import { TrendCard } from "@/components/benchmark/trend-card";
+import { BenchmarkStatCards } from "@/components/benchmark/benchmark-stat-cards";
+import { AiReportSection } from "@/components/benchmark/ai-report-section";
+import { WageAnalysisCard } from "@/components/benchmark/wage-analysis-card";
+import { StabilityAnalysisCard } from "@/components/benchmark/stability-analysis-card";
+import { ManagementCheckCard } from "@/components/benchmark/management-check-card";
+import { PositioningCard } from "@/components/benchmark/positioning-card";
+import { BenchmarkEmptyState } from "@/components/benchmark/benchmark-empty-state";
+import { NullableAxisPlaceholder } from "@/components/benchmark/nullable-axis-placeholder";
 
 export default function BenchmarkPage() {
   const { selectedCompanyId } = useCompanyContext();
-  const { data, isLoading, isError, error } = useBenchmark(selectedCompanyId);
+  const { data: benchmarks, isLoading, isError, error } = useBenchmarkList(selectedCompanyId);
+  const createBenchmark = useCreateBenchmark();
+  const [activeChecklistCategory, setActiveChecklistCategory] = useState<string | null>(null);
+  const [activeReasonLabel, setActiveReasonLabel] = useState<string | null>(null);
+
+  const handleReasonClick = (category: string, reasonLabel: string) => {
+    setActiveChecklistCategory(category);
+    setActiveReasonLabel(reasonLabel);
+    // intentional DOM access — id is defined in ManagementCheckCard, couples via string
+    document.getElementById("management-check-card")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleCreateBenchmark = () => {
+    if (selectedCompanyId == null) return;
+    createBenchmark.mutate({ companyId: selectedCompanyId });
+  };
 
   if (selectedCompanyId == null) {
     return (
@@ -38,29 +56,89 @@ export default function BenchmarkPage() {
     );
   }
 
-  if (!data) return null;
+  if (!benchmarks || benchmarks.length === 0) {
+    return (
+      <BenchmarkEmptyState
+        onCreateBenchmark={handleCreateBenchmark}
+        isLoading={createBenchmark.isPending}
+      />
+    );
+  }
+
+  const latest = benchmarks[0];
 
   return (
-    <div className="space-y-6">
-      <BenchmarkHeader reportPeriod={data.reportPeriod} />
+    <div className="space-y-5">
+      <BenchmarkHeader
+        analyzedAt={latest.analyzedAt}
+        onCreateBenchmark={handleCreateBenchmark}
+        isCreating={createBenchmark.isPending}
+      />
 
-      <div className="grid grid-cols-[300px_1fr] gap-4">
-        <ScoreRingCard score={data.score} analyzedAt={data.analyzedAt} />
-        <div className="space-y-4">
-          <AiSummaryBlock html={data.aiSummary} />
-          <QuickActionCards actions={data.quickActions} />
+      {/* 상단: Score Ring + 4축 요약 Stat Cards */}
+      <div className="grid grid-cols-[240px_1fr] gap-4">
+        <ScoreRingCard managementScore={latest.managementScore} analyzedAt={latest.analyzedAt} />
+        <BenchmarkStatCards benchmark={latest} />
+      </div>
+
+      {/* AI 종합 분석 */}
+      <AiReportSection aiReport={latest.aiReport} />
+
+      <div className="space-y-7">
+        <div className="space-y-2">
+          <p className="text-xs font-bold tracking-wide text-muted-foreground">
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[oklch(0.6_0.15_255)]" />
+            포지셔닝
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            {latest.wageAnalysis ? (
+              <WageAnalysisCard wageAnalysis={latest.wageAnalysis} />
+            ) : (
+              <NullableAxisPlaceholder
+                title="임금 구간 포지셔닝"
+                fieldLabel="평균 월임금"
+                companyId={selectedCompanyId}
+              />
+            )}
+            <PositioningCard positioningAnalysis={latest.positioningAnalysis} />
+          </div>
+        </div>
+
+        <hr className="border-border" />
+
+        <div className="space-y-2">
+          <p className="text-xs font-bold tracking-wide text-muted-foreground">
+            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[oklch(0.65_0.18_55)]" />
+            진단 &amp; 개선
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            {latest.stabilityAnalysis ? (
+              <StabilityAnalysisCard
+                stabilityAnalysis={latest.stabilityAnalysis}
+                onReasonClick={handleReasonClick}
+              />
+            ) : (
+              <NullableAxisPlaceholder
+                title="고용 안정성"
+                fieldLabel="최근 1년 퇴사 외국인 수"
+                companyId={selectedCompanyId}
+              />
+            )}
+            <ManagementCheckCard
+              managementCheck={latest.managementCheck}
+              filterCategory={activeChecklistCategory}
+              filterReasonLabel={activeReasonLabel}
+              onClearFilter={() => {
+                setActiveChecklistCategory(null);
+                setActiveReasonLabel(null);
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <WageCard data={data.wage} defaultInsightOpen />
-        <AttritionCard data={data.attrition} />
-        <DependencyCard data={data.dependency} />
-        <TrendCard data={data.trend} />
-      </div>
-
       <p className="text-center text-xs text-muted-foreground">
-        ⚖ 본 서비스는 법률 자문이 아닌 관리 보조 도구입니다. 공공데이터 기준 시점: 2026년 1분기
+        본 서비스는 법률 자문이 아닌 관리 보조 도구입니다. 정확한 법률 판단은 전문가와 상담하세요.
       </p>
     </div>
   );
@@ -68,20 +146,23 @@ export default function BenchmarkPage() {
 
 function BenchmarkSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-10 w-64" />
-      <div className="grid grid-cols-[300px_1fr] gap-4">
-        <Skeleton className="h-80 rounded-lg" />
-        <div className="space-y-4">
-          <Skeleton className="h-40 rounded-lg" />
-          <Skeleton className="h-24 rounded-lg" />
+    <div className="space-y-5">
+      <Skeleton className="h-10 w-72" />
+      <div className="grid grid-cols-[240px_1fr] gap-4">
+        <Skeleton className="h-60 rounded-xl" />
+        <div className="grid grid-cols-2 gap-3">
+          <Skeleton className="h-28 rounded-xl" />
+          <Skeleton className="h-28 rounded-xl" />
+          <Skeleton className="h-28 rounded-xl" />
+          <Skeleton className="h-28 rounded-xl" />
         </div>
       </div>
+      <Skeleton className="h-40 rounded-xl" />
       <div className="grid grid-cols-2 gap-4">
-        <Skeleton className="h-64 rounded-lg" />
-        <Skeleton className="h-64 rounded-lg" />
-        <Skeleton className="h-64 rounded-lg" />
-        <Skeleton className="h-64 rounded-lg" />
+        <Skeleton className="h-72 rounded-xl" />
+        <Skeleton className="h-72 rounded-xl" />
+        <Skeleton className="h-72 rounded-xl" />
+        <Skeleton className="h-72 rounded-xl" />
       </div>
     </div>
   );
