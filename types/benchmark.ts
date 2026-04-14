@@ -29,6 +29,7 @@ export const terminationReasonsSchema = z.object({
   betterJob: z.number(),
   environment: z.number(),
   wageDelay: z.number(),
+  friend: z.number(),
   other: z.number(),
 });
 export type TerminationReasons = z.infer<typeof terminationReasonsSchema>;
@@ -37,7 +38,6 @@ export const stabilityAnalysisSchema = z.object({
   turnoverRate: z.number().nullable(),
   terminationCount: z.number(),
   foreignWorkerCount: z.number(),
-  nationalTurnoverDesireRate: z.number(),
   terminationReasons: terminationReasonsSchema,
 });
 export type StabilityAnalysis = z.infer<typeof stabilityAnalysisSchema>;
@@ -78,7 +78,7 @@ export const positioningAnalysisSchema = z.object({
   industryTotal: z.number(),
   companyForeignWorkerCount: z.number(),
   companyShare: z.number(),
-  sizeCategory: z.string(),
+  sizeCategory: z.enum(["소규모", "중소규모", "중규모", "대규모"]),
 });
 export type PositioningAnalysis = z.infer<typeof positioningAnalysisSchema>;
 

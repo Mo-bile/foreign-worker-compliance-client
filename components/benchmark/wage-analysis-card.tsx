@@ -26,10 +26,10 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
   ];
 
   const bracketKeyMap: Record<string, string> = {
-    "~100만": "under100",
-    "100~200만": "from100to200",
-    "200~300만": "from200to300",
-    "300만+": "over300",
+    "100만원 미만": "under100",
+    "100~200만원": "from100to200",
+    "200~300만원": "from200to300",
+    "300만원 이상": "over300",
   };
   const activeBracketKey = companyBracket ? bracketKeyMap[companyBracket] : null;
 

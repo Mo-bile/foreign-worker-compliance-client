@@ -26,14 +26,13 @@ export const mockBenchmarkResponse: BenchmarkResponse = {
       from200to300: 221,
       over300: 98,
     },
-    companyBracket: "200~300만",
+    companyBracket: "200~300만원",
   },
 
   stabilityAnalysis: {
     turnoverRate: 12.5,
     terminationCount: 3,
     foreignWorkerCount: 24,
-    nationalTurnoverDesireRate: 10.8,
     terminationReasons: {
       lowWage: 24.5,
       companyIssue: 23.1,
@@ -41,7 +40,8 @@ export const mockBenchmarkResponse: BenchmarkResponse = {
       betterJob: 10.2,
       environment: 6.4,
       wageDelay: 5.4,
-      other: 16.5,
+      friend: 3.8,
+      other: 12.7,
     },
   },
 

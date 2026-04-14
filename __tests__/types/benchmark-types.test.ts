@@ -19,7 +19,6 @@ describe("benchmarkResponseSchema", () => {
         turnoverRate: 12.5,
         terminationCount: 3,
         foreignWorkerCount: 24,
-        nationalTurnoverDesireRate: 10.8,
         terminationReasons: {
           lowWage: 24.5,
           companyIssue: 23.1,
@@ -27,7 +26,8 @@ describe("benchmarkResponseSchema", () => {
           betterJob: 10.2,
           environment: 6.4,
           wageDelay: 5.4,
-          other: 16.5,
+          friend: 3.8,
+          other: 12.7,
         },
       },
       managementCheck: {
