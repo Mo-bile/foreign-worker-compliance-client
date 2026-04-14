@@ -53,8 +53,8 @@ function getStatCards(benchmark: BenchmarkResponse): StatCardData[] {
     },
     {
       label: "지역·업종",
-      value: positioningAnalysis.region,
-      sub: `${positioningAnalysis.industryCategory} · ${positioningAnalysis.companyForeignWorkerCount}명 고용`,
+      value: positioningAnalysis.regionName,
+      sub: `${positioningAnalysis.industryCategoryName} · ${positioningAnalysis.companyForeignWorkerCount}명 고용`,
       accentColor: "border-t-[oklch(0.6_0.15_255)]",
       bgColor: "bg-[oklch(0.95_0.03_255)]",
       icon: "📍",
