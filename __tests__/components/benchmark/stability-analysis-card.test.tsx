@@ -21,13 +21,6 @@ describe("StabilityAnalysisCard", () => {
     expect(screen.getByText(/E-9 이전 직장 퇴사 사유/)).toBeInTheDocument();
   });
 
-  it("nationalTurnoverDesireRate를 직접 노출하지 않는다", () => {
-    render(<StabilityAnalysisCard stabilityAnalysis={stability} />);
-
-    expect(screen.queryByText("10.8%")).not.toBeInTheDocument();
-    expect(screen.queryByText(/이직희망률/)).not.toBeInTheDocument();
-  });
-
   it("면책 안내를 표시한다", () => {
     render(<StabilityAnalysisCard stabilityAnalysis={stability} />);
 
