@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Cell, ResponsiveContainer, LabelList } from "recharts";
 import type { WageAnalysis } from "@/types/benchmark";
 import { DataSourceMeta } from "./data-source-meta";
 
@@ -9,14 +8,21 @@ interface WageAnalysisCardProps {
   readonly wageAnalysis: WageAnalysis;
 }
 
-function formatCount(thousands: number): string {
-  if (thousands === 0) return "0명";
-  if (thousands < 10) return `${thousands}천명`;
-  return `${(thousands / 10).toFixed(1)}만명`.replace(".0만명", "만명");
-}
+const BRACKET_KEY_MAP: Record<string, string> = {
+  "100만원 미만": "under100",
+  "100~200만원": "from100to200",
+  "200~300만원": "from200to300",
+  "300만원 이상": "over300",
+};
+
+const MIN_BAR_HEIGHT = 20;
+const MAX_BAR_HEIGHT = 140;
 
 export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
   const { distribution, companyBracket, companyAvgWage, visaType } = wageAnalysis;
+
+  const total =
+    distribution.under100 + distribution.from100to200 + distribution.from200to300 + distribution.over300;
 
   const data = [
     { bracket: "~100만", count: distribution.under100, key: "under100" },
@@ -25,13 +31,20 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
     { bracket: "300만+", count: distribution.over300, key: "over300" },
   ];
 
-  const bracketKeyMap: Record<string, string> = {
-    "100만원 미만": "under100",
-    "100~200만원": "from100to200",
-    "200~300만원": "from200to300",
-    "300만원 이상": "over300",
-  };
-  const activeBracketKey = companyBracket ? bracketKeyMap[companyBracket] : null;
+  const activeBracketKey = companyBracket ? BRACKET_KEY_MAP[companyBracket] : null;
+
+  function getBarHeight(count: number): number {
+    if (count === 0) return 2;
+    const pct = total > 0 ? count / total : 0;
+    return Math.max(MIN_BAR_HEIGHT, Math.round(pct * MAX_BAR_HEIGHT));
+  }
+
+  function formatPct(count: number): string {
+    if (total === 0) return "0%";
+    const pct = (count / total) * 100;
+    if (pct < 0.1) return "0%";
+    return `${pct.toFixed(1)}%`;
+  }
 
   return (
     <Card>
@@ -47,42 +60,35 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
           E-9 임금근로자 월평균 임금 구간 (2025.5)
         </p>
 
-        <ResponsiveContainer width="100%" height={160}>
-          <BarChart data={data} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-            <XAxis
-              dataKey="bracket"
-              tick={{ fontSize: 11, fill: "oklch(0.5 0.01 260)" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis hide />
-            <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={48}>
-              <LabelList
-                dataKey="count"
-                position="top"
-                formatter={(v: number) => formatCount(v)}
-                style={{ fontSize: 10, fontWeight: 600, fill: "oklch(0.4 0.01 260)" }}
-              />
-              {data.map((entry) => (
-                <Cell
-                  key={entry.key}
-                  fill={
-                    entry.key === activeBracketKey ? "oklch(0.6 0.15 255)" : "oklch(0.85 0.04 255)"
-                  }
-                  stroke={entry.key === activeBracketKey ? "oklch(0.6 0.15 255)" : "none"}
-                  strokeWidth={entry.key === activeBracketKey ? 2 : 0}
+        <div className="flex items-end gap-3" style={{ height: MAX_BAR_HEIGHT + 40 }}>
+          {data.map((item) => {
+            const isActive = item.key === activeBracketKey;
+            return (
+              <div key={item.key} className="flex flex-1 flex-col items-center">
+                <span className="mb-1 text-[10px] font-semibold text-[oklch(0.4_0.01_260)]">
+                  {formatPct(item.count)}
+                </span>
+                <div
+                  className={`w-full rounded-t ${
+                    item.count === 0
+                      ? "bg-[oklch(0.92_0.01_260)]"
+                      : isActive
+                        ? "bg-[oklch(0.6_0.15_255)] shadow-[0_0_0_2px_oklch(0.6_0.15_255),0_0_10px_rgba(107,138,253,0.2)]"
+                        : "bg-[oklch(0.85_0.04_255)]"
+                  }`}
+                  style={{ height: getBarHeight(item.count) }}
                 />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-
-        {companyBracket && (
-          <div className="flex items-center gap-1.5 text-xs text-[oklch(0.6_0.15_255)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.6_0.15_255)]" />
-            귀사 {companyBracket} 구간
-          </div>
-        )}
+                <span className="mt-2 text-[10px] text-muted-foreground">{item.bracket}</span>
+                {isActive && (
+                  <span className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-[oklch(0.6_0.15_255)]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.6_0.15_255)]" />
+                    귀사
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
         {companyAvgWage != null && (
           <div className="border-t border-dashed pt-2 text-xs text-muted-foreground">
