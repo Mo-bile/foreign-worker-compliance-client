@@ -8,9 +8,7 @@ interface AiReportSectionProps {
   readonly aiReport: string;
 }
 
-const ALLOWED_ELEMENTS = [
-  "p", "strong", "em", "ul", "ol", "li", "h1", "h2", "h3", "h4", "br", "hr",
-];
+const DISALLOWED_ELEMENTS = ["img", "a", "script", "iframe", "input", "form", "table"];
 
 const COLLAPSED_MAX_HEIGHT = 120;
 
@@ -40,7 +38,7 @@ export function AiReportSection({ aiReport }: AiReportSectionProps) {
           }`}
           style={!expanded ? { maxHeight: COLLAPSED_MAX_HEIGHT } : undefined}
         >
-          <Markdown allowedElements={ALLOWED_ELEMENTS}>{aiReport}</Markdown>
+          <Markdown disallowedElements={DISALLOWED_ELEMENTS}>{aiReport}</Markdown>
         </div>
 
         {!expanded && (
