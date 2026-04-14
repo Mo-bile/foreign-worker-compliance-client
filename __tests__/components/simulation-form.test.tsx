@@ -57,13 +57,7 @@ function renderForm(
   const company = overrides.company !== undefined ? overrides.company : mockCompany;
   const onSubmit = overrides.onSubmit ?? vi.fn();
   const isPending = overrides.isPending ?? false;
-  return render(
-    <SimulationForm
-      company={company}
-      onSubmit={onSubmit}
-      isPending={isPending}
-    />,
-  );
+  return render(<SimulationForm company={company} onSubmit={onSubmit} isPending={isPending} />);
 }
 
 // ─── Tests ───────────────────────────────────────────────────────

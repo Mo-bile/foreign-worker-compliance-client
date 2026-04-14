@@ -4,8 +4,16 @@ import type { AlertGroup, AlertGroupUrgency } from "@/types/dashboard";
 
 const urgencyStyles: Record<AlertGroupUrgency, { bg: string; dot: string; border: string }> = {
   critical: { bg: "bg-signal-red-bg", dot: "bg-signal-red", border: "border-signal-red/30" },
-  warning: { bg: "bg-signal-orange-bg", dot: "bg-signal-orange", border: "border-signal-orange/30" },
-  caution: { bg: "bg-signal-yellow-bg", dot: "bg-signal-yellow", border: "border-signal-yellow/30" },
+  warning: {
+    bg: "bg-signal-orange-bg",
+    dot: "bg-signal-orange",
+    border: "border-signal-orange/30",
+  },
+  caution: {
+    bg: "bg-signal-yellow-bg",
+    dot: "bg-signal-yellow",
+    border: "border-signal-yellow/30",
+  },
 };
 
 interface AlertGroupCardProps {
@@ -14,9 +22,7 @@ interface AlertGroupCardProps {
 
 export function AlertGroupCard({ alertGroups }: AlertGroupCardProps) {
   if (alertGroups.length === 0) {
-    return (
-      <p className="py-6 text-center text-sm text-muted-foreground">긴급 알림이 없습니다</p>
-    );
+    return <p className="py-6 text-center text-sm text-muted-foreground">긴급 알림이 없습니다</p>;
   }
 
   return (

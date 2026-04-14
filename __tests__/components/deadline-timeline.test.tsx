@@ -4,8 +4,20 @@ import { DeadlineTimeline } from "@/components/dashboard/deadline-timeline";
 import type { TimelineItem } from "@/types/dashboard";
 
 const mockItems: readonly TimelineItem[] = [
-  { id: "1", date: "4월 5일", deadlineLabel: "비자 갱신", workerName: "Nguyen Van A", urgency: "overdue" },
-  { id: "2", date: "4월 8일", deadlineLabel: "보험 가입", workerName: "Jose Garcia", urgency: "d7" },
+  {
+    id: "1",
+    date: "4월 5일",
+    deadlineLabel: "비자 갱신",
+    workerName: "Nguyen Van A",
+    urgency: "overdue",
+  },
+  {
+    id: "2",
+    date: "4월 8일",
+    deadlineLabel: "보험 가입",
+    workerName: "Jose Garcia",
+    urgency: "d7",
+  },
   { id: "3", date: "4월 22일", deadlineLabel: "계약 갱신", workerName: "Li Jun", urgency: "d30" },
 ];
 

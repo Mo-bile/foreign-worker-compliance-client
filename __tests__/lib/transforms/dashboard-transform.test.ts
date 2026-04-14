@@ -189,7 +189,7 @@ describe("transformDashboardResponse", () => {
       }
     });
 
-    it("label에 ALERT_TITLE_MAP 값을 사용한다 (\"비자 만료 임박\")", () => {
+    it('label에 ALERT_TITLE_MAP 값을 사용한다 ("비자 만료 임박")', () => {
       const result = transformDashboardResponse(baseRaw);
       const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
       expect(visaGroup?.label).toBe("비자 만료 임박");

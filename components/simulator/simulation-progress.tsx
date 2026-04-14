@@ -72,9 +72,7 @@ export function SimulationProgress({ isPending }: SimulationProgressProps) {
         <div>
           <p className="text-sm font-medium">{done ? "분석 완료!" : currentStep.label}</p>
           <p className="text-xs text-muted-foreground">
-            {done
-              ? "결과를 표시합니다"
-              : `${stepIndex + 1} / ${STEPS.length} 단계`}
+            {done ? "결과를 표시합니다" : `${stepIndex + 1} / ${STEPS.length} 단계`}
           </p>
         </div>
       </div>
@@ -103,9 +101,7 @@ export function SimulationProgress({ isPending }: SimulationProgressProps) {
               />
               <span
                 className={`text-xs ${
-                  isCompleted || isActive
-                    ? "text-foreground"
-                    : "text-muted-foreground/50"
+                  isCompleted || isActive ? "text-foreground" : "text-muted-foreground/50"
                 }`}
               >
                 {step.label.replace("...", "")}

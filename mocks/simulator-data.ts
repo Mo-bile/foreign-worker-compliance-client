@@ -13,9 +13,7 @@ export const mockWithinQuotaResponse: SimulationResultResponse = {
     baseLimit: 14,
     doubleCap: null,
     baseLimitAfterCap: 14,
-    additionalBonuses: [
-      { reason: "비수도권 우대", ratePercent: 20, cappedByDomesticCount: false },
-    ],
+    additionalBonuses: [{ reason: "비수도권 우대", ratePercent: 20, cappedByDomesticCount: false }],
     additionalCount: 2,
     totalLimit: 16,
     cappedByDomesticCount: false,
@@ -26,12 +24,27 @@ export const mockWithinQuotaResponse: SimulationResultResponse = {
   },
   scoringAnalysis: {
     appliedBonusItems: [
-      { code: "DEPOPULATION_AREA", displayName: "인구감소지역 소재 사업장", points: 5, applied: true },
-      { code: "LABOR_LAW_COMPLIANCE", displayName: "최근 2년간 노동관계법 위반 없음", points: 3, applied: true },
+      {
+        code: "DEPOPULATION_AREA",
+        displayName: "인구감소지역 소재 사업장",
+        points: 5,
+        applied: true,
+      },
+      {
+        code: "LABOR_LAW_COMPLIANCE",
+        displayName: "최근 2년간 노동관계법 위반 없음",
+        points: 3,
+        applied: true,
+      },
     ],
     availableBonusItems: [
       { code: "PREMIUM_DORMITORY", displayName: "우수 기숙사 제공", points: 5, applied: false },
-      { code: "NEW_WORKPLACE", displayName: "외국인 고용이 처음인 사업장", points: 3, applied: false },
+      {
+        code: "NEW_WORKPLACE",
+        displayName: "외국인 고용이 처음인 사업장",
+        points: 3,
+        applied: false,
+      },
     ],
     totalBonusScore: 8,
     totalDeductionScore: 0,
@@ -51,17 +64,38 @@ export const mockWithinQuotaResponse: SimulationResultResponse = {
     preferredNationality: "VIETNAM",
     estimatedMonths: 4,
     steps: [
-      { stepName: "내국인 구인노력", estimatedDays: 14, description: "워크넷 등록 후 14일 구인노력 의무 이행", source: "외국인고용법 시행령 제14조" },
-      { stepName: "고용허가 신청 → 배정", estimatedDays: 45, description: "서류 제출 후 점수 심사, 차수별 배정 결과 통보", source: "고용센터 처리 기준" },
-      { stepName: "근로계약 체결", estimatedDays: 18, description: "배정된 근로자와 표준근로계약서 체결", source: "실무 기준" },
-      { stepName: "입국 및 취업교육", estimatedDays: 45, description: "비자 발급 → 입국 → 취업교육(20시간) 이수", source: "외국인력지원센터 교육 일정" },
+      {
+        stepName: "내국인 구인노력",
+        estimatedDays: 14,
+        description: "워크넷 등록 후 14일 구인노력 의무 이행",
+        source: "외국인고용법 시행령 제14조",
+      },
+      {
+        stepName: "고용허가 신청 → 배정",
+        estimatedDays: 45,
+        description: "서류 제출 후 점수 심사, 차수별 배정 결과 통보",
+        source: "고용센터 처리 기준",
+      },
+      {
+        stepName: "근로계약 체결",
+        estimatedDays: 18,
+        description: "배정된 근로자와 표준근로계약서 체결",
+        source: "실무 기준",
+      },
+      {
+        stepName: "입국 및 취업교육",
+        estimatedDays: 45,
+        description: "비자 발급 → 입국 → 취업교육(20시간) 이수",
+        source: "외국인력지원센터 교육 일정",
+      },
     ],
   },
   aiInsights: {
     overallVerdict:
       "귀사는 현재 <strong>고용 한도(16명)</strong> 내에서 3명 추가 채용이 가능합니다. 예상 배정 점수 68점은 상위 약 30% 수준으로, 배정 가능성이 높은 편입니다. 다만 점수 경쟁이 심한 차수에서는 탈락 가능성도 있으므로, 우수 기숙사 제공(+5점)으로 점수를 개선하시는 것을 권장합니다.",
     limitInsight: "내국인 33명 기준 고용 한도 16명 중 12명 사용, 잔여 4명입니다.",
-    scoringInsight: "기본 60점 + 가점 8점 = 68점. 우수 기숙사 인증 시 73점(상위 ~20%)까지 향상 가능합니다.",
+    scoringInsight:
+      "기본 60점 + 가점 8점 = 68점. 우수 기숙사 인증 시 73점(상위 ~20%)까지 향상 가능합니다.",
     quotaInsight: "식료품제조업 배정 비율이 증가 추세이며, 이번 차수 경쟁률은 완화되고 있습니다.",
     timelineInsight: "베트남 국적 선택 시 약 4개월, 미지정 시 약 3개월 소요 예상입니다.",
     actionItems: [
@@ -88,9 +122,7 @@ export const mockExceededResponse: SimulationResultResponse = {
     baseLimit: 14,
     doubleCap: null,
     baseLimitAfterCap: 14,
-    additionalBonuses: [
-      { reason: "비수도권 우대", ratePercent: 20, cappedByDomesticCount: false },
-    ],
+    additionalBonuses: [{ reason: "비수도권 우대", ratePercent: 20, cappedByDomesticCount: false }],
     additionalCount: 2,
     totalLimit: 16,
     cappedByDomesticCount: false,
@@ -138,12 +170,27 @@ export const mockExceededResponse: SimulationResultResponse = {
   },
   scoringAnalysis: {
     appliedBonusItems: [
-      { code: "DEPOPULATION_AREA", displayName: "인구감소지역 소재 사업장", points: 5, applied: true },
-      { code: "LABOR_LAW_COMPLIANCE", displayName: "최근 2년간 노동관계법 위반 없음", points: 3, applied: true },
+      {
+        code: "DEPOPULATION_AREA",
+        displayName: "인구감소지역 소재 사업장",
+        points: 5,
+        applied: true,
+      },
+      {
+        code: "LABOR_LAW_COMPLIANCE",
+        displayName: "최근 2년간 노동관계법 위반 없음",
+        points: 3,
+        applied: true,
+      },
     ],
     availableBonusItems: [
       { code: "PREMIUM_DORMITORY", displayName: "우수 기숙사 제공", points: 5, applied: false },
-      { code: "NEW_WORKPLACE", displayName: "외국인 고용이 처음인 사업장", points: 3, applied: false },
+      {
+        code: "NEW_WORKPLACE",
+        displayName: "외국인 고용이 처음인 사업장",
+        points: 3,
+        applied: false,
+      },
     ],
     totalBonusScore: 8,
     totalDeductionScore: 0,
@@ -163,10 +210,30 @@ export const mockExceededResponse: SimulationResultResponse = {
     preferredNationality: "VIETNAM",
     estimatedMonths: 4,
     steps: [
-      { stepName: "내국인 구인노력", estimatedDays: 14, description: "워크넷 등록 후 14일 구인노력 의무 이행", source: "외국인고용법 시행령 제14조" },
-      { stepName: "고용허가 신청 → 배정", estimatedDays: 45, description: "서류 제출 후 점수 심사, 차수별 배정 결과 통보", source: "고용센터 처리 기준" },
-      { stepName: "근로계약 체결", estimatedDays: 18, description: "배정된 근로자와 표준근로계약서 체결", source: "실무 기준" },
-      { stepName: "입국 및 취업교육", estimatedDays: 45, description: "비자 발급 → 입국 → 취업교육(20시간) 이수", source: "외국인력지원센터 교육 일정" },
+      {
+        stepName: "내국인 구인노력",
+        estimatedDays: 14,
+        description: "워크넷 등록 후 14일 구인노력 의무 이행",
+        source: "외국인고용법 시행령 제14조",
+      },
+      {
+        stepName: "고용허가 신청 → 배정",
+        estimatedDays: 45,
+        description: "서류 제출 후 점수 심사, 차수별 배정 결과 통보",
+        source: "고용센터 처리 기준",
+      },
+      {
+        stepName: "근로계약 체결",
+        estimatedDays: 18,
+        description: "배정된 근로자와 표준근로계약서 체결",
+        source: "실무 기준",
+      },
+      {
+        stepName: "입국 및 취업교육",
+        estimatedDays: 45,
+        description: "비자 발급 → 입국 → 취업교육(20시간) 이수",
+        source: "외국인력지원센터 교육 일정",
+      },
     ],
   },
   aiInsights: {

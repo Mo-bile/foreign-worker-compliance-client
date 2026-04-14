@@ -51,10 +51,7 @@ export const mockImpacts: Record<string, LegalImpact> = {
     ],
     aiAnalysis:
       '<p>이번 개정은 사업장 변경 사유를 확대하는 내용으로, 귀사에 <strong class="text-signal-orange">직접적인 리스크는 낮습니다</strong>. 다만, 근로 환경 개선을 통해 자발적 이직을 방지하는 것이 권장됩니다. 주기적인 근로조건 점검을 통해 사전 대응하시기 바랍니다.</p>',
-    actions: [
-      { label: "근로조건 점검 시작" },
-      { label: "확인 완료 처리" },
-    ],
+    actions: [{ label: "근로조건 점검 시작" }, { label: "확인 완료 처리" }],
   },
   "lc-2": {
     changeId: "lc-2",

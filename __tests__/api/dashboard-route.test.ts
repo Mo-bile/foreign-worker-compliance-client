@@ -57,9 +57,7 @@ describe("GET /api/dashboard", () => {
 
   it("BE_응답이_변환_불가하면_502를_반환한다", async () => {
     server.use(
-      http.get(`${BACKEND}/api/dashboard`, () =>
-        HttpResponse.json({ stats: null, alerts: null }),
-      ),
+      http.get(`${BACKEND}/api/dashboard`, () => HttpResponse.json({ stats: null, alerts: null })),
     );
     const request = makeRequest("http://localhost:3000/api/dashboard?companyId=1");
     const response = await GET(request);

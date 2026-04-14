@@ -40,12 +40,7 @@ export function useCreateBenchmark() {
   const queryClient = useQueryClient();
   return useMutation<BenchmarkResponse, Error, { companyId: number }>({
     mutationFn: (data) =>
-      mutateApi<BenchmarkResponse>(
-        "/api/benchmarks",
-        "POST",
-        data,
-        "벤치마크 생성에 실패했습니다",
-      ),
+      mutateApi<BenchmarkResponse>("/api/benchmarks", "POST", data, "벤치마크 생성에 실패했습니다"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["benchmarks"] });
     },

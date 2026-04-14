@@ -90,9 +90,7 @@ export default function SimulatorPage() {
 
         {mutation.isError && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-            <p className="text-sm font-medium text-destructive">
-              시뮬레이션 분석에 실패했습니다
-            </p>
+            <p className="text-sm font-medium text-destructive">시뮬레이션 분석에 실패했습니다</p>
             <p className="mt-1 text-xs text-muted-foreground">
               잠시 후 다시 시도해주세요. 문제가 지속되면 관리자에게 문의하세요.
             </p>
@@ -124,25 +122,13 @@ export default function SimulatorPage() {
             )}
 
             {/* ② Scoring */}
-            <ScoringSection
-              data={result.scoring}
-              defaultOpen={!isExceeded}
-              muted={isExceeded}
-            />
+            <ScoringSection data={result.scoring} defaultOpen={!isExceeded} muted={isExceeded} />
 
             {/* ③ Quota */}
-            <QuotaSection
-              data={result.quota}
-              defaultOpen={!isExceeded}
-              muted={isExceeded}
-            />
+            <QuotaSection data={result.quota} defaultOpen={!isExceeded} muted={isExceeded} />
 
             {/* ④ Timeline */}
-            <TimelineSection
-              data={result.timeline}
-              defaultOpen={!isExceeded}
-              muted={isExceeded}
-            />
+            <TimelineSection data={result.timeline} defaultOpen={!isExceeded} muted={isExceeded} />
 
             {/* ⑥ What-if (exceeded only) */}
             {result.whatIf && <WhatIfSection data={result.whatIf} />}

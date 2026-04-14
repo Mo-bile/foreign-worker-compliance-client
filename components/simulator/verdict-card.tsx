@@ -37,9 +37,7 @@ export function VerdictCard({ data }: VerdictCardProps) {
       </div>
 
       {/* Limit text */}
-      <p className="mb-3 text-sm leading-relaxed">
-        {data.limitText}
-      </p>
+      <p className="mb-3 text-sm leading-relaxed">{data.limitText}</p>
 
       {/* Quota display */}
       <div className="mb-3 rounded-lg bg-secondary p-4">

@@ -75,21 +75,21 @@ function formatDays(estimatedDays: number): string {
 
 // ─── Verdict ─────────────────────────────────────────────────────
 
-function buildVerdict(
-  limit: EmploymentLimitAnalysis,
-  desiredWorkers: number,
-): VerdictDisplayData {
+function buildVerdict(limit: EmploymentLimitAnalysis, desiredWorkers: number): VerdictDisplayData {
   const verdict: SimulationVerdict = limit.limitExceeded ? "EXCEEDED" : "WITHIN_QUOTA";
-  const usagePercent = limit.totalLimit > 0
-    ? Math.round((limit.currentForeignWorkerCount / limit.totalLimit) * 100)
-    : limit.currentForeignWorkerCount > 0 ? 100 : 0;
+  const usagePercent =
+    limit.totalLimit > 0
+      ? Math.round((limit.currentForeignWorkerCount / limit.totalLimit) * 100)
+      : limit.currentForeignWorkerCount > 0
+        ? 100
+        : 0;
 
   const title = limit.limitExceeded ? "추가 채용 불가" : "추가 채용 가능";
 
   const additionalBonuses: readonly AdditionalBonusDisplay[] = limit.additionalBonuses.map((b) => ({
     reason: b.reason,
     additionalCount: Number.isFinite(b.ratePercent)
-      ? Math.floor(limit.baseLimitAfterCap * b.ratePercent / 100)
+      ? Math.floor((limit.baseLimitAfterCap * b.ratePercent) / 100)
       : 0,
   }));
 
@@ -168,7 +168,7 @@ function buildScoringImprovement(
     (item) => !deductionCodes.has(item.code),
   );
 
-  const bestAvailable = bonusCandidates.reduce<typeof scoring.availableBonusItems[number] | null>(
+  const bestAvailable = bonusCandidates.reduce<(typeof scoring.availableBonusItems)[number] | null>(
     (best, item) => (best === null || item.points > best.points ? item : best),
     null,
   );
@@ -258,7 +258,9 @@ function buildWhatIf(limit: EmploymentLimitAnalysis): WhatIfDisplayData | null {
   }));
 
   const minPossible = limit.whatIfScenarios.find(
-    (s) => s.additionalDomesticCount > 0 && (s.feasibility === "POSSIBLE" || s.feasibility === "SURPLUS"),
+    (s) =>
+      s.additionalDomesticCount > 0 &&
+      (s.feasibility === "POSSIBLE" || s.feasibility === "SURPLUS"),
   );
 
   const minimumConditionText = minPossible
@@ -278,9 +280,9 @@ function buildRecommendation(
   const title = limitExceeded ? "대안 조치" : "다음 단계 안내";
 
   const items: readonly RecommendationItem[] = limitExceeded
-    ? (insights.actionItems.length > 0
-        ? insights.actionItems.map((text) => ({ text }))
-        : [{ text: "관할 고용센터에 문의하여 대안을 확인하세요." }])
+    ? insights.actionItems.length > 0
+      ? insights.actionItems.map((text) => ({ text }))
+      : [{ text: "관할 고용센터에 문의하여 대안을 확인하세요." }]
     : [
         {
           text: "내국인 구인노력 14일 이행",
@@ -308,7 +310,8 @@ export function transformSimulationResult(
   raw: SimulationResultResponse,
   deductionCodes: ReadonlySet<string> = new Set(),
 ): SimulationResponse {
-  const { employmentLimitAnalysis, scoringAnalysis, quotaStatus, timelineEstimate, aiInsights } = raw;
+  const { employmentLimitAnalysis, scoringAnalysis, quotaStatus, timelineEstimate, aiInsights } =
+    raw;
 
   return {
     id: String(raw.id),

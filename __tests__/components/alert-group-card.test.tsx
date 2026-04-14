@@ -4,9 +4,27 @@ import { AlertGroupCard } from "@/components/dashboard/alert-group-card";
 import type { AlertGroup } from "@/types/dashboard";
 
 const mockGroups: readonly AlertGroup[] = [
-  { deadlineType: "VISA_EXPIRY", label: "비자 만료 임박", count: 2, urgency: "critical", href: "/compliance?type=VISA_EXPIRY" },
-  { deadlineType: "INSURANCE_ENROLLMENT", label: "보험 가입 필요", count: 3, urgency: "warning", href: "/compliance?type=INSURANCE_ENROLLMENT" },
-  { deadlineType: "CONTRACT_RENEWAL", label: "근로계약 갱신", count: 1, urgency: "caution", href: "/compliance?type=CONTRACT_RENEWAL" },
+  {
+    deadlineType: "VISA_EXPIRY",
+    label: "비자 만료 임박",
+    count: 2,
+    urgency: "critical",
+    href: "/compliance?type=VISA_EXPIRY",
+  },
+  {
+    deadlineType: "INSURANCE_ENROLLMENT",
+    label: "보험 가입 필요",
+    count: 3,
+    urgency: "warning",
+    href: "/compliance?type=INSURANCE_ENROLLMENT",
+  },
+  {
+    deadlineType: "CONTRACT_RENEWAL",
+    label: "근로계약 갱신",
+    count: 1,
+    urgency: "caution",
+    href: "/compliance?type=CONTRACT_RENEWAL",
+  },
 ];
 
 describe("AlertGroupCard", () => {

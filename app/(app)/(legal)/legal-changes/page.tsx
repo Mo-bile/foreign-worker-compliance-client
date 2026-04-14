@@ -10,10 +10,7 @@ import { LegalTimeline } from "@/components/legal/legal-timeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LegalChange } from "@/types/legal";
 
-function applyFilter(
-  changes: readonly LegalChange[],
-  filter: FilterValue,
-): readonly LegalChange[] {
+function applyFilter(changes: readonly LegalChange[], filter: FilterValue): readonly LegalChange[] {
   switch (filter) {
     case "all":
       return changes;

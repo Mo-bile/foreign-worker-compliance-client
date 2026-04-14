@@ -18,9 +18,7 @@ export function NullableAxisPlaceholder({
     <Card>
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
         <p className="text-sm font-medium text-muted-foreground">{title}</p>
-        <p className="mt-2 text-xs text-muted-foreground">
-          데이터가 입력되지 않았습니다
-        </p>
+        <p className="mt-2 text-xs text-muted-foreground">데이터가 입력되지 않았습니다</p>
         <p className="mt-1 text-xs text-muted-foreground">
           사업장 정보에서 {fieldLabel}을(를) 입력하면 진단이 활성화됩니다
         </p>

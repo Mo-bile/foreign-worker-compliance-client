@@ -35,7 +35,7 @@ export default function CompliancePage() {
   const [deadlineTypeFilter, setDeadlineTypeFilter] = useState<DeadlineType | "ALL">(
     typeFromUrl != null && (DEADLINE_TYPES as readonly string[]).includes(typeFromUrl)
       ? typeFromUrl
-      : "ALL"
+      : "ALL",
   );
   const [statusFilter, setStatusFilter] = useState<DeadlineStatus | "ALL">("ALL");
   const [overduePage, setOverduePage] = useState(1);

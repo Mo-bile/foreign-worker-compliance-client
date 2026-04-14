@@ -22,7 +22,9 @@ export function ScoringSection({ data, defaultOpen = true, muted = false }: Scor
         <span className="text-[28px] font-bold">{data.estimatedScore}점</span>
         <span className="ml-2 text-[13px] text-muted-foreground">
           {data.percentileText} 수준
-          <span className="ml-1 text-[11px] text-muted-foreground/60">({data.percentileDisclaimer})</span>
+          <span className="ml-1 text-[11px] text-muted-foreground/60">
+            ({data.percentileDisclaimer})
+          </span>
         </span>
       </div>
 
@@ -30,13 +32,22 @@ export function ScoringSection({ data, defaultOpen = true, muted = false }: Scor
       <table className="w-full border-collapse text-[13px]">
         <thead>
           <tr>
-            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold" style={{ width: "60%" }}>
+            <th
+              className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold"
+              style={{ width: "60%" }}
+            >
               항목
             </th>
-            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold" style={{ width: "25%" }}>
+            <th
+              className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold"
+              style={{ width: "25%" }}
+            >
               점수
             </th>
-            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold" style={{ width: "15%" }}>
+            <th
+              className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold"
+              style={{ width: "15%" }}
+            >
               상태
             </th>
           </tr>
@@ -84,14 +95,20 @@ export function ScoringSection({ data, defaultOpen = true, muted = false }: Scor
             <div className="rounded-lg border bg-card p-3">
               <div className="text-[11px] text-muted-foreground">현재</div>
               <div className="text-[22px] font-bold">{data.improvement.currentScore}점</div>
-              <div className="text-[11px] text-muted-foreground">{data.improvement.currentPercentile}</div>
+              <div className="text-[11px] text-muted-foreground">
+                {data.improvement.currentPercentile}
+              </div>
             </div>
             <div className="rounded-lg border border-signal-green/30 bg-card p-3">
-              <div className="text-[11px] text-signal-green">{data.improvement.improvementLabel}</div>
+              <div className="text-[11px] text-signal-green">
+                {data.improvement.improvementLabel}
+              </div>
               <div className="text-[22px] font-bold text-signal-green">
                 {data.improvement.improvedScore}점
               </div>
-              <div className="text-[11px] text-signal-green">{data.improvement.improvedPercentile} ↑</div>
+              <div className="text-[11px] text-signal-green">
+                {data.improvement.improvedPercentile} ↑
+              </div>
             </div>
           </div>
           <p className="mt-2.5 text-xs leading-relaxed">

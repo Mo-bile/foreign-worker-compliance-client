@@ -8,14 +8,11 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 function makePostRequest(body: unknown) {
-  return new NextRequest(
-    new URL("http://localhost/api/simulations"),
-    {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: { "Content-Type": "application/json" },
-    },
-  );
+  return new NextRequest(new URL("http://localhost/api/simulations"), {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 const validBody = {
@@ -62,14 +59,11 @@ describe("POST /api/simulations", () => {
   });
 
   it("잘못된_JSON이면_400을_반환한다", async () => {
-    const req = new NextRequest(
-      new URL("http://localhost/api/simulations"),
-      {
-        method: "POST",
-        body: "not json",
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    const req = new NextRequest(new URL("http://localhost/api/simulations"), {
+      method: "POST",
+      body: "not json",
+      headers: { "Content-Type": "application/json" },
+    });
     const res = await POST(req);
     expect(res.status).toBe(400);
   });

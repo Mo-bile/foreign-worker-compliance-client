@@ -52,7 +52,9 @@ export function DetailCardShell({
             {icon}
           </span>
           <span className="flex-1 text-sm font-semibold">{title}</span>
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${badgeColors[badge.color]}`}>
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${badgeColors[badge.color]}`}
+          >
             {badge.text}
           </span>
         </div>

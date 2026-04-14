@@ -19,7 +19,10 @@ export function ChecklistItemRow({ item }: ChecklistItemRowProps) {
     <div className="flex items-center gap-3 py-2">
       <span
         aria-label={config.label}
-        className={cn("flex h-5 w-5 items-center justify-center rounded-full text-xs", config.color)}
+        className={cn(
+          "flex h-5 w-5 items-center justify-center rounded-full text-xs",
+          config.color,
+        )}
       >
         {config.icon}
       </span>
@@ -29,7 +32,12 @@ export function ChecklistItemRow({ item }: ChecklistItemRowProps) {
       </div>
       {item.date && <span className="text-xs text-muted-foreground">{item.date}</span>}
       {item.badge && (
-        <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", BADGE_COLORS[item.badge.color] ?? BADGE_FALLBACK)}>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-xs font-medium",
+            BADGE_COLORS[item.badge.color] ?? BADGE_FALLBACK,
+          )}
+        >
           {item.badge.text}
         </span>
       )}

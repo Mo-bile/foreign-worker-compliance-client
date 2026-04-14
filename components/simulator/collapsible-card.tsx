@@ -26,12 +26,7 @@ export function CollapsibleCard({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-lg border bg-card",
-        muted && "opacity-50",
-      )}
-    >
+    <div className={cn("overflow-hidden rounded-lg border bg-card", muted && "opacity-50")}>
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}

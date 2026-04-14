@@ -10,7 +10,9 @@ describe("AiInsightBlock", () => {
   });
 
   it("strips disallowed tags", () => {
-    const { container } = render(<AiInsightBlock html='<p>안전</p><script>alert("xss")</script>' />);
+    const { container } = render(
+      <AiInsightBlock html='<p>안전</p><script>alert("xss")</script>' />,
+    );
     expect(container.querySelector("script")).toBeNull();
     expect(screen.getByText("안전")).toBeInTheDocument();
   });

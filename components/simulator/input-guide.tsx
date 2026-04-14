@@ -5,8 +5,8 @@ export function InputGuide() {
         <h3 className="mb-3 text-sm font-semibold">입력 가이드</h3>
         <div className="space-y-3 text-[13px] leading-relaxed text-muted-foreground">
           <p>
-            <strong className="text-foreground">내국인 피보험자 수</strong>는 고용허가제 한도
-            계산의 기준이 됩니다. 고용보험 가입 내국인 근로자 수를 정확히 입력해주세요.
+            <strong className="text-foreground">내국인 피보험자 수</strong>는 고용허가제 한도 계산의
+            기준이 됩니다. 고용보험 가입 내국인 근로자 수를 정확히 입력해주세요.
           </p>
           <p>
             <strong className="text-foreground">배정 점수</strong>는 사업장의 고용허가 신청 시

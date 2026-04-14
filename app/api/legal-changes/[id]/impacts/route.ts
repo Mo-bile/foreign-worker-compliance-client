@@ -2,10 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { mockImpacts } from "@/mocks/legal-data";
 import { handleRouteError } from "@/lib/api-route-utils";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const raw = request.nextUrl.searchParams.get("companyId");
   if (!raw) {

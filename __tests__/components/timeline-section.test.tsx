@@ -7,9 +7,19 @@ const mockData: TimelineDisplayData = {
   estimatedMonths: 4,
   preferredNationality: "VIETNAM",
   steps: [
-    { title: "내국인 구인노력", duration: "약 14일", description: "워크넷 등록", source: "외국인고용법 시행령 제14조" },
+    {
+      title: "내국인 구인노력",
+      duration: "약 14일",
+      description: "워크넷 등록",
+      source: "외국인고용법 시행령 제14조",
+    },
     { title: "고용허가서 신청", duration: "약 1개월", description: "서류 제출", source: null },
-    { title: "비자발급·입국", duration: "약 3개월", description: "입국", source: "외국인력지원센터 교육 일정" },
+    {
+      title: "비자발급·입국",
+      duration: "약 3개월",
+      description: "입국",
+      source: "외국인력지원센터 교육 일정",
+    },
   ],
 };
 

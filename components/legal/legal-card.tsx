@@ -20,11 +20,7 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
   const bodyId = useId();
   const isResolved = change.status === "resolved";
 
-  const { data, isLoading, isError, refetch } = useLegalImpact(
-    change.id,
-    companyId,
-    isOpen,
-  );
+  const { data, isLoading, isError, refetch } = useLegalImpact(change.id, companyId, isOpen);
 
   const header = (
     <>
@@ -36,7 +32,12 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
         시행일: {change.effectiveDate} · 감지일: {change.detectedDate} · {change.lawName}
       </p>
       <div className="mt-2 flex gap-2">
-        <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", BADGE_COLORS[change.badge.color] ?? BADGE_FALLBACK)}>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-xs font-medium",
+            BADGE_COLORS[change.badge.color] ?? BADGE_FALLBACK,
+          )}
+        >
           {change.badge.text}
         </span>
         {change.dDay != null && (

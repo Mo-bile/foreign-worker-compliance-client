@@ -271,9 +271,7 @@ export function CompanyForm(props: CompanyFormProps) {
 
           {/* 벤치마크 진단용 (선택) */}
           <div className="space-y-4 rounded-lg border border-dashed p-4 md:col-span-2">
-            <p className="text-sm font-medium text-muted-foreground">
-              벤치마크 진단용 (선택)
-            </p>
+            <p className="text-sm font-medium text-muted-foreground">벤치마크 진단용 (선택)</p>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="flex flex-col gap-1.5">
@@ -288,9 +286,7 @@ export function CompanyForm(props: CompanyFormProps) {
                       placeholder="만원 단위"
                       value={field.value ?? ""}
                       onChange={(e) =>
-                        field.onChange(
-                          e.target.value === "" ? undefined : Number(e.target.value),
-                        )
+                        field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
                       }
                       aria-invalid={!!errors.averageForeignWorkerWage}
                     />
@@ -300,7 +296,9 @@ export function CompanyForm(props: CompanyFormProps) {
                   미입력 시 임금 포지셔닝 진단이 생략됩니다
                 </p>
                 {errors.averageForeignWorkerWage && (
-                  <p className="text-sm text-destructive">{errors.averageForeignWorkerWage.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.averageForeignWorkerWage.message}
+                  </p>
                 )}
               </div>
 
@@ -316,9 +314,7 @@ export function CompanyForm(props: CompanyFormProps) {
                       placeholder="명"
                       value={field.value ?? ""}
                       onChange={(e) =>
-                        field.onChange(
-                          e.target.value === "" ? undefined : Number(e.target.value),
-                        )
+                        field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
                       }
                       aria-invalid={!!errors.recentYearTerminationCount}
                     />
@@ -328,7 +324,9 @@ export function CompanyForm(props: CompanyFormProps) {
                   미입력 시 고용 안정성 진단이 생략됩니다
                 </p>
                 {errors.recentYearTerminationCount && (
-                  <p className="text-sm text-destructive">{errors.recentYearTerminationCount.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.recentYearTerminationCount.message}
+                  </p>
                 )}
               </div>
             </div>

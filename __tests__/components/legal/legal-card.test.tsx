@@ -55,7 +55,9 @@ describe("LegalCard", () => {
   });
 
   it("resolved card renders as non-expandable div without button", () => {
-    const { container } = render(<LegalCard change={resolvedChange} companyId={1} />, { wrapper: Wrapper });
+    const { container } = render(<LegalCard change={resolvedChange} companyId={1} />, {
+      wrapper: Wrapper,
+    });
     expect(screen.getByText("한-캄보디아 사회보장협정")).toBeInTheDocument();
     expect(container.querySelector("button[aria-expanded]")).toBeNull();
   });

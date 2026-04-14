@@ -119,104 +119,104 @@ describe("simulationRequestSchema", () => {
 
   describe("boundary values — desiredWorkers (int, 1..50)", () => {
     it("accepts boundary minimum: 1", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 1 }).success
-      ).toBe(true);
+      expect(simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 1 }).success).toBe(
+        true,
+      );
     });
 
     it("accepts boundary maximum: 50", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 50 }).success
-      ).toBe(true);
+      expect(simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 50 }).success).toBe(
+        true,
+      );
     });
 
     it("rejects below minimum: 0", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 0 }).success
-      ).toBe(false);
+      expect(simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 0 }).success).toBe(
+        false,
+      );
     });
 
     it("rejects above maximum: 51", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 51 }).success
-      ).toBe(false);
+      expect(simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 51 }).success).toBe(
+        false,
+      );
     });
 
     it("rejects float values: 1.5", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 1.5 }).success
-      ).toBe(false);
+      expect(simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: 1.5 }).success).toBe(
+        false,
+      );
     });
   });
 
   describe("boundary values — domesticInsuredCount (int, min 1)", () => {
     it("accepts boundary minimum: 1", () => {
       expect(
-        simulationRequestSchema.safeParse({ ...validBase, domesticInsuredCount: 1 }).success
+        simulationRequestSchema.safeParse({ ...validBase, domesticInsuredCount: 1 }).success,
       ).toBe(true);
     });
 
     it("rejects below minimum: 0", () => {
       expect(
-        simulationRequestSchema.safeParse({ ...validBase, domesticInsuredCount: 0 }).success
+        simulationRequestSchema.safeParse({ ...validBase, domesticInsuredCount: 0 }).success,
       ).toBe(false);
     });
 
     it("rejects float values: 2.5", () => {
       expect(
-        simulationRequestSchema.safeParse({ ...validBase, domesticInsuredCount: 2.5 }).success
+        simulationRequestSchema.safeParse({ ...validBase, domesticInsuredCount: 2.5 }).success,
       ).toBe(false);
     });
   });
 
   describe("boundary values — deductionScore (int, min 0)", () => {
     it("accepts zero (minimum boundary)", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, deductionScore: 0 }).success
-      ).toBe(true);
+      expect(simulationRequestSchema.safeParse({ ...validBase, deductionScore: 0 }).success).toBe(
+        true,
+      );
     });
 
     it("accepts positive values", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, deductionScore: 100 }).success
-      ).toBe(true);
+      expect(simulationRequestSchema.safeParse({ ...validBase, deductionScore: 100 }).success).toBe(
+        true,
+      );
     });
 
     it("rejects negative values: -1", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, deductionScore: -1 }).success
-      ).toBe(false);
+      expect(simulationRequestSchema.safeParse({ ...validBase, deductionScore: -1 }).success).toBe(
+        false,
+      );
     });
 
     it("rejects float values: 1.5", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, deductionScore: 1.5 }).success
-      ).toBe(false);
+      expect(simulationRequestSchema.safeParse({ ...validBase, deductionScore: 1.5 }).success).toBe(
+        false,
+      );
     });
   });
 
   describe("field type validation", () => {
     it("rejects a string for desiredWorkers", () => {
-      expect(
-        simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: "5" }).success
-      ).toBe(false);
+      expect(simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: "5" }).success).toBe(
+        false,
+      );
     });
 
     it("rejects an invalid desiredTiming value", () => {
       expect(
-        simulationRequestSchema.safeParse({ ...validBase, desiredTiming: "2026_Q1" }).success
+        simulationRequestSchema.safeParse({ ...validBase, desiredTiming: "2026_Q1" }).success,
       ).toBe(false);
     });
 
     it("rejects an invalid preferredNationality", () => {
       expect(
-        simulationRequestSchema.safeParse({ ...validBase, preferredNationality: "FRANCE" }).success
+        simulationRequestSchema.safeParse({ ...validBase, preferredNationality: "FRANCE" }).success,
       ).toBe(false);
     });
 
     it("rejects a non-array appliedScoringCodes", () => {
       expect(
-        simulationRequestSchema.safeParse({ ...validBase, appliedScoringCodes: "CODE_A" }).success
+        simulationRequestSchema.safeParse({ ...validBase, appliedScoringCodes: "CODE_A" }).success,
       ).toBe(false);
     });
   });
@@ -427,9 +427,7 @@ describe("SimulationResultResponse shape", () => {
       expect(typeof scenario.newBaseLimitAfterCap).toBe("number");
       expect(typeof scenario.newTotalLimit).toBe("number");
       expect(typeof scenario.newRemainingCapacity).toBe("number");
-      expect(["IMPOSSIBLE", "INSUFFICIENT", "POSSIBLE", "SURPLUS"]).toContain(
-        scenario.feasibility
-      );
+      expect(["IMPOSSIBLE", "INSUFFICIENT", "POSSIBLE", "SURPLUS"]).toContain(scenario.feasibility);
     });
   });
 

@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { transformSimulationResult } from "@/lib/transforms/simulation-transform";
-import {
-  mockWithinQuotaResponse,
-  mockExceededResponse,
-} from "@/mocks/simulator-data";
+import { mockWithinQuotaResponse, mockExceededResponse } from "@/mocks/simulator-data";
 
 // ─── Within Quota ─────────────────────────────────────────────────────────────
 
@@ -463,7 +460,11 @@ describe("additionalCount ratePercent 계산", () => {
         ...mockWithinQuotaResponse.employmentLimitAnalysis,
         baseLimitAfterCap: 20,
         additionalBonuses: [
-          { reason: "테스트", ratePercent: undefined as unknown as number, cappedByDomesticCount: false },
+          {
+            reason: "테스트",
+            ratePercent: undefined as unknown as number,
+            cappedByDomesticCount: false,
+          },
         ],
       },
     });
@@ -476,9 +477,7 @@ describe("additionalCount ratePercent 계산", () => {
       employmentLimitAnalysis: {
         ...mockWithinQuotaResponse.employmentLimitAnalysis,
         baseLimitAfterCap: 15,
-        additionalBonuses: [
-          { reason: "테스트", ratePercent: 10, cappedByDomesticCount: false },
-        ],
+        additionalBonuses: [{ reason: "테스트", ratePercent: 10, cappedByDomesticCount: false }],
       },
     });
     // Math.floor(15 * 10 / 100) = Math.floor(1.5) = 1
@@ -505,9 +504,7 @@ describe("buildTimeline 출력", () => {
 
   it("stepName이 title로 매핑된다", () => {
     const firstStep = result.timeline.steps[0];
-    expect(firstStep.title).toBe(
-      mockWithinQuotaResponse.timelineEstimate.steps[0].stepName,
-    );
+    expect(firstStep.title).toBe(mockWithinQuotaResponse.timelineEstimate.steps[0].stepName);
   });
 
   it("estimatedDays가 duration 문자열로 변환된다", () => {
@@ -527,9 +524,7 @@ describe("buildTimeline 출력", () => {
 
   it("source가 있으면 그대로 전달된다", () => {
     const firstStep = result.timeline.steps[0];
-    expect(firstStep.source).toBe(
-      mockWithinQuotaResponse.timelineEstimate.steps[0].source,
-    );
+    expect(firstStep.source).toBe(mockWithinQuotaResponse.timelineEstimate.steps[0].source);
   });
 
   it("source가 없으면 null로 변환된다", () => {
@@ -537,9 +532,7 @@ describe("buildTimeline 출력", () => {
       ...mockWithinQuotaResponse,
       timelineEstimate: {
         ...mockWithinQuotaResponse.timelineEstimate,
-        steps: [
-          { stepName: "테스트", estimatedDays: 14, description: "소스 없음" },
-        ],
+        steps: [{ stepName: "테스트", estimatedDays: 14, description: "소스 없음" }],
       },
     });
     expect(noSourceResult.timeline.steps[0].source).toBeNull();
@@ -550,9 +543,7 @@ describe("buildTimeline 출력", () => {
       ...mockWithinQuotaResponse,
       timelineEstimate: {
         ...mockWithinQuotaResponse.timelineEstimate,
-        steps: [
-          { stepName: "테스트", estimatedDays: 14, description: "빈 소스", source: "" },
-        ],
+        steps: [{ stepName: "테스트", estimatedDays: 14, description: "빈 소스", source: "" }],
       },
     });
     expect(emptySourceResult.timeline.steps[0].source).toBeNull();
@@ -567,9 +558,7 @@ describe("formatDays 경계값 (30일)", () => {
       ...mockWithinQuotaResponse,
       timelineEstimate: {
         ...mockWithinQuotaResponse.timelineEstimate,
-        steps: [
-          { stepName: "테스트", estimatedDays: 30, description: "30일 경계" },
-        ],
+        steps: [{ stepName: "테스트", estimatedDays: 30, description: "30일 경계" }],
       },
     });
     expect(result.timeline.steps[0].duration).toBe("약 1개월");
@@ -580,9 +569,7 @@ describe("formatDays 경계값 (30일)", () => {
       ...mockWithinQuotaResponse,
       timelineEstimate: {
         ...mockWithinQuotaResponse.timelineEstimate,
-        steps: [
-          { stepName: "테스트", estimatedDays: 29, description: "29일" },
-        ],
+        steps: [{ stepName: "테스트", estimatedDays: 29, description: "29일" }],
       },
     });
     expect(result.timeline.steps[0].duration).toBe("약 29일");
@@ -593,9 +580,7 @@ describe("formatDays 경계값 (30일)", () => {
       ...mockWithinQuotaResponse,
       timelineEstimate: {
         ...mockWithinQuotaResponse.timelineEstimate,
-        steps: [
-          { stepName: "테스트", estimatedDays: 45, description: "45일" },
-        ],
+        steps: [{ stepName: "테스트", estimatedDays: 45, description: "45일" }],
       },
     });
     // Math.round(45/30) = Math.round(1.5) = 2

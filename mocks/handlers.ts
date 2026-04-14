@@ -136,8 +136,7 @@ const mockDeductionCodes = new Set(
 const postSimulationBff: Parameters<typeof http.post>[1] = () =>
   HttpResponse.json(transformSimulationResult(mockWithinQuotaResponse, mockDeductionCodes));
 
-const getBenchmarks: Parameters<typeof http.get>[1] = () =>
-  HttpResponse.json(mockBenchmarkList);
+const getBenchmarks: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockBenchmarkList);
 
 const getBenchmarkById: Parameters<typeof http.get>[1] = ({ params }) => {
   const id = Number(params.id);
@@ -163,8 +162,7 @@ const getLegalImpact: Parameters<typeof http.get>[1] = ({ params }) => {
   return HttpResponse.json(impact);
 };
 
-const getReport: Parameters<typeof http.get>[1] = () =>
-  HttpResponse.json(mockComplianceReport);
+const getReport: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockComplianceReport);
 
 // ─── Handler registration (BACKEND + jsdom paths) ───────
 

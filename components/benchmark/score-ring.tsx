@@ -31,7 +31,14 @@ export function ScoreRing({ score, size = 180 }: ScoreRingProps) {
             <stop offset="100%" stopColor="oklch(0.75 0.15 85)" />
           </linearGradient>
         </defs>
-        <circle cx={center} cy={center} r={radius} fill="none" strokeWidth={12} className="stroke-muted" />
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          strokeWidth={12}
+          className="stroke-muted"
+        />
         <circle
           cx={center}
           cy={center}

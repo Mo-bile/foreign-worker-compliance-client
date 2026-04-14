@@ -14,9 +14,7 @@ const bffRequestSchema = simulationRequestSchema.extend({
 async function fetchDeductionCodes(): Promise<ReadonlySet<string>> {
   try {
     const metadata = await apiClient.get<MetadataResponse>("/api/metadata");
-    return new Set(
-      metadata.scoringPolicies.filter((p) => p.isDeduction).map((p) => p.code),
-    );
+    return new Set(metadata.scoringPolicies.filter((p) => p.isDeduction).map((p) => p.code));
   } catch (error) {
     console.error(
       "[fetchDeductionCodes] Failed to load metadata — deduction items will not be distinguished:",
@@ -43,8 +41,17 @@ export async function POST(request: NextRequest) {
     return handleRouteError(error, "POST /api/simulations");
   }
 
-  if (!raw?.employmentLimitAnalysis || !raw?.scoringAnalysis || !raw?.quotaStatus || !raw?.timelineEstimate || !raw?.aiInsights) {
-    console.error("[POST /api/simulations] BE response missing required fields:", Object.keys(raw ?? {}));
+  if (
+    !raw?.employmentLimitAnalysis ||
+    !raw?.scoringAnalysis ||
+    !raw?.quotaStatus ||
+    !raw?.timelineEstimate ||
+    !raw?.aiInsights
+  ) {
+    console.error(
+      "[POST /api/simulations] BE response missing required fields:",
+      Object.keys(raw ?? {}),
+    );
     return NextResponse.json(
       { message: "시뮬레이션 결과 처리 중 오류가 발생했습니다" },
       { status: 502 },
@@ -56,10 +63,7 @@ export async function POST(request: NextRequest) {
     const transformed = transformSimulationResult(raw, deductionCodes);
     return NextResponse.json(transformed);
   } catch (transformError) {
-    console.error(
-      `[POST /api/simulations] Transform failed for id=${raw.id}:`,
-      transformError,
-    );
+    console.error(`[POST /api/simulations] Transform failed for id=${raw.id}:`, transformError);
     return NextResponse.json(
       { message: "시뮬레이션 결과 처리 중 오류가 발생했습니다" },
       { status: 500 },

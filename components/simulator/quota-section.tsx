@@ -31,18 +31,34 @@ export function QuotaSection({ data, defaultOpen = false, muted = false }: Quota
       <table className="w-full border-collapse text-[13px]">
         <thead>
           <tr>
-            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold">연도</th>
-            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold">쿼터</th>
-            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold">출처</th>
+            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold">
+              연도
+            </th>
+            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold">
+              쿼터
+            </th>
+            <th className="border border-border bg-secondary px-2.5 py-2.5 text-left font-semibold">
+              출처
+            </th>
           </tr>
         </thead>
         <tbody>
           {data.yearRows.map((row) => (
             <tr key={row.year}>
-              <td className={cn("border border-border px-2.5 py-2.5", row.isCurrent && "font-semibold")}>
+              <td
+                className={cn(
+                  "border border-border px-2.5 py-2.5",
+                  row.isCurrent && "font-semibold",
+                )}
+              >
                 {row.year}년{row.isCurrent && " (현재)"}
               </td>
-              <td className={cn("border border-border px-2.5 py-2.5", row.isCurrent && "font-semibold")}>
+              <td
+                className={cn(
+                  "border border-border px-2.5 py-2.5",
+                  row.isCurrent && "font-semibold",
+                )}
+              >
                 {row.quotaCount}
               </td>
               <td className="border border-border px-2.5 py-2.5 text-muted-foreground">

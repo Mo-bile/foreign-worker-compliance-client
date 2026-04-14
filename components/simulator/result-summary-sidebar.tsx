@@ -33,13 +33,10 @@ export function ResultSummarySidebar({
             <strong className="text-foreground">희망 채용:</strong> {request.desiredWorkers}명
           </p>
           <p>
-            <strong className="text-foreground">사업장:</strong>{" "}
-            {company?.regionName ?? "—"}
+            <strong className="text-foreground">사업장:</strong> {company?.regionName ?? "—"}
           </p>
           <p>
-            <strong className="text-foreground">
-              {isExceeded ? "상태:" : "예상 점수:"}
-            </strong>{" "}
+            <strong className="text-foreground">{isExceeded ? "상태:" : "예상 점수:"}</strong>{" "}
             {isExceeded ? "한도 초과" : `${estimatedScore}점`}
           </p>
         </div>

@@ -3,10 +3,7 @@ import { apiClient } from "@/lib/api-client";
 import { handleRouteError } from "@/lib/api-route-utils";
 import { transformBenchmarkResponse } from "@/lib/transforms/benchmark-transform";
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const benchmarkId = Number(id);
   if (!Number.isFinite(benchmarkId) || benchmarkId <= 0) {

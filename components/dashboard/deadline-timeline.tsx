@@ -31,10 +31,15 @@ export function DeadlineTimeline({ items }: DeadlineTimelineProps) {
       </CardHeader>
       <CardContent className="space-y-1.5">
         {items.length === 0 ? (
-          <p className="py-4 text-center text-sm text-muted-foreground">30일 이내 예정 항목이 없습니다</p>
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            30일 이내 예정 항목이 없습니다
+          </p>
         ) : (
           items.map((item) => (
-            <div key={item.id} className="flex items-center gap-2.5 rounded-lg bg-secondary p-2.5 text-[13px]">
+            <div
+              key={item.id}
+              className="flex items-center gap-2.5 rounded-lg bg-secondary p-2.5 text-[13px]"
+            >
               <div className={cn("h-7 w-1 shrink-0 rounded-sm", urgencyBarColors[item.urgency])} />
               <span className="min-w-[52px] text-xs text-muted-foreground">{item.date}</span>
               <span className="flex-1">{item.deadlineLabel}</span>

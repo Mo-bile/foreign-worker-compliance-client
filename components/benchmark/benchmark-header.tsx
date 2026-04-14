@@ -31,19 +31,11 @@ export function BenchmarkHeader({
         </span>
       </div>
       <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => toast("준비 중입니다")}
-        >
+        <Button variant="outline" size="sm" onClick={() => toast("준비 중입니다")}>
           <Download className="mr-1.5 h-4 w-4" />
           PDF
         </Button>
-        <Button
-          size="sm"
-          onClick={onCreateBenchmark}
-          disabled={isCreating}
-        >
+        <Button size="sm" onClick={onCreateBenchmark} disabled={isCreating}>
           <RefreshCw className={`mr-1.5 h-4 w-4 ${isCreating ? "animate-spin" : ""}`} />
           {isCreating ? "진단 중..." : "재진단"}
         </Button>

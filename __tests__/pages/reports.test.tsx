@@ -18,14 +18,16 @@ vi.mock("@/lib/queries/use-compliance-report", () => ({
         { id: "c1", title: "고용변동 신고", description: "완료", status: "done", date: "03.05" },
       ],
       pending: [
-        { id: "p1", title: "비자 연장", description: "미완료", status: "miss", badge: { text: "D-4", color: "red" } },
+        {
+          id: "p1",
+          title: "비자 연장",
+          description: "미완료",
+          status: "miss",
+          badge: { text: "D-4", color: "red" },
+        },
       ],
-      legalChanges: [
-        { title: "최저임금법", description: "개정", color: "red" },
-      ],
-      upcoming: [
-        { title: "비자 만료", description: "2026.04.15", urgency: "urgent" },
-      ],
+      legalChanges: [{ title: "최저임금법", description: "개정", color: "red" }],
+      upcoming: [{ title: "비자 만료", description: "2026.04.15", urgency: "urgent" }],
     },
     isLoading: false,
     isError: false,
