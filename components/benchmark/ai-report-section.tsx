@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import Markdown from "react-markdown";
 
 interface AiReportSectionProps {
@@ -10,7 +12,11 @@ const ALLOWED_ELEMENTS = [
   "p", "strong", "em", "ul", "ol", "li", "h1", "h2", "h3", "h4", "br", "hr",
 ];
 
+const COLLAPSED_MAX_HEIGHT = 120;
+
 export function AiReportSection({ aiReport }: AiReportSectionProps) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <div className="relative overflow-hidden rounded-xl border border-[oklch(0.85_0.04_280)] bg-gradient-to-br from-[oklch(0.97_0.02_280)] to-[oklch(0.96_0.02_260)] p-5 pl-7">
       <div className="absolute left-0 top-0 h-full w-1 rounded-l-xl bg-gradient-to-b from-[oklch(0.6_0.15_255)] to-[oklch(0.55_0.18_300)]" />
@@ -27,9 +33,31 @@ export function AiReportSection({ aiReport }: AiReportSectionProps) {
         </span>
       </div>
 
-      <div className="prose prose-sm max-w-none text-[oklch(0.35_0.02_260)] prose-strong:text-[oklch(0.25_0.03_260)]">
-        <Markdown allowedElements={ALLOWED_ELEMENTS}>{aiReport}</Markdown>
+      <div className="relative">
+        <div
+          className={`prose prose-sm max-w-none text-[oklch(0.35_0.02_260)] prose-strong:text-[oklch(0.25_0.03_260)] ${
+            !expanded ? "overflow-hidden" : ""
+          }`}
+          style={!expanded ? { maxHeight: COLLAPSED_MAX_HEIGHT } : undefined}
+        >
+          <Markdown allowedElements={ALLOWED_ELEMENTS}>{aiReport}</Markdown>
+        </div>
+
+        {!expanded && (
+          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[oklch(0.97_0.02_280)] to-transparent" />
+        )}
       </div>
+
+      <button
+        type="button"
+        onClick={() => setExpanded((prev) => !prev)}
+        className="mt-2 flex w-full items-center justify-center gap-1 text-xs font-medium text-[oklch(0.45_0.12_260)] transition-colors hover:text-[oklch(0.3_0.03_260)]"
+      >
+        {expanded ? "접기" : "더 보기"}
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition-transform ${expanded ? "rotate-180" : ""}`}
+        />
+      </button>
     </div>
   );
 }
