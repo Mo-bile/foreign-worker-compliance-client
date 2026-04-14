@@ -35,7 +35,7 @@ export function AiReportSection({ aiReport }: AiReportSectionProps) {
 
       <div className="relative">
         <div
-          className={`prose prose-sm max-w-none text-[oklch(0.35_0.02_260)] prose-strong:text-[oklch(0.25_0.03_260)] ${
+          className={`prose prose-sm max-w-none leading-relaxed text-[oklch(0.35_0.02_260)] prose-strong:text-[oklch(0.25_0.03_260)] ${
             !expanded ? "overflow-hidden" : ""
           }`}
           style={!expanded ? { maxHeight: COLLAPSED_MAX_HEIGHT } : undefined}
