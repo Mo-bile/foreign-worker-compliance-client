@@ -7,6 +7,17 @@ import type { AiInsight } from "@/types/dashboard";
 import { formatRelativeTime } from "@/lib/utils/format-relative-time";
 
 const DISALLOWED_ELEMENTS = ["img", "a", "script", "iframe", "input", "form", "table"];
+const COOLDOWN_MS = 5 * 60 * 1000; // 5분
+
+function isCooldownActive(generatedAt: string): boolean {
+  return Date.now() - new Date(generatedAt).getTime() < COOLDOWN_MS;
+}
+
+function formatCooldownRemaining(generatedAt: string): string {
+  const remaining = COOLDOWN_MS - (Date.now() - new Date(generatedAt).getTime());
+  const minutes = Math.ceil(remaining / 60_000);
+  return `${minutes}분 후 다시 분석할 수 있습니다`;
+}
 
 interface DashboardAiInsightProps {
   readonly aiInsight: Readonly<AiInsight> | null;
@@ -43,7 +54,11 @@ export function DashboardAiInsight({ aiInsight, isPending, onGenerate }: Dashboa
       ) : aiInsight === null ? (
         <EmptyState onGenerate={onGenerate} />
       ) : (
-        <InsightContent content={aiInsight.content} onGenerate={onGenerate} />
+        <InsightContent
+          content={aiInsight.content}
+          generatedAt={aiInsight.generatedAt}
+          onGenerate={onGenerate}
+        />
       )}
 
       {/* Disclaimer */}
@@ -80,21 +95,31 @@ function EmptyState({ onGenerate }: { readonly onGenerate: () => void }) {
 
 function InsightContent({
   content,
+  generatedAt,
   onGenerate,
 }: {
   readonly content: string;
+  readonly generatedAt: string;
   readonly onGenerate: () => void;
 }) {
+  const cooldown = isCooldownActive(generatedAt);
+
   return (
     <>
       <div className="prose prose-sm max-w-none leading-relaxed text-[oklch(0.35_0.02_260)] prose-strong:text-[oklch(0.25_0.03_260)]">
         <Markdown disallowedElements={DISALLOWED_ELEMENTS}>{content}</Markdown>
       </div>
-      <div className="mt-3 flex justify-end">
+      <div className="mt-3 flex items-center justify-end gap-2">
+        {cooldown && (
+          <span className="text-[11px] text-muted-foreground">
+            {formatCooldownRemaining(generatedAt)}
+          </span>
+        )}
         <button
           type="button"
           onClick={onGenerate}
-          className="inline-flex items-center gap-1 rounded-md border border-[oklch(0.8_0.03_260)] px-3 py-1.5 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-[oklch(0.95_0.01_260)]"
+          disabled={cooldown}
+          className="inline-flex items-center gap-1 rounded-md border border-[oklch(0.8_0.03_260)] px-3 py-1.5 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-[oklch(0.95_0.01_260)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <RefreshCw className="h-3 w-3" />
           다시 분석

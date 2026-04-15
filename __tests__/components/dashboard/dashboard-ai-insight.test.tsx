@@ -35,7 +35,7 @@ describe("DashboardAiInsight", () => {
   describe("결과 상태 (aiInsight !== null)", () => {
     const mockInsight: AiInsight = {
       content: "**테스트** 인사이트 내용",
-      generatedAt: "2026-04-15T10:00:00Z",
+      generatedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10분 전 (쿨다운 해제)
     };
 
     it("마크다운_콘텐츠를_렌더링한다", () => {
@@ -83,6 +83,43 @@ describe("DashboardAiInsight", () => {
       );
       expect(screen.queryByRole("button", { name: /AI 분석/ })).toBeNull();
       expect(screen.queryByRole("button", { name: /다시 분석/ })).toBeNull();
+    });
+  });
+
+  describe("쿨다운 (5분)", () => {
+    it("생성_후_5분_이내면_다시_분석_버튼이_비활성화된다", () => {
+      const recentInsight: AiInsight = {
+        content: "테스트",
+        generatedAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2분 전
+      };
+      render(
+        <DashboardAiInsight aiInsight={recentInsight} isPending={false} onGenerate={mockOnGenerate} />,
+      );
+      const button = screen.getByRole("button", { name: /다시 분석/ });
+      expect(button).toHaveProperty("disabled", true);
+    });
+
+    it("쿨다운_중_남은_시간을_표시한다", () => {
+      const recentInsight: AiInsight = {
+        content: "테스트",
+        generatedAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2분 전
+      };
+      render(
+        <DashboardAiInsight aiInsight={recentInsight} isPending={false} onGenerate={mockOnGenerate} />,
+      );
+      expect(screen.getByText(/분 후 다시 분석할 수 있습니다/)).toBeDefined();
+    });
+
+    it("5분_경과_후에는_다시_분석_버튼이_활성화된다", () => {
+      const oldInsight: AiInsight = {
+        content: "테스트",
+        generatedAt: new Date(Date.now() - 6 * 60 * 1000).toISOString(), // 6분 전
+      };
+      render(
+        <DashboardAiInsight aiInsight={oldInsight} isPending={false} onGenerate={mockOnGenerate} />,
+      );
+      const button = screen.getByRole("button", { name: /다시 분석/ });
+      expect(button).toHaveProperty("disabled", false);
     });
   });
 
