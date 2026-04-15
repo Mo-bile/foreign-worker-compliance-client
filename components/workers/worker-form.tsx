@@ -86,9 +86,6 @@ export function WorkerForm() {
         toast.success("근로자가 등록되었습니다");
         router.push(`/workers/${worker.id}`);
       },
-      onError: (error) => {
-        toast.error(error.message);
-      },
     });
   };
 

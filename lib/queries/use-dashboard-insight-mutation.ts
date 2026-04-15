@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 import { mutateApi } from "./query-utils";
 
@@ -18,9 +17,6 @@ export function useDashboardInsightMutation(companyId: number) {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard", companyId] });
-    },
-    onError: (error) => {
-      toast.error(error.message || "분석에 실패했습니다. 잠시 후 다시 시도해주세요.");
     },
   });
 }

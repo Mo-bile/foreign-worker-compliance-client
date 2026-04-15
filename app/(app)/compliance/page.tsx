@@ -61,9 +61,6 @@ export default function CompliancePage() {
         onSuccess: () => {
           toast.success("데드라인이 완료 처리되었습니다");
         },
-        onError: (error) => {
-          toast.error(error.message);
-        },
       });
     },
     [completeMutation],

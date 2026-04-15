@@ -6,11 +6,6 @@ import { server } from "@/mocks/server";
 import type { ReactNode } from "react";
 
 import { useDashboardInsightMutation } from "@/lib/queries/use-dashboard-insight-mutation";
-import { toast } from "sonner";
-
-vi.mock("sonner", () => ({
-  toast: { error: vi.fn() },
-}));
 
 beforeAll(() => server.listen());
 afterEach(() => {
@@ -48,7 +43,7 @@ describe("useDashboardInsightMutation", () => {
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["dashboard", 1] });
   });
 
-  it("실패_시_toast_error를_호출한다", async () => {
+  it("실패_시_에러_상태를_전파한다", async () => {
     server.use(
       http.post("*/api/dashboard/insight", () =>
         HttpResponse.json({ message: "LLM 호출 실패" }, { status: 500 }),
@@ -66,6 +61,6 @@ describe("useDashboardInsightMutation", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(toast.error).toHaveBeenCalled();
+    expect(result.current.error?.message).toBe("LLM 호출 실패");
   });
 });
