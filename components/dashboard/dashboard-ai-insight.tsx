@@ -2,9 +2,9 @@
 
 import Markdown from "react-markdown";
 import { Sparkles, RefreshCw } from "lucide-react";
+import { AiAnalysisProgress } from "@/components/common/ai-analysis-progress";
 import type { AiInsight } from "@/types/dashboard";
 import { formatRelativeTime } from "@/lib/utils/format-relative-time";
-import { DashboardInsightProgress } from "./dashboard-insight-progress";
 
 const DISALLOWED_ELEMENTS = ["img", "a", "script", "iframe", "input", "form", "table"];
 
@@ -39,7 +39,7 @@ export function DashboardAiInsight({ aiInsight, isPending, onGenerate }: Dashboa
 
       {/* Body: 3 states */}
       {isPending ? (
-        <DashboardInsightProgress isPending={isPending} />
+        <AiAnalysisProgress variant="dashboard" isPending={isPending} />
       ) : aiInsight === null ? (
         <EmptyState onGenerate={onGenerate} />
       ) : (

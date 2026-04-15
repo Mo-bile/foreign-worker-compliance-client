@@ -74,7 +74,7 @@ describe("DashboardAiInsight", () => {
       render(
         <DashboardAiInsight aiInsight={null} isPending={true} onGenerate={mockOnGenerate} />,
       );
-      expect(screen.getByText("사업장 데이터 수집 중...")).toBeDefined();
+      expect(screen.getByText("근로자 현황을 조회하고 있습니다...")).toBeDefined();
     });
 
     it("버튼을_렌더링하지_않는다", () => {

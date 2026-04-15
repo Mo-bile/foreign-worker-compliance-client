@@ -13,7 +13,7 @@ import { StabilityAnalysisCard } from "@/components/benchmark/stability-analysis
 import { ManagementCheckCard } from "@/components/benchmark/management-check-card";
 import { PositioningCard } from "@/components/benchmark/positioning-card";
 import { BenchmarkEmptyState } from "@/components/benchmark/benchmark-empty-state";
-import { BenchmarkProgress } from "@/components/benchmark/benchmark-progress";
+import { AiAnalysisProgress } from "@/components/common/ai-analysis-progress";
 import { NullableAxisPlaceholder } from "@/components/benchmark/nullable-axis-placeholder";
 
 export default function BenchmarkPage() {
@@ -64,7 +64,7 @@ export default function BenchmarkPage() {
           onCreateBenchmark={handleCreateBenchmark}
           isLoading={createBenchmark.isPending}
         />
-        <BenchmarkProgress isPending={createBenchmark.isPending} />
+        <AiAnalysisProgress variant="benchmark" isPending={createBenchmark.isPending} />
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function BenchmarkPage() {
         onCreateBenchmark={handleCreateBenchmark}
         isCreating={createBenchmark.isPending}
       />
-      <BenchmarkProgress isPending={createBenchmark.isPending} />
+      <AiAnalysisProgress variant="benchmark" isPending={createBenchmark.isPending} />
 
       {/* 상단: Score Ring + 4축 요약 Stat Cards */}
       <div className="grid grid-cols-[240px_1fr] gap-4">
