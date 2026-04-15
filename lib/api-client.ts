@@ -90,4 +90,15 @@ async function patch(path: string): Promise<void> {
   // 204 No Content → body 없음
 }
 
-export const apiClient = { get, post, postAndFollow, put, patch } as const;
+async function postTrigger(path: string): Promise<void> {
+  const response = await fetch(`${getBaseUrl()}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!response.ok) {
+    await handleResponse(response);
+  }
+  // 201 + Location, body 없음
+}
+
+export const apiClient = { get, post, postAndFollow, put, patch, postTrigger } as const;

@@ -120,6 +120,12 @@ const getDashboardBackend: Parameters<typeof http.get>[1] = () =>
 const getDashboardBff: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(transformDashboardResponse(mockDashboardRaw));
 
+const postDashboardInsightBackend: Parameters<typeof http.post>[1] = () =>
+  new HttpResponse(null, { status: 201, headers: { Location: '/api/dashboard?companyId=1' } });
+
+const postDashboardInsightBff: Parameters<typeof http.post>[1] = () =>
+  HttpResponse.json({ success: true }, { status: 201 });
+
 const postSimulationBackend: Parameters<typeof http.post>[1] = () =>
   new HttpResponse(null, {
     status: 201,
@@ -201,6 +207,8 @@ export const handlers = [
   // Dashboard
   http.get(`${BACKEND}/api/dashboard`, getDashboardBackend),
   http.get("*/api/dashboard", getDashboardBff),
+  http.post(`${BACKEND}/api/dashboard/insight`, postDashboardInsightBackend),
+  http.post("*/api/dashboard/insight", postDashboardInsightBff),
 
   // Simulations
   http.post(`${BACKEND}/api/simulations`, postSimulationBackend),

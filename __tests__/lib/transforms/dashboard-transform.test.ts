@@ -66,7 +66,7 @@ const baseRaw: DashboardRawResponse = {
       { category: "DEADLINE", score: 65 },
     ],
   },
-  aiInsight: "AI 인사이트 텍스트",
+  aiInsight: { content: "AI 인사이트 텍스트", generatedAt: "2026-04-15T10:00:00Z" },
   upcomingDeadlines: [
     {
       deadlineId: 1,
@@ -100,7 +100,10 @@ describe("transformDashboardResponse", () => {
     expect(result.visaDistribution).toBeDefined();
     expect(result.insuranceSummary).toBeDefined();
     expect(result.complianceScore).toBeDefined();
-    expect(result.aiInsight).toBe("AI 인사이트 텍스트");
+    expect(result.aiInsight).toEqual({
+      content: "AI 인사이트 텍스트",
+      generatedAt: "2026-04-15T10:00:00Z",
+    });
     expect(result.timeline).toBeDefined();
   });
 
