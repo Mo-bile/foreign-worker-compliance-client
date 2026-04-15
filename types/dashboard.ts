@@ -3,6 +3,11 @@ import type { VisaType, DeadlineType, DeadlineStatus } from "./api";
 export type DeadlineUrgency = "overdue" | "d7" | "d30" | "safe";
 export type AlertGroupUrgency = "critical" | "warning" | "caution";
 
+export interface AiInsight {
+  readonly content: string;
+  readonly generatedAt: string;
+}
+
 export interface AlertGroup {
   readonly deadlineType: DeadlineType;
   readonly label: string;
@@ -60,7 +65,7 @@ export interface DashboardResponse {
   readonly visaDistribution: readonly VisaDistributionItem[];
   readonly insuranceSummary: readonly InsuranceSummaryItem[];
   readonly complianceScore: Readonly<ComplianceScoreData>;
-  readonly aiInsight: string;
+  readonly aiInsight: Readonly<AiInsight> | null;
   readonly timeline: readonly TimelineItem[];
 }
 
@@ -72,7 +77,7 @@ export interface DashboardRawResponse {
   readonly visaDistribution: readonly VisaRawDistributionItem[];
   readonly insuranceSummary: readonly InsuranceRawSummaryItem[];
   readonly complianceScore: Readonly<ComplianceRawScoreData>;
-  readonly aiInsight: string;
+  readonly aiInsight: Readonly<AiInsight> | null;
   readonly upcomingDeadlines: readonly DashboardRawDeadline[];
 }
 

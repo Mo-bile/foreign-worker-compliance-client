@@ -64,8 +64,11 @@ export const mockDashboardRaw: DashboardRawResponse = {
       { category: "DEADLINE", score: 65 },
     ],
   },
-  aiInsight:
-    "귀사의 외국인 근로자 임금 수준은 경기도 안산시 식료품제조업 동종업계 대비 <strong>하위 30%</strong>에 해당합니다. 최근 동종업계의 사업장 변경율이 증가 추세(전분기 대비 +12%)이므로, 인력 유출 방지를 위한 임금 경쟁력 개선을 권장드립니다. 또한 Nguyen Van A 근로자의 비자 만료가 4일 남았으므로 <strong>즉시 연장 신청</strong>을 진행하세요.",
+  aiInsight: {
+    content:
+      "**현재 상태 요약:** 귀사는 외국인 근로자 12명을 고용 중이며, 전체 보험 가입률은 91.7%입니다. E-9 비자 근로자 8명 중 국민연금 미가입 2건이 확인됩니다.\n\n**리스크:** Nguyen Van A 근로자의 비자 만료가 **4일 후**로 임박해 있습니다. 연장 미신청 시 불법체류 전환 및 사업주 과태료(최대 2,000만원) 리스크가 있습니다.\n\n**권장 조치:** ① 비자 연장 즉시 신청 ② 미가입 국민연금 2건 처리 ③ Rahman C 근로자 근로계약 갱신 준비",
+    generatedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+  },
   upcomingDeadlines: [
     {
       deadlineId: 1,

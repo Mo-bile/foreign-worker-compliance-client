@@ -17,6 +17,5 @@ export function useDashboard(companyId: number | null | undefined) {
       );
     },
     enabled: companyId != null && companyId > 0,
-    refetchInterval: 30_000,
   });
 }

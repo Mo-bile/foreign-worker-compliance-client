@@ -7,15 +7,18 @@ import { AlertGroupCard } from "@/components/dashboard/alert-group-card";
 import { ComplianceGauge } from "@/components/dashboard/compliance-gauge";
 import { VisaDistribution } from "@/components/dashboard/visa-distribution";
 import { InsuranceSummary } from "@/components/dashboard/insurance-summary";
-import { AiInsightBlock } from "@/components/common/ai-insight-block";
+import { DashboardAiInsight } from "@/components/dashboard/dashboard-ai-insight";
 import { DeadlineTimeline } from "@/components/dashboard/deadline-timeline";
 import { useDashboard } from "@/lib/queries/use-dashboard";
+import { useDashboardInsightMutation } from "@/lib/queries/use-dashboard-insight-mutation";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
   const { selectedCompanyId } = useCompanyContext();
   const { data, isLoading, isError, error, refetch } = useDashboard(selectedCompanyId);
+  const { mutate: generateInsight, isPending: isInsightPending } =
+    useDashboardInsightMutation(selectedCompanyId ?? 0);
 
   if (selectedCompanyId == null) {
     return (
@@ -120,7 +123,11 @@ export default function DashboardPage() {
           </div>
 
           {/* AI Insight */}
-          <AiInsightBlock content={data.aiInsight} />
+          <DashboardAiInsight
+            aiInsight={data.aiInsight}
+            isPending={isInsightPending}
+            onGenerate={() => generateInsight()}
+          />
         </div>
 
         {/* Right Column */}

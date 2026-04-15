@@ -11,7 +11,7 @@ import { TimelineSection } from "@/components/simulator/timeline-section";
 import { AiSummarySection } from "@/components/simulator/ai-summary-section";
 import { WhatIfSection } from "@/components/simulator/what-if-section";
 import { RecommendationBox } from "@/components/simulator/recommendation-box";
-import { SimulationProgress } from "@/components/simulator/simulation-progress";
+import { AiAnalysisProgress } from "@/components/common/ai-analysis-progress";
 import { useSimulation } from "@/lib/queries/use-simulation";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import type { SimulationRequest } from "@/types/simulator";
@@ -86,7 +86,7 @@ export default function SimulatorPage() {
 
       {/* Right content */}
       <div className="space-y-4">
-        <SimulationProgress isPending={mutation.isPending} />
+        <AiAnalysisProgress variant="simulation" isPending={mutation.isPending} />
 
         {mutation.isError && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
