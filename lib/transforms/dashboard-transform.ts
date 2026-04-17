@@ -40,7 +40,10 @@ const STATUS_TO_URGENCY: Record<string, DeadlineUrgency> = {
 
 const ALERT_TITLE_MAP: Record<DeadlineType, string> = {
   VISA_EXPIRY: "비자 만료 임박",
-  INSURANCE_ENROLLMENT: "보험 가입 필요",
+  NATIONAL_PENSION_ENROLLMENT: "국민연금 취득신고",
+  HEALTH_INSURANCE_ENROLLMENT: "건강보험 취득신고",
+  EMPLOYMENT_INSURANCE_ENROLLMENT: "고용보험 취득신고",
+  INDUSTRIAL_ACCIDENT_ENROLLMENT: "산재보험 취득신고",
   CONTRACT_RENEWAL: "근로계약 갱신",
   CHANGE_REPORT: "고용변동 신고",
 };
