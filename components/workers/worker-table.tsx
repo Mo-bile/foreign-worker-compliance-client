@@ -9,6 +9,7 @@ import {
   WORKER_STATUSES,
   WORKER_STATUS_LABELS,
   INSURANCE_STATUSES,
+  INSURANCE_STATUS_LABELS,
 } from "@/types/api";
 import type { VisaType, WorkerStatus, InsuranceStatus, WorkerResponse } from "@/types/api";
 
@@ -86,7 +87,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
     if (!matchesSearch || !matchesVisa) return false;
     if (statusFilter !== "ALL" && worker.status !== statusFilter) return false;
     if (insuranceFilter !== "ALL") {
-      if (!worker.insuranceEligibilities.some((ie) => ie.status === insuranceFilter)) return false;
+      if (!worker.insuranceEligibilities.some((ie) => ie.statusCode === insuranceFilter)) return false;
     }
     return true;
   });
@@ -127,6 +128,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
           onValueChange={handleInsuranceChange}
           placeholder="보험 상태 전체"
           options={[...INSURANCE_STATUSES]}
+          labelMap={INSURANCE_STATUS_LABELS}
           className="w-44"
         />
       </div>
