@@ -45,7 +45,7 @@ describe("DashboardPage", () => {
     expect(screen.getByText("긴급 조치 필요")).toBeDefined();
 
     expect(screen.getByText(/비자 만료 임박/)).toBeDefined();
-    expect(screen.getByText(/보험 가입 필요/)).toBeDefined();
+    expect(screen.getAllByText(/건강보험 취득신고/).length).toBeGreaterThan(0);
 
     expect(screen.getByText("비자 유형별 분포")).toBeDefined();
     expect(screen.getByText("4대보험 현황")).toBeDefined();

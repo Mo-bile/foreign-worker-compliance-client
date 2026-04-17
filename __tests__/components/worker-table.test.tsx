@@ -51,14 +51,14 @@ describe("WorkerTable", () => {
     expect(screen.getByText("등록된 근로자가 없습니다")).toBeDefined();
   });
 
-  it("보험_상태_필터에서_면제를_선택하면_면제_보험이_있는_근로자만_표시한다", async () => {
+  it("보험_상태_필터에서_가입제외를_선택하면_가입제외_보험이_있는_근로자만_표시한다", async () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     const insuranceTrigger = screen.getByRole("combobox", { name: "보험 상태 전체" });
     await userEvent.click(insuranceTrigger);
-    const option = screen.getByRole("option", { name: "면제" });
+    const option = screen.getByRole("option", { name: "가입제외" });
     await userEvent.click(option);
     const expectedCount = mockWorkers.filter((w) =>
-      w.insuranceEligibilities.some((ie) => ie.status === "면제"),
+      w.insuranceEligibilities.some((ie) => ie.statusCode === "EXEMPT"),
     ).length;
     expect(expectedCount).toBeGreaterThan(0);
     expect(screen.getByText(new RegExp(`총 ${expectedCount}건`))).toBeDefined();
