@@ -17,6 +17,8 @@ export const mockCompanies: readonly CompanyResponse[] = [
     foreignWorkerCount: 30,
     address: "서울시 강남구 테헤란로 123",
     contactPhone: "02-1234-5678",
+    averageForeignWorkerWage: 2900000,
+    recentYearTerminationCount: 2,
     createdAt: "2025-01-15T09:00:00",
     updatedAt: "2025-06-20T14:30:00",
   },
@@ -35,6 +37,8 @@ export const mockCompanies: readonly CompanyResponse[] = [
     foreignWorkerCount: 25,
     address: "부산시 해운대구 센텀로 45",
     contactPhone: "051-9876-5432",
+    averageForeignWorkerWage: 2750000,
+    recentYearTerminationCount: 1,
     createdAt: "2025-03-01T10:00:00",
     updatedAt: "2025-07-15T11:00:00",
   },
@@ -53,6 +57,8 @@ export const mockCompanies: readonly CompanyResponse[] = [
     foreignWorkerCount: 15,
     address: "경기도 이천시 농업로 78",
     contactPhone: "031-5555-1234",
+    averageForeignWorkerWage: 2500000,
+    recentYearTerminationCount: 0,
     createdAt: "2025-05-10T08:00:00",
     updatedAt: "2025-08-01T09:30:00",
   },
@@ -71,13 +77,29 @@ const SAMPLE_NATIONALITIES = [
 ] as const;
 const SAMPLE_VISA_TYPES = ["E9", "H2", "E7", "E8", "F2", "F5", "F6", "E7_4"] as const;
 const SAMPLE_STATUSES = ["ACTIVE", "INACTIVE", "TERMINATED"] as const;
-const SAMPLE_INSURANCE = ["의무", "임의", "면제"] as const;
+const SAMPLE_INSURANCE_CODES = [
+  "MANDATORY",
+  "FULL_MANDATORY",
+  "AUTO_BENEFITS_OPT_IN",
+  "OPTIONAL_ON_APPLICATION",
+  "EXEMPT",
+] as const;
+const SAMPLE_INSURANCE_LABELS: Record<string, string> = {
+  MANDATORY: "의무가입",
+  FULL_MANDATORY: "전부 의무적용",
+  AUTO_BENEFITS_OPT_IN: "자동가입(급여신청형)",
+  OPTIONAL_ON_APPLICATION: "신청시가입",
+  EXEMPT: "가입제외",
+};
 
 function generateWorker(id: number): WorkerResponse {
   const natIdx = id % SAMPLE_NATIONALITIES.length;
   const visaIdx = id % SAMPLE_VISA_TYPES.length;
   const statusIdx = id % SAMPLE_STATUSES.length;
-  const insIdx = id % SAMPLE_INSURANCE.length;
+  const insIdx = id % SAMPLE_INSURANCE_CODES.length;
+  const empInsIdx = (insIdx + 1) % SAMPLE_INSURANCE_CODES.length;
+  const pensionStatusCode = SAMPLE_INSURANCE_CODES[insIdx];
+  const employmentStatusCode = SAMPLE_INSURANCE_CODES[empInsIdx];
 
   return {
     id,
@@ -85,16 +107,37 @@ function generateWorker(id: number): WorkerResponse {
     nationality: SAMPLE_NATIONALITIES[natIdx],
     visaType: SAMPLE_VISA_TYPES[visaIdx],
     visaExpiryDate: `2027-${String((id % 12) + 1).padStart(2, "0")}-15`,
+    dateOfBirth: `${String(1980 + (id % 25))}-${String((id % 12) + 1).padStart(2, "0")}-${String(((id + 10) % 28) + 1).padStart(2, "0")}`,
     status: SAMPLE_STATUSES[statusIdx],
     insuranceEligibilities: [
-      { insuranceType: "국민연금", status: SAMPLE_INSURANCE[insIdx], reason: "테스트 사유" },
-      { insuranceType: "건강보험", status: "의무", reason: "전원 의무가입" },
+      {
+        insuranceType: "국민연금",
+        insuranceTypeCode: "NATIONAL_PENSION",
+        status: SAMPLE_INSURANCE_LABELS[pensionStatusCode],
+        statusCode: pensionStatusCode,
+        reason: `${SAMPLE_INSURANCE_LABELS[pensionStatusCode]} 테스트 사유`,
+      },
+      {
+        insuranceType: "건강보험",
+        insuranceTypeCode: "HEALTH_INSURANCE",
+        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
+        statusCode: "MANDATORY",
+        reason: "외국인 근로자 전원 의무가입",
+      },
       {
         insuranceType: "고용보험",
-        status: SAMPLE_INSURANCE[(insIdx + 1) % 3],
-        reason: "테스트 사유",
+        insuranceTypeCode: "EMPLOYMENT_INSURANCE",
+        status: SAMPLE_INSURANCE_LABELS[employmentStatusCode],
+        statusCode: employmentStatusCode,
+        reason: `${SAMPLE_INSURANCE_LABELS[employmentStatusCode]} 테스트 사유`,
       },
-      { insuranceType: "산재보험", status: "의무", reason: "전원 의무가입" },
+      {
+        insuranceType: "산재보험",
+        insuranceTypeCode: "INDUSTRIAL_ACCIDENT",
+        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
+        statusCode: "MANDATORY",
+        reason: "외국인 근로자 전원 의무가입",
+      },
     ],
   };
 }
@@ -107,12 +150,37 @@ export const mockWorkers: readonly WorkerResponse[] = [
     nationality: "VIETNAM",
     visaType: "E9",
     visaExpiryDate: "2026-12-31",
+    dateOfBirth: "1995-03-15",
     status: "ACTIVE",
     insuranceEligibilities: [
-      { insuranceType: "국민연금", status: "의무", reason: "일반 외국인 (사회보장협정 미체결국)" },
-      { insuranceType: "건강보험", status: "의무", reason: "외국인 근로자 전원 의무가입" },
-      { insuranceType: "고용보험", status: "임의", reason: "E9 비자: 임의가입 대상" },
-      { insuranceType: "산재보험", status: "의무", reason: "외국인 근로자 전원 의무가입" },
+      {
+        insuranceType: "국민연금",
+        insuranceTypeCode: "NATIONAL_PENSION",
+        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
+        statusCode: "MANDATORY",
+        reason: "일반 외국인 사회보장협정 미체결국",
+      },
+      {
+        insuranceType: "건강보험",
+        insuranceTypeCode: "HEALTH_INSURANCE",
+        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
+        statusCode: "MANDATORY",
+        reason: "외국인 근로자 전원 의무가입",
+      },
+      {
+        insuranceType: "고용보험",
+        insuranceTypeCode: "EMPLOYMENT_INSURANCE",
+        status: SAMPLE_INSURANCE_LABELS.AUTO_BENEFITS_OPT_IN,
+        statusCode: "AUTO_BENEFITS_OPT_IN",
+        reason: "E-9 피보험자격 자동취득",
+      },
+      {
+        insuranceType: "산재보험",
+        insuranceTypeCode: "INDUSTRIAL_ACCIDENT",
+        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
+        statusCode: "MANDATORY",
+        reason: "외국인 근로자 전원 의무가입",
+      },
     ],
   },
   {
@@ -121,12 +189,37 @@ export const mockWorkers: readonly WorkerResponse[] = [
     nationality: "CHINA",
     visaType: "H2",
     visaExpiryDate: "2027-06-15",
+    dateOfBirth: "1988-11-20",
     status: "ACTIVE",
     insuranceEligibilities: [
-      { insuranceType: "국민연금", status: "면제", reason: "사회보장협정 체결국 근로자" },
-      { insuranceType: "건강보험", status: "의무", reason: "외국인 근로자 전원 의무가입" },
-      { insuranceType: "고용보험", status: "임의", reason: "H2 비자: 임의가입 대상" },
-      { insuranceType: "산재보험", status: "의무", reason: "외국인 근로자 전원 의무가입" },
+      {
+        insuranceType: "국민연금",
+        insuranceTypeCode: "NATIONAL_PENSION",
+        status: SAMPLE_INSURANCE_LABELS.EXEMPT,
+        statusCode: "EXEMPT",
+        reason: "사회보장협정 체결국 근로자",
+      },
+      {
+        insuranceType: "건강보험",
+        insuranceTypeCode: "HEALTH_INSURANCE",
+        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
+        statusCode: "MANDATORY",
+        reason: "외국인 근로자 전원 의무가입",
+      },
+      {
+        insuranceType: "고용보험",
+        insuranceTypeCode: "EMPLOYMENT_INSURANCE",
+        status: SAMPLE_INSURANCE_LABELS.AUTO_BENEFITS_OPT_IN,
+        statusCode: "AUTO_BENEFITS_OPT_IN",
+        reason: "H-2 피보험자격 자동취득",
+      },
+      {
+        insuranceType: "산재보험",
+        insuranceTypeCode: "INDUSTRIAL_ACCIDENT",
+        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
+        statusCode: "MANDATORY",
+        reason: "외국인 근로자 전원 의무가입",
+      },
     ],
   },
   ...Array.from({ length: 23 }, (_, i) => generateWorker(i + 3)),
@@ -135,13 +228,19 @@ export const mockWorkers: readonly WorkerResponse[] = [
 // ─── 데드라인 목 데이터 ──────────────────────────────────
 const SAMPLE_DEADLINE_TYPES = [
   "VISA_EXPIRY",
-  "INSURANCE_ENROLLMENT",
+  "NATIONAL_PENSION_ENROLLMENT",
+  "HEALTH_INSURANCE_ENROLLMENT",
+  "EMPLOYMENT_INSURANCE_ENROLLMENT",
+  "INDUSTRIAL_ACCIDENT_ENROLLMENT",
   "CHANGE_REPORT",
   "CONTRACT_RENEWAL",
 ] as const;
 const SAMPLE_DEADLINE_DESCS: Record<string, string> = {
   VISA_EXPIRY: "비자 갱신 필요",
-  INSURANCE_ENROLLMENT: "보험 가입 기한",
+  NATIONAL_PENSION_ENROLLMENT: "국민연금 취득신고 기한",
+  HEALTH_INSURANCE_ENROLLMENT: "건강보험 취득신고 기한",
+  EMPLOYMENT_INSURANCE_ENROLLMENT: "고용보험 취득신고 기한",
+  INDUSTRIAL_ACCIDENT_ENROLLMENT: "산재보험 취득신고 기한",
   CHANGE_REPORT: "고용변동 신고 필요",
   CONTRACT_RENEWAL: "계약 갱신 필요",
 };
@@ -186,10 +285,10 @@ export const mockOverdueDeadlines: readonly ComplianceDeadlineResponse[] = [
   {
     id: 2,
     workerId: 2,
-    deadlineType: "INSURANCE_ENROLLMENT",
+    deadlineType: "HEALTH_INSURANCE_ENROLLMENT",
     dueDate: "2025-11-30",
     status: "OVERDUE",
-    description: "건강보험 가입 기한 초과",
+    description: "건강보험 취득신고 기한 초과",
   },
   ...Array.from({ length: 20 }, (_, i) => generateOverdueDeadline(i + 100)),
 ];
