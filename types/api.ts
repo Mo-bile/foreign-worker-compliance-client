@@ -26,6 +26,8 @@ export const NATIONALITIES = [
   "UK",
   "GERMANY",
   "FRANCE",
+  "EAST_TIMOR",
+  "LAOS",
 ] as const;
 
 export type Nationality = (typeof NATIONALITIES)[number];
@@ -55,6 +57,8 @@ export const NATIONALITY_LABELS: Record<Nationality, string> = {
   UK: "영국",
   GERMANY: "독일",
   FRANCE: "프랑스",
+  EAST_TIMOR: "동티모르",
+  LAOS: "라오스",
 };
 
 // ─── VisaType ─────────────────────────────────────────────
@@ -86,7 +90,10 @@ export const VISA_TYPE_SHORT: Record<VisaType, string> = {
 // ─── DeadlineType / DeadlineStatus ────────────────────────
 export const DEADLINE_TYPES = [
   "VISA_EXPIRY",
-  "INSURANCE_ENROLLMENT",
+  "NATIONAL_PENSION_ENROLLMENT",
+  "HEALTH_INSURANCE_ENROLLMENT",
+  "EMPLOYMENT_INSURANCE_ENROLLMENT",
+  "INDUSTRIAL_ACCIDENT_ENROLLMENT",
   "CHANGE_REPORT",
   "CONTRACT_RENEWAL",
 ] as const;
@@ -115,8 +122,21 @@ export const WORKER_STATUS_LABELS: Record<WorkerStatus, string> = {
 export type FilterOption<T extends string> = T | "ALL";
 
 // ─── InsuranceStatus ─────────────────────────────────────────
-export const INSURANCE_STATUSES = ["의무", "임의", "면제"] as const;
+export const INSURANCE_STATUSES = [
+  "MANDATORY",
+  "FULL_MANDATORY",
+  "AUTO_BENEFITS_OPT_IN",
+  "OPTIONAL_ON_APPLICATION",
+  "EXEMPT",
+] as const;
 export type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
+export const INSURANCE_STATUS_LABELS: Record<InsuranceStatus, string> = {
+  MANDATORY: "의무가입",
+  FULL_MANDATORY: "전부 의무적용",
+  AUTO_BENEFITS_OPT_IN: "자동가입(급여신청형)",
+  OPTIONAL_ON_APPLICATION: "신청시가입",
+  EXEMPT: "가입제외",
+};
 
 // ─── Region ─────────────────────────────────────────────
 export const REGIONS = [
@@ -189,7 +209,10 @@ export const INDUSTRY_CATEGORY_LABELS: Record<IndustryCategory, string> = {
 // ─── Label Maps ──────────────────────────────────────────────
 export const DEADLINE_TYPE_LABELS: Record<DeadlineType, string> = {
   VISA_EXPIRY: "비자 만료",
-  INSURANCE_ENROLLMENT: "보험 가입",
+  NATIONAL_PENSION_ENROLLMENT: "국민연금 취득신고",
+  HEALTH_INSURANCE_ENROLLMENT: "건강보험 취득신고",
+  EMPLOYMENT_INSURANCE_ENROLLMENT: "고용보험 취득신고",
+  INDUSTRIAL_ACCIDENT_ENROLLMENT: "산재보험 취득신고",
   CHANGE_REPORT: "변경 신고",
   CONTRACT_RENEWAL: "계약 갱신",
 };
@@ -244,6 +267,10 @@ export type UpdateCompanyRequest = z.infer<typeof updateCompanyRequestSchema>;
 
 export const registerWorkerRequestSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
+  dateOfBirth: z
+    .string()
+    .regex(isoDateRegex, "날짜 형식: YYYY-MM-DD")
+    .refine((val) => new Date(val) <= new Date(), "미래 날짜는 입력할 수 없습니다"),
   passportNumber: z.string().optional(),
   nationalityCode: z.enum(NATIONALITIES, { error: "국적을 선택해주세요" }),
   visaType: z.enum(VISA_TYPES, { error: "비자 유형을 선택해주세요" }),
@@ -287,7 +314,9 @@ export interface CompanyResponse {
 
 export interface InsuranceEligibilityDto {
   readonly insuranceType: string;
-  readonly status: InsuranceStatus;
+  readonly insuranceTypeCode: string;
+  readonly status: string;
+  readonly statusCode: InsuranceStatus;
   readonly reason: string;
 }
 
@@ -297,6 +326,7 @@ export interface WorkerResponse {
   readonly nationality: Nationality;
   readonly visaType: VisaType;
   readonly visaExpiryDate: string;
+  readonly dateOfBirth: string;
   readonly status: WorkerStatus;
   readonly insuranceEligibilities: readonly InsuranceEligibilityDto[];
 }
