@@ -99,9 +99,6 @@ export function CompanyForm(props: CompanyFormProps) {
             toast.success("사업장이 수정되었습니다");
             router.push(`/companies/${props.companyId}`);
           },
-          onError: (error) => {
-            toast.error(error.message);
-          },
         },
       );
     } else {
@@ -109,9 +106,6 @@ export function CompanyForm(props: CompanyFormProps) {
         onSuccess: (company) => {
           toast.success("사업장이 등록되었습니다");
           router.push(`/companies/${company.id}`);
-        },
-        onError: (error) => {
-          toast.error(error.message);
         },
       });
     }
