@@ -49,6 +49,7 @@ describe("WorkerForm", () => {
     renderWithProviders(<WorkerForm />);
 
     expect(screen.getByLabelText("이름")).toBeDefined();
+    expect(screen.getByLabelText("생년월일")).toBeDefined();
     expect(screen.getByLabelText("국적")).toBeDefined();
     expect(screen.getByLabelText("비자 유형")).toBeDefined();
     expect(screen.getByLabelText("비자 만료일")).toBeDefined();
