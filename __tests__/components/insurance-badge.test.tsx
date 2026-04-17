@@ -39,6 +39,7 @@ describe("InsuranceBadge", () => {
   });
 
   it("알_수_없는_statusCode는_기본_스타일로_렌더링한다", () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     render(<InsuranceBadge statusCode={"UNKNOWN" as any} label="알수없음" />);
     expect(screen.getByText("알수없음")).toBeDefined();
   });
