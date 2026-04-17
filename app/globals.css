@@ -35,6 +35,8 @@
   --color-signal-green-bg: var(--signal-green-bg);
   --color-signal-gray: var(--signal-gray);
   --color-signal-gray-bg: var(--signal-gray-bg);
+  --color-signal-indigo: var(--signal-indigo);
+  --color-signal-indigo-bg: var(--signal-indigo-bg);
   --color-sidebar-muted: var(--sidebar-muted);
   --color-ring: var(--ring);
   --color-input: var(--input);
@@ -97,6 +99,8 @@
   --signal-green-bg: oklch(0.94 0.04 155);
   --signal-gray: oklch(0.55 0.01 255);
   --signal-gray-bg: oklch(0.95 0.01 255);
+  --signal-indigo: oklch(0.55 0.12 280);
+  --signal-indigo-bg: oklch(0.93 0.03 280);
 
   /* Chart */
   --chart-1: var(--signal-blue);
@@ -145,6 +149,7 @@
   --signal-blue-bg: oklch(0.2 0.06 255);
   --signal-green-bg: oklch(0.2 0.06 155);
   --signal-gray-bg: oklch(0.22 0.01 255);
+  --signal-indigo-bg: oklch(0.2 0.06 280);
 
   /* Chart */
   --chart-1: var(--signal-blue);
