@@ -96,7 +96,7 @@ function filterWorkers(
 
     if (params.insuranceStatus !== "ALL") {
       const hasMatch = worker.insuranceEligibilities.some(
-        (ie) => ie.status === params.insuranceStatus,
+        (ie) => ie.statusCode === params.insuranceStatus,
       );
       if (!hasMatch) return false;
     }
