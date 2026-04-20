@@ -4,7 +4,11 @@ import userEvent from "@testing-library/user-event";
 import { FilterSelect } from "@/components/common/filter-select";
 
 const options = ["A", "B", "C"] as const;
-const labelMap: Record<string, string> = { A: "옵션 A", B: "옵션 B", C: "옵션 C" };
+const labelMap: Readonly<Record<(typeof options)[number], string>> = {
+  A: "옵션 A",
+  B: "옵션 B",
+  C: "옵션 C",
+};
 
 describe("FilterSelect", () => {
   it("placeholder를_aria-label로_설정한다", () => {

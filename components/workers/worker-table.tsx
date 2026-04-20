@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   VISA_TYPES,
   VISA_TYPE_LABELS,
-  NATIONALITY_LABELS,
   WORKER_STATUSES,
   WORKER_STATUS_LABELS,
   INSURANCE_STATUSES,
@@ -83,15 +82,15 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   };
 
   const filteredWorkers = workers.filter((worker) => {
-    const nationalityLabel = NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
+    const nationalityLabel = worker.nationality;
     const matchesSearch =
       search.trim() === "" ||
       worker.name.toLowerCase().includes(search.toLowerCase()) ||
       nationalityLabel.toLowerCase().includes(search.toLowerCase());
-    const matchesVisa = visaFilter === "ALL" || worker.visaType === visaFilter;
+    const matchesVisa = visaFilter === "ALL" || worker.visaTypeCode === visaFilter;
 
     if (!matchesSearch || !matchesVisa) return false;
-    if (statusFilter !== "ALL" && worker.status !== statusFilter) return false;
+    if (statusFilter !== "ALL" && worker.statusCode !== statusFilter) return false;
     if (insuranceFilter !== "ALL") {
       if (!worker.insuranceEligibilities.some((ie) => ie.statusCode === insuranceFilter)) return false;
     }
@@ -158,10 +157,8 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
             </TableHeader>
             <TableBody>
               {paginated.items.map((worker) => {
-                const nationalityLabel = NATIONALITY_LABELS[worker.nationality];
-                const visaLabel = VISA_TYPE_LABELS[worker.visaType];
-                const statusLabel = WORKER_STATUS_LABELS[worker.status];
-                const statusClass = WORKER_STATUS_COLORS[worker.status];
+                const nationalityLabel = worker.nationality;
+                const statusClass = WORKER_STATUS_COLORS[worker.statusCode];
 
                 return (
                   <TableRow
@@ -172,12 +169,12 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     <TableCell className="font-medium">{worker.name}</TableCell>
                     <TableCell>{nationalityLabel}</TableCell>
                     <TableCell>
-                      <span className="font-mono text-xs">{worker.visaType}</span>
-                      <span className="ml-1.5 text-muted-foreground">{visaLabel}</span>
+                      <span className="font-mono text-xs">{worker.visaTypeCode}</span>
+                      <span className="ml-1.5 text-muted-foreground">{worker.visaType}</span>
                     </TableCell>
                     <TableCell>{worker.visaExpiryDate}</TableCell>
                     <TableCell>
-                      <span className={statusClass}>{statusLabel}</span>
+                      <span className={statusClass}>{worker.status}</span>
                     </TableCell>
                     <TableCell>
                       <InsuranceSummaryCell eligibilities={worker.insuranceEligibilities} />

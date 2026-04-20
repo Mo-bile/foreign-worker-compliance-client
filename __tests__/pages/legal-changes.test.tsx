@@ -56,7 +56,7 @@ vi.mock("@/lib/contexts/company-context", () => ({
   useCompanyContext: () => mockUseCompanyContext(),
 }));
 
-const mockUseLegalChanges = vi.fn(() => ({
+const mockUseLegalChanges = vi.fn((_companyId?: number | null) => ({
   data: mockLegalChangesData,
   isLoading: false,
   isError: false,
@@ -64,7 +64,7 @@ const mockUseLegalChanges = vi.fn(() => ({
 }));
 
 vi.mock("@/lib/queries/use-legal-changes", () => ({
-  useLegalChanges: (...args: unknown[]) => mockUseLegalChanges(...args),
+  useLegalChanges: (companyId: number | null | undefined) => mockUseLegalChanges(companyId),
 }));
 
 vi.mock("@/lib/queries/use-legal-impact", () => ({
