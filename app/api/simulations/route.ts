@@ -14,7 +14,9 @@ const bffRequestSchema = simulationRequestSchema.extend({
 async function fetchDeductionCodes(): Promise<ReadonlySet<string>> {
   try {
     const metadata = await apiClient.get<MetadataResponse>("/api/metadata");
-    return new Set(metadata.scoringPolicies.filter((p) => p.isDeduction).map((p) => p.code));
+    return new Set(
+      metadata.scoringPolicies.filter((p) => p.type === "DEDUCTION").map((p) => p.code),
+    );
   } catch (error) {
     console.error(
       "[fetchDeductionCodes] Failed to load metadata — deduction items will not be distinguished:",
