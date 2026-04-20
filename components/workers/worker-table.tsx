@@ -11,7 +11,13 @@ import {
   INSURANCE_STATUSES,
   INSURANCE_STATUS_LABELS,
 } from "@/types/api";
-import type { VisaType, WorkerStatus, InsuranceStatus, WorkerResponse } from "@/types/api";
+import type {
+  InsuranceEligibilityDto,
+  InsuranceStatus,
+  VisaType,
+  WorkerResponse,
+  WorkerStatus,
+} from "@/types/api";
 
 const VISA_FILTER_LABELS: Record<VisaType, string> = Object.fromEntries(
   VISA_TYPES.map((v) => [v, `${v} — ${VISA_TYPE_LABELS[v]}`]),
@@ -147,6 +153,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                 <TableHead>비자 유형</TableHead>
                 <TableHead>비자 만료일</TableHead>
                 <TableHead>상태</TableHead>
+                <TableHead>보험</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -172,6 +179,9 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     <TableCell>
                       <span className={statusClass}>{statusLabel}</span>
                     </TableCell>
+                    <TableCell>
+                      <InsuranceSummaryCell eligibilities={worker.insuranceEligibilities} />
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -190,6 +200,34 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   );
 }
 
+function InsuranceSummaryCell({
+  eligibilities,
+}: {
+  readonly eligibilities: readonly InsuranceEligibilityDto[];
+}) {
+  const mandatoryLikeStatuses = new Set(["MANDATORY", "FULL_MANDATORY", "AUTO_BENEFITS_OPT_IN"]);
+  const mandatory = eligibilities.filter((eligibility) =>
+    mandatoryLikeStatuses.has(eligibility.statusCode),
+  ).length;
+  const exempt = eligibilities.filter((eligibility) => eligibility.statusCode === "EXEMPT").length;
+  const optional = eligibilities.filter(
+    (eligibility) =>
+      !mandatoryLikeStatuses.has(eligibility.statusCode) && eligibility.statusCode !== "EXEMPT",
+  ).length;
+
+  const parts = [
+    ...(mandatory > 0 ? [`의무 ${mandatory}`] : []),
+    ...(optional > 0 ? [`신청 ${optional}`] : []),
+    ...(exempt > 0 ? [`제외 ${exempt}`] : []),
+  ];
+
+  if (parts.length === 0) {
+    return <span className="text-xs text-muted-foreground">—</span>;
+  }
+
+  return <span className="text-xs text-muted-foreground">{parts.join(" / ")}</span>;
+}
+
 function WorkerTableSkeleton() {
   return (
     <div className="space-y-4">
@@ -201,7 +239,7 @@ function WorkerTableSkeleton() {
       </div>
       <div className="space-y-2">
         <Skeleton className="h-10 w-full" />
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-12 w-full" />
         ))}
       </div>

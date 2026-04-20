@@ -55,7 +55,7 @@ describe("WorkerTable", () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     const insuranceTrigger = screen.getByRole("combobox", { name: "보험 상태 전체" });
     await userEvent.click(insuranceTrigger);
-    const option = screen.getByRole("option", { name: "가입제외" });
+    const option = await screen.findByRole("option", { name: "가입제외" });
     await userEvent.click(option);
     const expectedCount = mockWorkers.filter((w) =>
       w.insuranceEligibilities.some((ie) => ie.statusCode === "EXEMPT"),
