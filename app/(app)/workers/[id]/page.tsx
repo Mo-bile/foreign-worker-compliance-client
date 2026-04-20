@@ -15,7 +15,6 @@ import { InsuranceBadge } from "@/components/workers/insurance-badge";
 import { DeadlineTable } from "@/components/compliance/deadline-table";
 import { useWorker } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
-import { NATIONALITY_LABELS, VISA_TYPE_LABELS } from "@/types/api";
 
 export default function WorkerDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -44,9 +43,6 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
   const w = worker.data;
   if (!w) return null;
 
-  const nationalityLabel = NATIONALITY_LABELS[w.nationality];
-  const visaTypeLabel = VISA_TYPE_LABELS[w.visaType];
-
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{w.name}</h1>
@@ -63,11 +59,14 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">국적</dt>
-              <dd className="font-medium">{nationalityLabel}</dd>
+              <dd className="font-medium">{w.nationality}</dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">비자 유형</dt>
-              <dd className="font-medium">{visaTypeLabel}</dd>
+              <dd className="font-medium">
+                <span className="font-mono text-xs">{w.visaTypeCode}</span>
+                <span className="ml-1.5">{w.visaType}</span>
+              </dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">비자 만료일</dt>
@@ -106,11 +105,19 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
                     <TableCell>
                       <InsuranceBadge statusCode={ie.statusCode} label={ie.status} />
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{ie.reason}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      <div>{ie.reason}</div>
+                      {ie.note !== null && (
+                        <p className="mt-1 text-xs text-muted-foreground/70">💡 {ie.note}</p>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+          )}
+          {w.insuranceDisclaimer && (
+            <p className="mt-3 text-[11px] text-muted-foreground/60">※ {w.insuranceDisclaimer}</p>
           )}
         </CardContent>
       </Card>
