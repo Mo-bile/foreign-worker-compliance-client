@@ -13,7 +13,7 @@ import type { PaginatedResult } from "@/lib/pagination";
 
 export function useOverdueDeadlines(companyId?: number | null) {
   const params = new URLSearchParams();
-  if (companyId) {
+  if (companyId != null && companyId > 0) {
     params.set("companyId", String(companyId));
   }
   const queryString = params.toString();
@@ -32,8 +32,8 @@ export function useOverdueDeadlines(companyId?: number | null) {
 
 export function useUpcomingDeadlines(days: number = 30, companyId?: number | null) {
   const params = new URLSearchParams();
-  if (companyId) {
-    params.append("companyId", String(companyId));
+  if (companyId != null && companyId > 0) {
+    params.set("companyId", String(companyId));
   }
   params.set("days", String(days));
 
@@ -45,7 +45,7 @@ export function useUpcomingDeadlines(days: number = 30, companyId?: number | nul
         "임박 데드라인을 불러올 수 없습니다",
       ),
     refetchInterval: 30_000,
-    enabled: companyId != null && companyId > 0,
+    enabled: companyId != null && companyId > 0 && Number.isFinite(days) && days > 0,
   });
 }
 
