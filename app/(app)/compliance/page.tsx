@@ -20,6 +20,7 @@ import {
   useUpcomingDeadlines,
   useCompleteDeadline,
 } from "@/lib/queries/use-compliance";
+import { useCompanyContext } from "@/lib/contexts/company-context";
 import type { ComplianceFilterValues } from "@/lib/queries/use-compliance";
 import {
   DEADLINE_TYPES,
@@ -31,6 +32,7 @@ import type { DeadlineType, DeadlineStatus } from "@/types/api";
 
 export default function CompliancePage() {
   const searchParams = useSearchParams();
+  const { selectedCompanyId } = useCompanyContext();
   const typeFromUrl = searchParams.get("type") as DeadlineType | null;
   const [deadlineTypeFilter, setDeadlineTypeFilter] = useState<DeadlineType | "ALL">(
     typeFromUrl != null && (DEADLINE_TYPES as readonly string[]).includes(typeFromUrl)
@@ -46,12 +48,17 @@ export default function CompliancePage() {
     status: statusFilter,
   };
 
-  const overdueAll = useOverdueDeadlines();
-  const overdue = usePaginatedOverdueDeadlines(filters, overduePage);
-  const upcoming = usePaginatedUpcomingDeadlines(30, filters, upcomingPage);
+  const overdueAll = useOverdueDeadlines(selectedCompanyId);
+  const overdue = usePaginatedOverdueDeadlines(selectedCompanyId, filters, overduePage);
+  const upcoming = usePaginatedUpcomingDeadlines(
+    30,
+    selectedCompanyId,
+    filters,
+    upcomingPage,
+  );
   // useUpcomingDeadlines(30) is already called inside usePaginatedUpcomingDeadlines above,
   // so React Query deduplicates — no extra fetch for the chart.
-  const upcomingAll = useUpcomingDeadlines(30);
+  const upcomingAll = useUpcomingDeadlines(30, selectedCompanyId);
 
   const completeMutation = useCompleteDeadline();
 

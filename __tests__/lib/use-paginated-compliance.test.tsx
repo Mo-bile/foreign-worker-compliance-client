@@ -24,7 +24,7 @@ function createWrapper() {
 describe("usePaginatedOverdueDeadlines", () => {
   it("필터_없이_첫_페이지를_반환한다", async () => {
     const { result } = renderHook(
-      () => usePaginatedOverdueDeadlines({ deadlineType: "ALL", status: "ALL" }, 1),
+      () => usePaginatedOverdueDeadlines(1, { deadlineType: "ALL", status: "ALL" }, 1),
       { wrapper: createWrapper() },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -35,7 +35,7 @@ describe("usePaginatedOverdueDeadlines", () => {
 
   it("데드라인_유형_필터가_적용된다", async () => {
     const { result } = renderHook(
-      () => usePaginatedOverdueDeadlines({ deadlineType: "VISA_EXPIRY", status: "ALL" }, 1),
+      () => usePaginatedOverdueDeadlines(1, { deadlineType: "VISA_EXPIRY", status: "ALL" }, 1),
       { wrapper: createWrapper() },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -46,7 +46,7 @@ describe("usePaginatedOverdueDeadlines", () => {
 
   it("상태_필터가_적용된다", async () => {
     const { result } = renderHook(
-      () => usePaginatedOverdueDeadlines({ deadlineType: "ALL", status: "OVERDUE" }, 1),
+      () => usePaginatedOverdueDeadlines(1, { deadlineType: "ALL", status: "OVERDUE" }, 1),
       { wrapper: createWrapper() },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -57,7 +57,7 @@ describe("usePaginatedOverdueDeadlines", () => {
 describe("usePaginatedUpcomingDeadlines", () => {
   it("필터_없이_첫_페이지를_반환한다", async () => {
     const { result } = renderHook(
-      () => usePaginatedUpcomingDeadlines(30, { deadlineType: "ALL", status: "ALL" }, 1),
+      () => usePaginatedUpcomingDeadlines(30, 1, { deadlineType: "ALL", status: "ALL" }, 1),
       { wrapper: createWrapper() },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -69,7 +69,12 @@ describe("usePaginatedUpcomingDeadlines", () => {
   it("데드라인_유형_필터가_적용된다", async () => {
     const { result } = renderHook(
       () =>
-        usePaginatedUpcomingDeadlines(30, { deadlineType: "CONTRACT_RENEWAL", status: "ALL" }, 1),
+        usePaginatedUpcomingDeadlines(
+          30,
+          1,
+          { deadlineType: "CONTRACT_RENEWAL", status: "ALL" },
+          1,
+        ),
       { wrapper: createWrapper() },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));

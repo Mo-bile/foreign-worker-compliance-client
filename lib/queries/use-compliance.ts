@@ -11,27 +11,41 @@ import type {
 import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 
-export function useOverdueDeadlines() {
+export function useOverdueDeadlines(companyId?: number | null) {
+  const params = new URLSearchParams();
+  if (companyId != null && companyId > 0) {
+    params.set("companyId", String(companyId));
+  }
+  const queryString = params.toString();
+
   return useQuery<readonly ComplianceDeadlineResponse[]>({
-    queryKey: ["compliance", "overdue"],
+    queryKey: ["compliance", "overdue", { companyId }],
     queryFn: () =>
       fetchApi<readonly ComplianceDeadlineResponse[]>(
-        "/api/compliance/overdue",
+        `/api/compliance/overdue${queryString ? `?${queryString}` : ""}`,
         "기한초과 데이터를 불러올 수 없습니다",
       ),
     refetchInterval: 30_000,
+    enabled: companyId != null && companyId > 0,
   });
 }
 
-export function useUpcomingDeadlines(days: number = 30) {
+export function useUpcomingDeadlines(days: number = 30, companyId?: number | null) {
+  const params = new URLSearchParams();
+  if (companyId != null && companyId > 0) {
+    params.set("companyId", String(companyId));
+  }
+  params.set("days", String(days));
+
   return useQuery<readonly ComplianceDeadlineResponse[]>({
-    queryKey: ["compliance", "upcoming", days],
+    queryKey: ["compliance", "upcoming", days, { companyId }],
     queryFn: () =>
       fetchApi<readonly ComplianceDeadlineResponse[]>(
-        `/api/compliance/upcoming?days=${days}`,
+        `/api/compliance/upcoming?${params.toString()}`,
         "임박 데드라인을 불러올 수 없습니다",
       ),
     refetchInterval: 30_000,
+    enabled: companyId != null && companyId > 0 && Number.isFinite(days) && days > 0,
   });
 }
 
@@ -64,6 +78,7 @@ function filterDeadlines(
 }
 
 export function usePaginatedOverdueDeadlines(
+  companyId: number | null,
   filters: ComplianceFilterValues,
   page: number,
 ): {
@@ -71,7 +86,7 @@ export function usePaginatedOverdueDeadlines(
   isLoading: boolean;
   isError: boolean;
 } {
-  const query = useOverdueDeadlines();
+  const query = useOverdueDeadlines(companyId);
 
   const deadlines = query.data
     ? paginateItems(filterDeadlines(query.data, filters), page)
@@ -82,6 +97,7 @@ export function usePaginatedOverdueDeadlines(
 
 export function usePaginatedUpcomingDeadlines(
   days: number,
+  companyId: number | null,
   filters: ComplianceFilterValues,
   page: number,
 ): {
@@ -89,7 +105,7 @@ export function usePaginatedUpcomingDeadlines(
   isLoading: boolean;
   isError: boolean;
 } {
-  const query = useUpcomingDeadlines(days);
+  const query = useUpcomingDeadlines(days, companyId);
 
   const deadlines = query.data
     ? paginateItems(filterDeadlines(query.data, filters), page)

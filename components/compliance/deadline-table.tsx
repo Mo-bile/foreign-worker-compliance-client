@@ -96,7 +96,7 @@ export function DeadlineTable({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>근로자 ID</TableHead>
+                  <TableHead>근로자</TableHead>
                   <TableHead>설명</TableHead>
                   <TableHead>기한</TableHead>
                   <TableHead>상태</TableHead>
@@ -106,7 +106,9 @@ export function DeadlineTable({
               <TableBody>
                 {items.map((d) => (
                   <TableRow key={d.id}>
-                    <TableCell>{d.workerId}</TableCell>
+                    <TableCell>
+                      {d.workerName} ({d.workerId})
+                    </TableCell>
                     <TableCell>{d.description}</TableCell>
                     <TableCell>{d.dueDate}</TableCell>
                     <TableCell>
