@@ -21,9 +21,11 @@ export interface VisaTypeItem {
 
 export interface ScoringPolicyItem {
   readonly code: string;
-  readonly label: string;
-  readonly score: number;
-  readonly isDeduction: boolean;
+  readonly displayName: string;
+  readonly points: number;
+  readonly type: "BONUS" | "DEDUCTION";
+  readonly applicableIndustry: string | null;
+  readonly mutualExclusionGroup: string | null;
 }
 
 export interface MetadataResponse {

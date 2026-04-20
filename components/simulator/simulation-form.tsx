@@ -4,9 +4,11 @@ import { useState, useMemo } from "react";
 import { CheckCircle, Activity, Lightbulb, Loader2, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { E9_NATIONALITIES, DESIRED_TIMINGS, DESIRED_TIMING_LABELS } from "@/types/simulator";
-import { NATIONALITY_LABELS } from "@/types/api";
+import { cn } from "@/lib/utils";
+import { INDUSTRY_CATEGORY_LABELS, NATIONALITY_LABELS } from "@/types/api";
 import type { SimulationRequest } from "@/types/simulator";
-import type { CompanyResponse } from "@/types/api";
+import type { CompanyResponse, IndustryCategory } from "@/types/api";
+import type { ScoringPolicyItem } from "@/types/metadata";
 import { useMetadata } from "@/lib/queries/use-metadata";
 
 interface SimulationFormProps {
@@ -14,6 +16,10 @@ interface SimulationFormProps {
   readonly onSubmit: (data: SimulationRequest) => void;
   readonly isPending: boolean;
 }
+
+const GROUP_LABELS: Record<string, string> = {
+  LONG_TENURE: "장기근속",
+};
 
 export function SimulationForm({ company, onSubmit, isPending }: SimulationFormProps) {
   const [desiredWorkers, setDesiredWorkers] = useState<number>(1);
@@ -23,6 +29,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
     company?.domesticInsuredCount ?? 0,
   );
   const [selectedScoringCodes, setSelectedScoringCodes] = useState<Set<string>>(new Set());
+  const [selectedGroupChoices, setSelectedGroupChoices] = useState<Record<string, string>>({});
   const { data: metadata, isError: isMetadataError } = useMetadata();
 
   const nationalityLabelMap = metadata
@@ -30,16 +37,42 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
     : (NATIONALITY_LABELS as Record<string, string>);
 
   const scoringPolicies = metadata?.scoringPolicies ?? [];
+  const independentPolicies = useMemo(
+    () => scoringPolicies.filter((policy) => policy.mutualExclusionGroup === null),
+    [scoringPolicies],
+  );
+  const policyGroups = useMemo(() => {
+    const groups = new Map<string, ScoringPolicyItem[]>();
+
+    for (const policy of scoringPolicies) {
+      if (policy.mutualExclusionGroup === null) continue;
+
+      const groupPolicies = groups.get(policy.mutualExclusionGroup) ?? [];
+      groups.set(policy.mutualExclusionGroup, [...groupPolicies, policy]);
+    }
+
+    return groups;
+  }, [scoringPolicies]);
+  const allSelectedCodes = useMemo(
+    () => new Set([...selectedScoringCodes, ...Object.values(selectedGroupChoices)]),
+    [selectedGroupChoices, selectedScoringCodes],
+  );
+
+  function isPolicyApplicable(policy: ScoringPolicyItem) {
+    return (
+      policy.applicableIndustry === null || policy.applicableIndustry === company?.industryCategory
+    );
+  }
 
   const deductionScore = useMemo(() => {
     let total = 0;
     for (const policy of scoringPolicies) {
-      if (policy.isDeduction && selectedScoringCodes.has(policy.code)) {
-        total += policy.score;
+      if (policy.type === "DEDUCTION" && allSelectedCodes.has(policy.code)) {
+        total += policy.points;
       }
     }
     return total;
-  }, [scoringPolicies, selectedScoringCodes]);
+  }, [allSelectedCodes, scoringPolicies]);
 
   const isSubmitDisabled =
     isPending ||
@@ -60,6 +93,17 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
     });
   }
 
+  function handleGroupChange(group: string, code: string) {
+    setSelectedGroupChoices((prev) => {
+      if (prev[group] === code) {
+        const { [group]: _removed, ...rest } = prev;
+        return rest;
+      }
+
+      return { ...prev, [group]: code };
+    });
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (desiredTiming === "") return;
@@ -69,7 +113,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
       preferredNationality: preferredNationality === "" ? undefined : preferredNationality,
       desiredTiming,
       domesticInsuredCount,
-      appliedScoringCodes: [...selectedScoringCodes],
+      appliedScoringCodes: [...allSelectedCodes],
       deductionScore,
     };
 
@@ -233,30 +277,104 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
               </p>
             )}
             <div className="flex flex-col gap-2.5">
-              {scoringPolicies.map((policy) => (
-                <label
-                  key={policy.code}
-                  className="flex cursor-pointer items-center gap-2 text-[13px]"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedScoringCodes.has(policy.code)}
-                    onChange={() => handleScoringToggle(policy.code)}
-                    className="h-4 w-4 cursor-pointer"
-                  />
-                  <span className={policy.isDeduction ? "text-signal-red" : undefined}>
-                    {policy.label}{" "}
-                    <span
-                      className={
-                        policy.isDeduction
-                          ? "font-semibold text-signal-red"
-                          : "font-semibold text-signal-green"
-                      }
-                    >
-                      ({policy.isDeduction ? `-${policy.score}점` : `+${policy.score}점`})
+              {independentPolicies.map((policy) => {
+                const isDeduction = policy.type === "DEDUCTION";
+                const isApplicable = isPolicyApplicable(policy);
+                const applicableIndustry = policy.applicableIndustry as IndustryCategory | null;
+
+                return (
+                  <label
+                    key={policy.code}
+                    className={cn(
+                      "flex items-center gap-2 text-[13px]",
+                      isApplicable ? "cursor-pointer" : "cursor-not-allowed opacity-70",
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedScoringCodes.has(policy.code)}
+                      disabled={!isApplicable}
+                      onChange={() => handleScoringToggle(policy.code)}
+                      className={cn(
+                        "h-4 w-4",
+                        isApplicable ? "cursor-pointer" : "cursor-not-allowed",
+                      )}
+                    />
+                    <span className={isDeduction ? "text-signal-red" : undefined}>
+                      {policy.displayName}{" "}
+                      <span
+                        className={
+                          isDeduction
+                            ? "font-semibold text-signal-red"
+                            : "font-semibold text-signal-green"
+                        }
+                      >
+                        ({isDeduction ? `-${policy.points}점` : `+${policy.points}점`})
+                      </span>
+                      {!isApplicable && applicableIndustry !== null && (
+                        <span className="ml-1 text-[11px] text-muted-foreground">
+                          ({INDUSTRY_CATEGORY_LABELS[applicableIndustry]} 사업장만 해당)
+                        </span>
+                      )}
                     </span>
-                  </span>
-                </label>
+                  </label>
+                );
+              })}
+              {[...policyGroups.entries()].map(([group, policies]) => (
+                <div key={group} className="rounded-md border border-border bg-background/70 p-3">
+                  <p className="mb-2 text-xs font-semibold text-foreground">
+                    {(GROUP_LABELS[group] ?? group) + " 가산점 (택1)"}
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    {policies.map((policy) => {
+                      const isApplicable = isPolicyApplicable(policy);
+                      const applicableIndustry =
+                        policy.applicableIndustry as IndustryCategory | null;
+
+                      return (
+                        <label
+                          key={policy.code}
+                          className={cn(
+                            "flex items-center gap-2 text-[13px]",
+                            isApplicable ? "cursor-pointer" : "cursor-not-allowed opacity-70",
+                          )}
+                        >
+                          <input
+                            type="radio"
+                            name={`policy-group-${group}`}
+                            checked={selectedGroupChoices[group] === policy.code}
+                            disabled={!isApplicable}
+                            onClick={() => {
+                              if (selectedGroupChoices[group] === policy.code) {
+                                handleGroupChange(group, policy.code);
+                              }
+                            }}
+                            onChange={() => {
+                              if (selectedGroupChoices[group] !== policy.code) {
+                                handleGroupChange(group, policy.code);
+                              }
+                            }}
+                            className={cn(
+                              "h-4 w-4",
+                              isApplicable ? "cursor-pointer" : "cursor-not-allowed",
+                            )}
+                          />
+                          <span>
+                            {policy.displayName}{" "}
+                            <span className="font-semibold text-signal-green">
+                              (+{policy.points}점)
+                            </span>
+                            {!isApplicable && applicableIndustry !== null && (
+                              <span className="ml-1 text-[11px] text-muted-foreground">
+                                ({INDUSTRY_CATEGORY_LABELS[applicableIndustry]} 사업장만 해당)
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

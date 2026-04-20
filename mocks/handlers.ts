@@ -121,7 +121,7 @@ const getDashboardBff: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(transformDashboardResponse(mockDashboardRaw));
 
 const postDashboardInsightBackend: Parameters<typeof http.post>[1] = () =>
-  new HttpResponse(null, { status: 201, headers: { Location: '/api/dashboard?companyId=1' } });
+  new HttpResponse(null, { status: 201, headers: { Location: "/api/dashboard?companyId=1" } });
 
 const postDashboardInsightBff: Parameters<typeof http.post>[1] = () =>
   HttpResponse.json({ success: true }, { status: 201 });
@@ -136,7 +136,7 @@ const getSimulationBackend: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockWithinQuotaResponse);
 
 const mockDeductionCodes = new Set(
-  MOCK_SCORING_POLICIES.filter((p) => p.isDeduction).map((p) => p.code),
+  MOCK_SCORING_POLICIES.filter((p) => p.type === "DEDUCTION").map((p) => p.code),
 );
 
 const postSimulationBff: Parameters<typeof http.post>[1] = () =>
