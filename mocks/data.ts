@@ -299,12 +299,19 @@ const SAMPLE_DEADLINE_DESCS: Record<string, string> = {
   CONTRACT_RENEWAL: "계약 갱신 필요",
 };
 
+function getWorkerName(workerId: number): string {
+  const worker = mockWorkers.find((worker) => worker.id === workerId);
+  return worker?.name ?? `Worker-${workerId}`;
+}
+
 function generateOverdueDeadline(id: number): ComplianceDeadlineResponse {
   const typeIdx = id % SAMPLE_DEADLINE_TYPES.length;
   const type = SAMPLE_DEADLINE_TYPES[typeIdx];
+  const workerId = (id % 25) + 1;
   return {
     id,
-    workerId: (id % 25) + 1,
+    workerId,
+    workerName: getWorkerName(workerId),
     deadlineType: type,
     dueDate: `2025-${String((id % 12) + 1).padStart(2, "0")}-${String((id % 28) + 1).padStart(2, "0")}`,
     status: "OVERDUE",
@@ -316,9 +323,11 @@ function generateUpcomingDeadline(id: number): ComplianceDeadlineResponse {
   const typeIdx = id % SAMPLE_DEADLINE_TYPES.length;
   const type = SAMPLE_DEADLINE_TYPES[typeIdx];
   const statuses = ["APPROACHING", "URGENT", "PENDING"] as const;
+  const workerId = (id % 25) + 1;
   return {
     id,
-    workerId: (id % 25) + 1,
+    workerId,
+    workerName: getWorkerName(workerId),
     deadlineType: type,
     dueDate: `2026-${String((id % 12) + 1).padStart(2, "0")}-${String((id % 28) + 1).padStart(2, "0")}`,
     status: statuses[id % 3],
@@ -331,6 +340,7 @@ export const mockOverdueDeadlines: readonly ComplianceDeadlineResponse[] = [
   {
     id: 1,
     workerId: 1,
+    workerName: "Nguyen Van A",
     deadlineType: "VISA_EXPIRY",
     dueDate: "2025-12-31",
     status: "OVERDUE",
@@ -339,6 +349,7 @@ export const mockOverdueDeadlines: readonly ComplianceDeadlineResponse[] = [
   {
     id: 2,
     workerId: 2,
+    workerName: "Zhang Wei",
     deadlineType: "HEALTH_INSURANCE_ENROLLMENT",
     dueDate: "2025-11-30",
     status: "OVERDUE",
@@ -352,6 +363,7 @@ export const mockUpcomingDeadlines: readonly ComplianceDeadlineResponse[] = [
   {
     id: 3,
     workerId: 1,
+    workerName: "Nguyen Van A",
     deadlineType: "CONTRACT_RENEWAL",
     dueDate: "2026-04-15",
     status: "APPROACHING",
@@ -360,6 +372,7 @@ export const mockUpcomingDeadlines: readonly ComplianceDeadlineResponse[] = [
   {
     id: 4,
     workerId: 2,
+    workerName: "Zhang Wei",
     deadlineType: "CHANGE_REPORT",
     dueDate: "2026-03-25",
     status: "URGENT",
@@ -368,6 +381,7 @@ export const mockUpcomingDeadlines: readonly ComplianceDeadlineResponse[] = [
   {
     id: 5,
     workerId: 1,
+    workerName: "Nguyen Van A",
     deadlineType: "VISA_EXPIRY",
     dueDate: "2026-04-10",
     status: "APPROACHING",

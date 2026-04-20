@@ -339,6 +339,7 @@ export interface WorkerResponse {
 export interface ComplianceDeadlineResponse {
   readonly id: number;
   readonly workerId: number;
+  readonly workerName: string;
   readonly deadlineType: DeadlineType;
   readonly dueDate: string;
   readonly status: DeadlineStatus;
