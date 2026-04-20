@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { CheckCircle, Activity, Lightbulb, Loader2, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { E9_NATIONALITIES, DESIRED_TIMINGS, DESIRED_TIMING_LABELS } from "@/types/simulator";
@@ -63,6 +63,33 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
       policy.applicableIndustry === null || policy.applicableIndustry === company?.industryCategory
     );
   }
+
+  useEffect(() => {
+    setSelectedScoringCodes((prev) => {
+      const filtered = new Set(
+        [...prev].filter((code) => {
+          const policy = scoringPolicies.find((p) => p.code === code);
+          return !policy || isPolicyApplicable(policy);
+        }),
+      );
+      return filtered.size === prev.size ? prev : filtered;
+    });
+
+    setSelectedGroupChoices((prev) => {
+      const filtered: Record<string, string> = {};
+      let changed = false;
+      for (const [group, code] of Object.entries(prev)) {
+        const policy = scoringPolicies.find((p) => p.code === code);
+        if (!policy || isPolicyApplicable(policy)) {
+          filtered[group] = code;
+        } else {
+          changed = true;
+        }
+      }
+      return changed ? filtered : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [company?.industryCategory]);
 
   const deductionScore = useMemo(() => {
     let total = 0;
