@@ -7,6 +7,7 @@ import type { ComplianceDeadlineResponse } from "@/types/api";
 const testDeadlines: ComplianceDeadlineResponse[] = Array.from({ length: 25 }, (_, i) => ({
   id: i + 1,
   workerId: (i % 5) + 1,
+  workerName: `Worker-${(i % 5) + 1}`,
   deadlineType: "VISA_EXPIRY" as const,
   dueDate: `2026-${String((i % 12) + 1).padStart(2, "0")}-15`,
   status: "OVERDUE" as const,
@@ -123,6 +124,7 @@ describe("DeadlineTable", () => {
       {
         id: 99,
         workerId: 1,
+        workerName: "Worker-1",
         deadlineType: "VISA_EXPIRY",
         dueDate: "2026-01-01",
         status: "COMPLETED",

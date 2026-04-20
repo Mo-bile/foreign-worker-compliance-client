@@ -12,6 +12,7 @@ function makeDeadline(
   return {
     id: 1,
     workerId: 1,
+    workerName: "Worker-1",
     deadlineType: "VISA_EXPIRY",
     dueDate: "2026-04-01",
     status: "PENDING",

@@ -15,6 +15,15 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => mockSearchParams,
 }));
 
+const mockUseCompanyContext = vi.fn(() => ({
+  selectedCompanyId: 1 as number | null,
+  companies: [],
+}));
+
+vi.mock("@/lib/contexts/company-context", () => ({
+  useCompanyContext: () => mockUseCompanyContext(),
+}));
+
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -27,6 +36,7 @@ function createWrapper() {
 describe("CompliancePage 쿼리파라미터 필터", () => {
   afterEach(() => {
     mockSearchParams.delete("type");
+    mockUseCompanyContext.mockReturnValue({ selectedCompanyId: 1, companies: [] });
   });
 
   it("type_파라미터_없이_진입하면_전체_필터가_기본값이다", async () => {
