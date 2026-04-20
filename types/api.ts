@@ -318,16 +318,21 @@ export interface InsuranceEligibilityDto {
   readonly status: string;
   readonly statusCode: InsuranceStatus;
   readonly reason: string;
+  readonly note: string | null;
 }
 
 export interface WorkerResponse {
   readonly id: number;
   readonly name: string;
-  readonly nationality: Nationality;
-  readonly visaType: VisaType;
+  readonly nationality: string;
+  readonly nationalityCode: Nationality;
+  readonly visaType: string;
+  readonly visaTypeCode: VisaType;
   readonly visaExpiryDate: string;
   readonly dateOfBirth: string;
-  readonly status: WorkerStatus;
+  readonly status: string;
+  readonly statusCode: WorkerStatus;
+  readonly insuranceDisclaimer: string;
   readonly insuranceEligibilities: readonly InsuranceEligibilityDto[];
 }
 
