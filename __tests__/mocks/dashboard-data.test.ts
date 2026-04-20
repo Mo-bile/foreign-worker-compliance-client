@@ -13,6 +13,7 @@ describe("mockDashboardRaw", () => {
     expect(mockDashboardRaw.alerts).toHaveLength(3);
     expect(mockDashboardRaw.alerts[0].deadlineType).toBe("VISA_EXPIRY");
     expect(mockDashboardRaw.alerts[0].status).toBe("URGENT");
+    expect(mockDashboardRaw.alerts[1].deadlineType).toBe("HEALTH_INSURANCE_ENROLLMENT");
     expect(mockDashboardRaw.alerts[1].status).toBe("OVERDUE");
     expect(mockDashboardRaw.alerts[2].status).toBe("APPROACHING");
   });

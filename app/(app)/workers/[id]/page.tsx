@@ -58,6 +58,10 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         <CardContent>
           <dl className="grid gap-4 md:grid-cols-2">
             <div>
+              <dt className="text-sm text-muted-foreground">생년월일</dt>
+              <dd className="font-medium">{w.dateOfBirth}</dd>
+            </div>
+            <div>
               <dt className="text-sm text-muted-foreground">국적</dt>
               <dd className="font-medium">{nationalityLabel}</dd>
             </div>
@@ -100,7 +104,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
                   <TableRow key={ie.insuranceType}>
                     <TableCell className="font-medium">{ie.insuranceType}</TableCell>
                     <TableCell>
-                      <InsuranceBadge status={ie.status} />
+                      <InsuranceBadge statusCode={ie.statusCode} label={ie.status} />
                     </TableCell>
                     <TableCell className="text-muted-foreground">{ie.reason}</TableCell>
                   </TableRow>

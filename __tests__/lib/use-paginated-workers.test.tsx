@@ -125,7 +125,7 @@ describe("usePaginatedWorkers", () => {
           search: "",
           visaType: "ALL",
           status: "ALL",
-          insuranceStatus: "면제",
+          insuranceStatus: "EXEMPT",
         }),
       { wrapper: createWrapper() },
     );
@@ -135,7 +135,7 @@ describe("usePaginatedWorkers", () => {
     expect(result.current.workers).toBeDefined();
     expect(
       result.current.workers!.items.every((w) =>
-        w.insuranceEligibilities.some((ie) => ie.status === "면제"),
+        w.insuranceEligibilities.some((ie) => ie.statusCode === "EXEMPT"),
       ),
     ).toBe(true);
   });

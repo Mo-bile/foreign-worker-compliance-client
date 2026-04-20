@@ -12,11 +12,11 @@ const mockGroups: readonly AlertGroup[] = [
     href: "/compliance?type=VISA_EXPIRY",
   },
   {
-    deadlineType: "INSURANCE_ENROLLMENT",
-    label: "보험 가입 필요",
+    deadlineType: "HEALTH_INSURANCE_ENROLLMENT",
+    label: "건강보험 취득신고",
     count: 3,
     urgency: "warning",
-    href: "/compliance?type=INSURANCE_ENROLLMENT",
+    href: "/compliance?type=HEALTH_INSURANCE_ENROLLMENT",
   },
   {
     deadlineType: "CONTRACT_RENEWAL",
@@ -32,7 +32,7 @@ describe("AlertGroupCard", () => {
     render(<AlertGroupCard alertGroups={mockGroups} />);
     expect(screen.getByText("비자 만료 임박")).toBeDefined();
     expect(screen.getByText("2명")).toBeDefined();
-    expect(screen.getByText("보험 가입 필요")).toBeDefined();
+    expect(screen.getByText("건강보험 취득신고")).toBeDefined();
     expect(screen.getByText("3명")).toBeDefined();
   });
 
@@ -51,7 +51,7 @@ describe("AlertGroupCard", () => {
 
   it("warning_urgency에_signal-orange_배경이다", () => {
     render(<AlertGroupCard alertGroups={[mockGroups[1]]} />);
-    const row = screen.getByText("보험 가입 필요").closest("[class]")?.parentElement;
+    const row = screen.getByText("건강보험 취득신고").closest("[class]")?.parentElement;
     expect(row?.className).toContain("bg-signal-orange-bg");
   });
 

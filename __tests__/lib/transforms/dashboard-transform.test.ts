@@ -31,7 +31,7 @@ const baseRaw: DashboardRawResponse = {
       deadlineId: 2,
       workerId: 5,
       workerName: "Pham Thi B",
-      deadlineType: "INSURANCE_ENROLLMENT",
+      deadlineType: "HEALTH_INSURANCE_ENROLLMENT",
       status: "OVERDUE",
       dDay: 3,
       dueDate: "2026-03-26",
@@ -136,7 +136,7 @@ describe("transformDashboardResponse", () => {
       expect(result.alertGroups).toHaveLength(3);
       const types = result.alertGroups.map((g) => g.deadlineType);
       expect(types).toContain("VISA_EXPIRY");
-      expect(types).toContain("INSURANCE_ENROLLMENT");
+      expect(types).toContain("HEALTH_INSURANCE_ENROLLMENT");
       expect(types).toContain("CONTRACT_RENEWAL");
     });
 
@@ -146,10 +146,10 @@ describe("transformDashboardResponse", () => {
       expect(visaGroup?.count).toBe(1);
     });
 
-    it("dDay >= 0이면 urgency가 critical이다 (INSURANCE_ENROLLMENT dDay: 3)", () => {
+    it("dDay >= 0이면 urgency가 critical이다 (HEALTH_INSURANCE_ENROLLMENT dDay: 3)", () => {
       const result = transformDashboardResponse(baseRaw);
       const insuranceGroup = result.alertGroups.find(
-        (g) => g.deadlineType === "INSURANCE_ENROLLMENT",
+        (g) => g.deadlineType === "HEALTH_INSURANCE_ENROLLMENT",
       );
       expect(insuranceGroup?.urgency).toBe("critical");
     });

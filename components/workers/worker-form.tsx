@@ -58,6 +58,7 @@ export function WorkerForm() {
     resolver: standardSchemaResolver(registerWorkerRequestSchema),
     defaultValues: {
       name: "",
+      dateOfBirth: "",
       passportNumber: "",
       nationalityCode: undefined,
       visaType: undefined,
@@ -103,6 +104,13 @@ export function WorkerForm() {
             register={register}
             errors={errors}
             placeholder="홍길동"
+          />
+          <FormField<RegisterWorkerRequest>
+            label="생년월일"
+            name="dateOfBirth"
+            register={register}
+            errors={errors}
+            type="date"
           />
 
           <div className="flex flex-col gap-1.5">
