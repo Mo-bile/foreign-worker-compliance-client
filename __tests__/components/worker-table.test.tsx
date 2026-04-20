@@ -31,7 +31,7 @@ describe("WorkerTable", () => {
     await userEvent.click(statusTrigger);
     const option = screen.getByRole("option", { name: "활성" });
     await userEvent.click(option);
-    const activeCount = mockWorkers.filter((w) => w.status === "ACTIVE").length;
+    const activeCount = mockWorkers.filter((w) => w.statusCode === "ACTIVE").length;
     expect(screen.getByText(new RegExp(`총 ${activeCount}건`))).toBeDefined();
   });
 

@@ -58,7 +58,7 @@ describe("Dashboard Types", () => {
       visaDistribution: [],
       insuranceSummary: [],
       complianceScore: { total: 73, breakdown: [] },
-      aiInsight: "test",
+      aiInsight: { content: "test", generatedAt: "2026-03-24T06:00:00+09:00" },
       timeline: [],
     };
     expect(response.stats.totalWorkers).toBe(12);

@@ -11,7 +11,6 @@ import type {
 } from "@/types/api";
 import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
-import { NATIONALITY_LABELS } from "@/types/api";
 
 import { fetchApi, mutateApi } from "./query-utils";
 
@@ -84,15 +83,14 @@ function filterWorkers(
   return workers.filter((worker) => {
     if (params.search.trim() !== "") {
       const searchLower = params.search.toLowerCase();
-      const nationalityLabel = NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
       const matchesSearch =
         worker.name.toLowerCase().includes(searchLower) ||
-        nationalityLabel.toLowerCase().includes(searchLower);
+        worker.nationality.toLowerCase().includes(searchLower);
       if (!matchesSearch) return false;
     }
 
-    if (params.visaType !== "ALL" && worker.visaType !== params.visaType) return false;
-    if (params.status !== "ALL" && worker.status !== params.status) return false;
+    if (params.visaType !== "ALL" && worker.visaTypeCode !== params.visaType) return false;
+    if (params.status !== "ALL" && worker.statusCode !== params.status) return false;
 
     if (params.insuranceStatus !== "ALL") {
       const hasMatch = worker.insuranceEligibilities.some(
