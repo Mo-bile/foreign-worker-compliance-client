@@ -24,8 +24,8 @@ export function ErrorDialog({ message, onClose }: ErrorDialogProps) {
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-signal-red-bg">
             <OctagonAlert className="h-6 w-6 text-signal-red" />
           </div>
-          <AlertDialogTitle className="text-base">오류가 발생했습니다</AlertDialogTitle>
-          <AlertDialogDescription className="text-sm">
+          <AlertDialogTitle className="sr-only">알림</AlertDialogTitle>
+          <AlertDialogDescription className="text-sm text-foreground">
             {message}
           </AlertDialogDescription>
         </AlertDialogHeader>
