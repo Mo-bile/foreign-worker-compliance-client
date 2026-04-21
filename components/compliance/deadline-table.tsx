@@ -1,7 +1,7 @@
 "use client";
 
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ChevronDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -20,55 +20,15 @@ import type { PaginationControlsProps } from "@/components/ui/pagination-control
 import type { ComplianceDeadlineResponse } from "@/types/api";
 import { EmptyState } from "@/components/common/empty-state";
 
-interface DeadlineGroup {
+type DeadlineWithWorkerName = ComplianceDeadlineResponse & {
+  readonly workerName?: string;
+};
+
+interface WorkerDeadlineGroup {
   readonly workerId: number;
-  readonly workerName: string;
-  readonly deadlines: readonly ComplianceDeadlineResponse[];
+  readonly workerLabel: string;
+  readonly deadlines: readonly DeadlineWithWorkerName[];
   readonly earliestDueDate: string;
-}
-
-function groupByWorker(items: readonly ComplianceDeadlineResponse[]): DeadlineGroup[] {
-  const grouped = new Map<
-    number,
-    {
-      workerId: number;
-      workerName: string;
-      deadlines: ComplianceDeadlineResponse[];
-      earliestDueDate: string;
-    }
-  >();
-
-  for (const item of items) {
-    const existing = grouped.get(item.workerId);
-
-    if (existing) {
-      existing.deadlines.push(item);
-      if (item.dueDate < existing.earliestDueDate) {
-        existing.earliestDueDate = item.dueDate;
-      }
-      continue;
-    }
-
-    grouped.set(item.workerId, {
-      workerId: item.workerId,
-      workerName: item.workerName,
-      deadlines: [item],
-      earliestDueDate: item.dueDate,
-    });
-  }
-
-  const groups = Array.from(grouped.values());
-  const allOverdue = items.every((item) => item.status === "OVERDUE");
-
-  groups.sort((a, b) => {
-    if (allOverdue) {
-      return b.deadlines.length - a.deadlines.length || a.workerId - b.workerId;
-    }
-
-    return a.earliestDueDate.localeCompare(b.earliestDueDate) || a.workerId - b.workerId;
-  });
-
-  return groups;
 }
 
 interface DeadlineTableProps {
@@ -81,6 +41,122 @@ interface DeadlineTableProps {
   readonly hasUnfilteredData?: boolean;
   readonly onComplete?: (id: number) => void;
   readonly isCompleting?: boolean;
+  readonly variant?: "overdue" | "upcoming";
+}
+
+function getWorkerLabel(item: DeadlineWithWorkerName): string {
+  return item.workerName?.trim() || `근로자 ${item.workerId}`;
+}
+
+function groupByWorker(
+  items: readonly ComplianceDeadlineResponse[],
+  shouldSortByDueDate: boolean,
+): readonly WorkerDeadlineGroup[] {
+  const grouped = new Map<number, WorkerDeadlineGroup>();
+
+  for (const deadline of items as readonly DeadlineWithWorkerName[]) {
+    const existing = grouped.get(deadline.workerId);
+
+    if (existing) {
+      grouped.set(deadline.workerId, {
+        ...existing,
+        deadlines: [...existing.deadlines, deadline],
+        earliestDueDate:
+          deadline.dueDate < existing.earliestDueDate ? deadline.dueDate : existing.earliestDueDate,
+      });
+      continue;
+    }
+
+    grouped.set(deadline.workerId, {
+      workerId: deadline.workerId,
+      workerLabel: getWorkerLabel(deadline),
+      deadlines: [deadline],
+      earliestDueDate: deadline.dueDate,
+    });
+  }
+
+  const groups = Array.from(grouped.values()).map((group) => ({
+    ...group,
+    deadlines: [...group.deadlines].sort((left, right) => left.dueDate.localeCompare(right.dueDate)),
+  }));
+
+  if (!shouldSortByDueDate) {
+    return groups;
+  }
+
+  return [...groups].sort((left, right) => {
+    const dueDateDiff = left.earliestDueDate.localeCompare(right.earliestDueDate);
+
+    if (dueDateDiff !== 0) {
+      return dueDateDiff;
+    }
+
+    return left.workerLabel.localeCompare(right.workerLabel, "ko");
+  });
+}
+
+function renderRows(
+  deadlines: readonly ComplianceDeadlineResponse[],
+  {
+    onComplete,
+    isCompleting,
+    showWorkerId,
+  }: {
+    readonly onComplete?: (id: number) => void;
+    readonly isCompleting?: boolean;
+    readonly showWorkerId: boolean;
+  },
+) {
+  return deadlines.map((deadline) => (
+    <TableRow key={deadline.id}>
+      {showWorkerId && <TableCell>{deadline.workerId}</TableCell>}
+      <TableCell>{deadline.description}</TableCell>
+      <TableCell>{deadline.dueDate}</TableCell>
+      <TableCell>
+        <StatusBadge status={deadline.status} />
+      </TableCell>
+      {onComplete && (
+        <TableCell>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={deadline.status === "COMPLETED" || isCompleting}
+            onClick={() => onComplete(deadline.id)}
+          >
+            {deadline.status === "COMPLETED" ? "완료됨" : "완료"}
+          </Button>
+        </TableCell>
+      )}
+    </TableRow>
+  ));
+}
+
+function renderTable(
+  deadlines: readonly ComplianceDeadlineResponse[],
+  {
+    onComplete,
+    isCompleting,
+    showWorkerId,
+  }: {
+    readonly onComplete?: (id: number) => void;
+    readonly isCompleting?: boolean;
+    readonly showWorkerId: boolean;
+  },
+) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          {showWorkerId && <TableHead>근로자 ID</TableHead>}
+          <TableHead>설명</TableHead>
+          <TableHead>기한</TableHead>
+          <TableHead>상태</TableHead>
+          {onComplete && <TableHead>처리</TableHead>}
+        </TableRow>
+      </TableHeader>
+      <TableBody>{renderRows(deadlines, { onComplete, isCompleting, showWorkerId })}</TableBody>
+    </Table>
+  );
 }
 
 export function DeadlineTable({
@@ -93,8 +169,10 @@ export function DeadlineTable({
   hasUnfilteredData,
   onComplete,
   isCompleting,
+  variant,
 }: DeadlineTableProps) {
   const [internalPage, setInternalPage] = useState(1);
+  const [expandedWorkers, setExpandedWorkers] = useState<Set<number>>(new Set());
 
   // 3-way branching to support different consumers:
   // dashboard summary (limit), compliance page with filters (external pagination),
@@ -121,43 +199,22 @@ export function DeadlineTable({
     }
   }
 
-  const groups = items ? groupByWorker(items) : [];
+  const groupStatusLabel =
+    variant === "overdue" || (variant === undefined && title.includes("기한초과"))
+      ? "기한초과"
+      : "임박";
+  const groups = items ? groupByWorker(items, groupStatusLabel !== "기한초과") : [];
   const isSingleWorker = groups.length <= 1;
-  const [expandedWorkers, setExpandedWorkers] = useState<Set<number>>(new Set());
-  const firstGroupId = groups[0]?.workerId;
-  const itemsKey = items?.map((item) => item.id).join(",") ?? "";
-
-  useEffect(() => {
-    if (isSingleWorker) {
-      setExpandedWorkers(new Set());
-      return;
-    }
-
-    if (firstGroupId != null) {
-      setExpandedWorkers(new Set([firstGroupId]));
-    }
-  }, [firstGroupId, isSingleWorker, itemsKey]);
-
-  const toggleWorker = (workerId: number) => {
-    setExpandedWorkers((prev) => {
-      const next = new Set(prev);
-
-      if (next.has(workerId)) {
-        next.delete(workerId);
-      } else {
-        next.add(workerId);
-      }
-
-      return next;
-    });
-  };
-
+  const deadlinesRef = JSON.stringify(deadlines?.map((deadline) => deadline.id) ?? []);
   const hasData = hasUnfilteredData ?? (deadlines != null && deadlines.length > 0);
   const emptyMessage = hasData ? "조건에 맞는 결과가 없습니다" : "데이터가 없습니다";
-  const groupStatusLabel = title.includes("기한초과") ? "기한초과" : "임박";
-  const groupStatusClass = title.includes("기한초과")
-    ? "bg-destructive/10 text-destructive"
-    : "bg-amber-500/10 text-amber-700";
+
+  useEffect(() => {
+    if (groups.length > 0 && !isSingleWorker) {
+      setExpandedWorkers(new Set([groups[0].workerId]));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deadlinesRef]);
 
   return (
     <Card>
@@ -167,8 +224,8 @@ export function DeadlineTable({
       <CardContent>
         {isLoading ? (
           <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} className="h-10 w-full" />
             ))}
           </div>
         ) : isError ? (
@@ -181,108 +238,54 @@ export function DeadlineTable({
         ) : (
           <>
             {isSingleWorker ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>설명</TableHead>
-                    <TableHead>기한</TableHead>
-                    <TableHead>상태</TableHead>
-                    {onComplete && <TableHead>처리</TableHead>}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((d) => (
-                    <TableRow key={d.id}>
-                      <TableCell>{d.description}</TableCell>
-                      <TableCell>{d.dueDate}</TableCell>
-                      <TableCell>
-                        <StatusBadge status={d.status} />
-                      </TableCell>
-                      {onComplete && (
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={d.status === "COMPLETED" || isCompleting}
-                            onClick={() => onComplete(d.id)}
-                          >
-                            {d.status === "COMPLETED" ? "완료됨" : "완료"}
-                          </Button>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              renderTable(items, { onComplete, isCompleting, showWorkerId: true })
             ) : (
               <div className="space-y-3">
                 {groups.map((group) => {
                   const isExpanded = expandedWorkers.has(group.workerId);
+                  const contentId = `deadline-group-${group.workerId}`;
 
                   return (
-                    <div key={group.workerId} className="overflow-hidden rounded-lg border">
-                      <button
+                    <section key={group.workerId} className="overflow-hidden rounded-lg border">
+                      <Button
                         type="button"
-                        onClick={() => toggleWorker(group.workerId)}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50"
+                        variant="ghost"
+                        className="flex h-auto w-full items-center justify-between rounded-none px-4 py-3 text-left"
                         aria-expanded={isExpanded}
-                      >
-                        <ChevronDown
-                          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-                            isExpanded ? "rotate-0" : "-rotate-90"
-                          }`}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="font-medium">{group.workerName}</div>
-                        </div>
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${groupStatusClass}`}
-                        >
-                          {groupStatusLabel}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {group.deadlines.length}건
-                        </span>
-                      </button>
+                        aria-controls={contentId}
+                        onClick={() => {
+                          setExpandedWorkers((current) => {
+                            const next = new Set(current);
 
+                            if (next.has(group.workerId)) {
+                              next.delete(group.workerId);
+                            } else {
+                              next.add(group.workerId);
+                            }
+
+                            return next;
+                          });
+                        }}
+                      >
+                        <span className="font-medium">
+                          {group.workerLabel} — {groupStatusLabel} {group.deadlines.length}건
+                        </span>
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        )}
+                      </Button>
                       {isExpanded && (
-                        <div className="border-t">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>설명</TableHead>
-                                <TableHead>기한</TableHead>
-                                <TableHead>상태</TableHead>
-                                {onComplete && <TableHead>처리</TableHead>}
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {group.deadlines.map((d) => (
-                                <TableRow key={d.id}>
-                                  <TableCell>{d.description}</TableCell>
-                                  <TableCell>{d.dueDate}</TableCell>
-                                  <TableCell>
-                                    <StatusBadge status={d.status} />
-                                  </TableCell>
-                                  {onComplete && (
-                                    <TableCell>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        disabled={d.status === "COMPLETED" || isCompleting}
-                                        onClick={() => onComplete(d.id)}
-                                      >
-                                        {d.status === "COMPLETED" ? "완료됨" : "완료"}
-                                      </Button>
-                                    </TableCell>
-                                  )}
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
+                        <div id={contentId} className="border-t px-4 py-3">
+                          {renderTable(group.deadlines, {
+                            onComplete,
+                            isCompleting,
+                            showWorkerId: false,
+                          })}
                         </div>
                       )}
-                    </div>
+                    </section>
                   );
                 })}
               </div>
