@@ -1,5 +1,6 @@
-'use client';
+"use client";
 
+import { OctagonAlert } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,23 +9,30 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
-type ErrorDialogProps = {
+interface ErrorDialogProps {
   readonly message: string | null;
   readonly onClose: () => void;
-};
+}
 
 export function ErrorDialog({ message, onClose }: ErrorDialogProps) {
   return (
     <AlertDialog open={message !== null}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>오류</AlertDialogTitle>
-          <AlertDialogDescription>{message}</AlertDialogDescription>
+      <AlertDialogContent className="max-w-sm">
+        <AlertDialogHeader className="items-center text-center">
+          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-signal-red-bg">
+            <OctagonAlert className="h-6 w-6 text-signal-red" />
+          </div>
+          <AlertDialogTitle className="text-base">오류가 발생했습니다</AlertDialogTitle>
+          <AlertDialogDescription className="text-sm">
+            {message}
+          </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={onClose}>확인</AlertDialogAction>
+        <AlertDialogFooter className="justify-center sm:justify-center">
+          <AlertDialogAction onClick={onClose} className="w-full">
+            확인
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
