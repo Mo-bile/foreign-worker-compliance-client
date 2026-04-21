@@ -20,13 +20,11 @@ export function ErrorDialog({ message, onClose }: ErrorDialogProps) {
   return (
     <AlertDialog open={message !== null}>
       <AlertDialogContent className="max-w-sm">
-        <AlertDialogHeader className="items-center text-center">
-          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-signal-red-bg">
-            <OctagonAlert className="h-6 w-6 text-signal-red" />
-          </div>
+        <AlertDialogHeader>
           <AlertDialogTitle className="sr-only">알림</AlertDialogTitle>
-          <AlertDialogDescription className="text-sm text-foreground">
-            {message}
+          <AlertDialogDescription className="flex items-start gap-3 text-sm text-foreground">
+            <OctagonAlert className="mt-0.5 h-5 w-5 shrink-0 text-signal-red" />
+            <span>{message}</span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="justify-center sm:justify-center">
