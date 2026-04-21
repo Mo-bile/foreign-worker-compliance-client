@@ -26,11 +26,8 @@ export function ErrorDialog({ message, onClose }: ErrorDialogProps) {
             {message}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="mt-4 sm:justify-stretch">
-          <AlertDialogAction
-            onClick={onClose}
-            className="h-9 w-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          >
+        <AlertDialogFooter className="mt-3 sm:justify-stretch">
+          <AlertDialogAction onClick={onClose} className="h-9 w-full">
             확인
           </AlertDialogAction>
         </AlertDialogFooter>
