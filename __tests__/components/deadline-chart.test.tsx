@@ -15,7 +15,7 @@ function makeDeadline(
     workerName: "Worker-1",
     deadlineType: "VISA_EXPIRY",
     dueDate: "2026-04-01",
-    status: "PENDING",
+    status: "APPROACHING",
     description: "테스트",
     ...overrides,
   };
@@ -50,16 +50,16 @@ describe("DeadlineChart", () => {
     const deadlines = [
       makeDeadline({ id: 1, status: "URGENT", dueDate: "2026-04-01" }),
       makeDeadline({ id: 2, status: "APPROACHING", dueDate: "2026-04-01" }),
-      makeDeadline({ id: 3, status: "PENDING", dueDate: "2026-04-02" }),
+      makeDeadline({ id: 3, status: "APPROACHING", dueDate: "2026-04-02" }),
     ];
     render(<DeadlineChart deadlines={deadlines} isLoading={false} isError={false} />);
     expect(screen.getByText("긴급")).toBeDefined();
     expect(screen.getByText("임박")).toBeDefined();
-    expect(screen.getByText("대기")).toBeDefined();
+    expect(screen.queryByText("대기")).toBeNull();
   });
 
   it("단일_날짜_단일_상태에서_정상_렌더한다", () => {
-    const deadlines = [makeDeadline({ id: 1, status: "PENDING", dueDate: "2026-04-01" })];
+    const deadlines = [makeDeadline({ id: 1, status: "APPROACHING", dueDate: "2026-04-01" })];
     render(<DeadlineChart deadlines={deadlines} isLoading={false} isError={false} />);
     expect(screen.queryByText("데이터가 없습니다")).toBeNull();
   });
@@ -70,29 +70,29 @@ describe("DeadlineChart", () => {
         makeDeadline({ id: 1, status: "URGENT", dueDate: "2026-04-01" }),
         makeDeadline({ id: 2, status: "URGENT", dueDate: "2026-04-01" }),
         makeDeadline({ id: 3, status: "APPROACHING", dueDate: "2026-04-01" }),
-        makeDeadline({ id: 4, status: "PENDING", dueDate: "2026-04-02" }),
+        makeDeadline({ id: 4, status: "APPROACHING", dueDate: "2026-04-02" }),
       ];
       const result = groupDeadlinesByDateAndStatus(deadlines);
       expect(result).toHaveLength(2);
-      expect(result[0]).toMatchObject({ urgent: 2, approaching: 1, pending: 0 });
-      expect(result[1]).toMatchObject({ urgent: 0, approaching: 0, pending: 1 });
+      expect(result[0]).toMatchObject({ urgent: 2, approaching: 1 });
+      expect(result[1]).toMatchObject({ urgent: 0, approaching: 1 });
     });
 
     it("OVERDUE와_COMPLETED를_제외한다", () => {
       const deadlines = [
         makeDeadline({ id: 1, status: "OVERDUE", dueDate: "2026-04-01" }),
         makeDeadline({ id: 2, status: "COMPLETED", dueDate: "2026-04-01" }),
-        makeDeadline({ id: 3, status: "PENDING", dueDate: "2026-04-01" }),
+        makeDeadline({ id: 3, status: "APPROACHING", dueDate: "2026-04-01" }),
       ];
       const result = groupDeadlinesByDateAndStatus(deadlines);
       expect(result).toHaveLength(1);
-      expect(result[0]).toMatchObject({ urgent: 0, approaching: 0, pending: 1 });
+      expect(result[0]).toMatchObject({ urgent: 0, approaching: 1 });
     });
 
     it("날짜순으로_정렬한다", () => {
       const deadlines = [
-        makeDeadline({ id: 1, status: "PENDING", dueDate: "2026-04-10" }),
-        makeDeadline({ id: 2, status: "PENDING", dueDate: "2026-04-01" }),
+        makeDeadline({ id: 1, status: "APPROACHING", dueDate: "2026-04-10" }),
+        makeDeadline({ id: 2, status: "APPROACHING", dueDate: "2026-04-01" }),
       ];
       const result = groupDeadlinesByDateAndStatus(deadlines);
       expect(result[0]?.sortKey).toBe("2026-04-01");
@@ -101,9 +101,9 @@ describe("DeadlineChart", () => {
 
     it("잘못된_날짜_형식의_데드라인을_건너뛴다", () => {
       const deadlines = [
-        makeDeadline({ id: 1, status: "PENDING", dueDate: "" }),
-        makeDeadline({ id: 2, status: "PENDING", dueDate: "20260401" }),
-        makeDeadline({ id: 3, status: "PENDING", dueDate: "2026-04-01" }),
+        makeDeadline({ id: 1, status: "APPROACHING", dueDate: "" }),
+        makeDeadline({ id: 2, status: "APPROACHING", dueDate: "20260401" }),
+        makeDeadline({ id: 3, status: "APPROACHING", dueDate: "2026-04-01" }),
       ];
       const result = groupDeadlinesByDateAndStatus(deadlines);
       expect(result).toHaveLength(1);

@@ -44,7 +44,7 @@ export interface ComplianceBreakdownItem {
 }
 
 export interface ComplianceScoreData {
-  readonly total: number;
+  readonly score: number;
   readonly breakdown: readonly ComplianceBreakdownItem[];
 }
 
@@ -115,7 +115,7 @@ export interface InsuranceRawSummaryItem {
 }
 
 export interface ComplianceRawScoreData {
-  readonly total: number;
+  readonly score: number;
   readonly breakdown: readonly ComplianceRawBreakdownItem[];
 }
 

@@ -63,6 +63,10 @@ const COMPLIANCE_CATEGORY_LABEL_MAP: Record<string, string> = {
 
 // ─── Helpers ─────────────────────────────────────────────────────
 
+function toFiniteNumber(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
 function toAlertGroupUrgency(dDay: number): AlertGroupUrgency {
   if (dDay >= CRITICAL_DDAY_THRESHOLD) return "critical";
   if (dDay >= WARNING_DDAY_THRESHOLD) return "warning";
@@ -185,7 +189,11 @@ export function transformDashboardResponse(raw: DashboardRawResponse): Dashboard
     visaDistribution: raw.visaDistribution.map(transformVisaDistribution),
     insuranceSummary: raw.insuranceSummary.map(transformInsuranceSummary),
     complianceScore: {
-      total: raw.complianceScore.total,
+      score: toFiniteNumber(
+        raw.complianceScore.score
+          ?? (raw.complianceScore as Record<string, unknown>).total,
+        0,
+      ),
       breakdown: raw.complianceScore.breakdown.map(transformComplianceBreakdown),
     },
     aiInsight: raw.aiInsight,

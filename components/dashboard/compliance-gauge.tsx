@@ -19,7 +19,7 @@ interface ComplianceGaugeProps {
 
 export function ComplianceGauge({ data }: ComplianceGaugeProps) {
   const gradientId = useId();
-  const offset = ARC_LENGTH * (1 - data.total / 100);
+  const offset = ARC_LENGTH * (1 - data.score / 100);
 
   return (
     <Card>
@@ -58,8 +58,8 @@ export function ComplianceGauge({ data }: ComplianceGaugeProps) {
               className="transition-[stroke-dashoffset] duration-700 ease-out"
             />
           </svg>
-          <p className={cn("mt-[-8px] text-[40px] font-extrabold", getScoreColor(data.total))}>
-            {data.total}
+          <p className={cn("mt-[-8px] text-[40px] font-extrabold", getScoreColor(data.score))}>
+            {data.score}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">100점 만점</p>
         </div>

@@ -9,12 +9,12 @@ import { DEADLINE_STATUS_LABELS } from "@/types/api";
 import { DEADLINE_STATUS_CHART_COLORS } from "@/lib/constants/status";
 
 // ─── Constants ───────────────────────────────────────────
-const CHART_STATUSES = ["PENDING", "APPROACHING", "URGENT"] as const;
+const CHART_STATUSES = ["APPROACHING", "URGENT"] as const;
 type ChartStatus = (typeof CHART_STATUSES)[number];
 
 // Stack order bottom → top: 낮은 긴급도가 바닥, 높은 긴급도가 꼭대기.
 // 마지막 요소(URGENT)에만 radius=[4,4,0,0] 적용됨 — 순서 변경 시 radius 로직도 확인할 것.
-const STACK_ORDER: ChartStatus[] = ["PENDING", "APPROACHING", "URGENT"];
+const STACK_ORDER: ChartStatus[] = ["APPROACHING", "URGENT"];
 
 export interface ChartDatum {
   readonly sortKey: string;
@@ -22,7 +22,6 @@ export interface ChartDatum {
   readonly displayDate: string;
   readonly urgent: number;
   readonly approaching: number;
-  readonly pending: number;
 }
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -53,14 +52,14 @@ function isChartStatus(status: string): status is ChartStatus {
 export function groupDeadlinesByDateAndStatus(
   deadlines: readonly ComplianceDeadlineResponse[],
 ): ChartDatum[] {
-  const grouped = new Map<string, { urgent: number; approaching: number; pending: number }>();
+  const grouped = new Map<string, { urgent: number; approaching: number }>();
 
   for (const d of deadlines) {
     if (!d.dueDate || !ISO_DATE_RE.test(d.dueDate)) continue;
     if (!isChartStatus(d.status)) continue;
 
-    const entry = grouped.get(d.dueDate) ?? { urgent: 0, approaching: 0, pending: 0 };
-    const key = d.status.toLowerCase() as "urgent" | "approaching" | "pending";
+    const entry = grouped.get(d.dueDate) ?? { urgent: 0, approaching: 0 };
+    const key = d.status.toLowerCase() as "urgent" | "approaching";
     grouped.set(d.dueDate, { ...entry, [key]: entry[key] + 1 });
   }
 
@@ -88,7 +87,7 @@ function ChartTooltip({ active, payload }: ChartTooltipProps) {
   const datum = payload[0]?.payload as ChartDatum | undefined;
   if (!datum) return null;
 
-  const total = datum.urgent + datum.approaching + datum.pending;
+  const total = datum.urgent + datum.approaching;
 
   const rows: { label: string; color: string; value: number }[] = [
     {
@@ -100,11 +99,6 @@ function ChartTooltip({ active, payload }: ChartTooltipProps) {
       label: DEADLINE_STATUS_LABELS.APPROACHING,
       color: DEADLINE_STATUS_CHART_COLORS.APPROACHING,
       value: datum.approaching,
-    },
-    {
-      label: DEADLINE_STATUS_LABELS.PENDING,
-      color: DEADLINE_STATUS_CHART_COLORS.PENDING,
-      value: datum.pending,
     },
   ].filter((r) => r.value > 0);
 
@@ -146,7 +140,7 @@ function ChartTooltip({ active, payload }: ChartTooltipProps) {
 }
 
 // ─── Custom Legend ────────────────────────────────────────
-// Legend shows highest-severity first (URGENT → PENDING), opposite of STACK_ORDER.
+// Legend shows highest-severity first (URGENT → APPROACHING), opposite of STACK_ORDER.
 const LEGEND_ORDER: readonly ChartStatus[] = [...STACK_ORDER].reverse();
 
 function ChartLegend() {

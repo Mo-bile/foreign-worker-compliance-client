@@ -4,7 +4,7 @@ import { ComplianceGauge } from "@/components/dashboard/compliance-gauge";
 import type { ComplianceScoreData } from "@/types/dashboard";
 
 const scoreData: ComplianceScoreData = {
-  total: 73,
+  score: 73,
   breakdown: [
     { label: "보험 가입", score: 92 },
     { label: "데드라인 준수", score: 65 },

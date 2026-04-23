@@ -60,7 +60,7 @@ const baseRaw: DashboardRawResponse = {
     { insuranceType: "INDUSTRIAL_ACCIDENT", mandatoryCount: 12, totalWorkers: 12 },
   ],
   complianceScore: {
-    total: 73,
+    score: 73,
     breakdown: [
       { category: "INSURANCE", score: 92 },
       { category: "DEADLINE", score: 65 },
@@ -266,16 +266,16 @@ describe("transformDashboardResponse", () => {
       expect(result.complianceScore.breakdown[1].label).toBe("데드라인 준수");
     });
 
-    it("total을_그대로_전달한다", () => {
+    it("score를_그대로_전달한다", () => {
       const result = transformDashboardResponse(baseRaw);
-      expect(result.complianceScore.total).toBe(73);
+      expect(result.complianceScore.score).toBe(73);
     });
 
     it("COMPLIANCE_CATEGORY_LABEL_MAP에_등록된_category는_한글_label로_변환한다", () => {
       const raw: DashboardRawResponse = {
         ...baseRaw,
         complianceScore: {
-          total: 50,
+          score: 50,
           breakdown: [{ category: "WAGE", score: 50 }],
         },
       };

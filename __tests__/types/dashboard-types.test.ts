@@ -57,12 +57,12 @@ describe("Dashboard Types", () => {
       alertGroups: [],
       visaDistribution: [],
       insuranceSummary: [],
-      complianceScore: { total: 73, breakdown: [] },
+      complianceScore: { score: 73, breakdown: [] },
       aiInsight: { content: "test", generatedAt: "2026-03-24T06:00:00+09:00" },
       timeline: [],
     };
     expect(response.stats.totalWorkers).toBe(12);
-    expect(response.complianceScore.total).toBe(73);
+    expect(response.complianceScore.score).toBe(73);
     expect(response.alertGroups).toHaveLength(0);
     expect(response.timeline).toHaveLength(0);
   });

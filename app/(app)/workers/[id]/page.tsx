@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InsuranceBadge } from "@/components/workers/insurance-badge";
-import { DeadlineTable } from "@/components/compliance/deadline-table";
+import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-timeline";
 import { useWorker } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
 
@@ -122,8 +122,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         </CardContent>
       </Card>
 
-      <DeadlineTable
-        title="컴플라이언스 데드라인"
+      <WorkerDeadlineTimeline
         deadlines={deadlines.data}
         isLoading={deadlines.isLoading}
         isError={deadlines.isError}
