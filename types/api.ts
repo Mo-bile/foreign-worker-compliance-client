@@ -306,6 +306,7 @@ export interface CompanyResponse {
   readonly foreignWorkerCount: number;
   readonly address: string;
   readonly contactPhone: string;
+  readonly contactEmail: string | null;
   readonly averageForeignWorkerWage: number | null;
   readonly recentYearTerminationCount: number | null;
   readonly createdAt: string;
