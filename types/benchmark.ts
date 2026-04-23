@@ -98,6 +98,7 @@ export const benchmarkResponseSchema = z
     companyId: z.number(),
     analyzedAt: z.string(),
     managementScore: z.number(),
+    managementGrade: z.enum(["EXCELLENT", "GOOD", "CAUTION", "RISK"]),
     aiReport: z.string(),
     wageAnalysis: wageAnalysisSchema.nullable(),
     stabilityAnalysis: stabilityAnalysisSchema.nullable(),
@@ -107,7 +108,21 @@ export const benchmarkResponseSchema = z
   .refine((d) => d.managementScore === d.managementCheck.score, {
     message: "managementScore must equal managementCheck.score",
     path: ["managementScore"],
-  });
+  })
+  .refine(
+    (d) => {
+      const score = d.managementScore;
+      const grade = d.managementGrade;
+      if (grade === "EXCELLENT") return score >= 90;
+      if (grade === "GOOD") return score >= 70 && score < 90;
+      if (grade === "CAUTION") return score >= 50 && score < 70;
+      return score < 50;
+    },
+    {
+      message: "managementGrade must match managementScore boundary (90/70/50)",
+      path: ["managementGrade"],
+    },
+  );
 export type BenchmarkResponse = z.infer<typeof benchmarkResponseSchema>;
 
 // ─── Create Request ─────────────────────────────────────────

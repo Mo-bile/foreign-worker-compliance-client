@@ -6,6 +6,7 @@ export const mockBenchmarkResponse: BenchmarkResponse = {
   analyzedAt: "2026-04-11T09:00:00Z",
 
   managementScore: 80,
+  managementGrade: "GOOD" as const,
   aiReport:
     "귀사의 관리 수준 점수는 **80점**입니다.\n\n" +
     "**임금 포지셔닝:** 귀사 E-9 평균 월임금 260만원은 전국 E-9의 " +
@@ -81,6 +82,7 @@ export const mockBenchmarkEmpty: BenchmarkResponse = {
   companyId: 1,
   analyzedAt: "2026-04-10T09:00:00Z",
   managementScore: 80,
+  managementGrade: "GOOD" as const,
   aiReport:
     "귀사의 관리 수준 점수는 **80점**입니다.\n\n" +
     "임금 및 고용 안정성 데이터가 입력되지 않아 해당 진단은 생략되었습니다.\n\n" +
@@ -125,6 +127,7 @@ export const mockBenchmarkList: BenchmarkResponse[] = [
     id: 3,
     analyzedAt: "2026-03-15T09:00:00Z",
     managementScore: 70,
+    managementGrade: "GOOD" as const,
     managementCheck: {
       ...mockBenchmarkResponse.managementCheck,
       passedItems: 7,
