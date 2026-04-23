@@ -23,12 +23,12 @@ export function ComplianceGauge({ data }: ComplianceGaugeProps) {
 
   return (
     <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            통합 컴플라이언스 점수
-          </CardTitle>
-        </CardHeader>
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+          <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          통합 컴플라이언스 점수
+        </CardTitle>
+      </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center py-4">
           <svg className="h-[120px] w-[200px]" viewBox="0 0 200 120">

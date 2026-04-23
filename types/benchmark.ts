@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MANAGEMENT_GRADES } from "@/lib/constants/benchmark";
 
 // ─── Wage Analysis ──────────────────────────────────────────
 
@@ -98,7 +99,7 @@ export const benchmarkResponseSchema = z
     companyId: z.number(),
     analyzedAt: z.string(),
     managementScore: z.number(),
-    managementGrade: z.enum(["EXCELLENT", "GOOD", "CAUTION", "RISK"]),
+    managementGrade: z.enum(MANAGEMENT_GRADES),
     aiReport: z.string(),
     wageAnalysis: wageAnalysisSchema.nullable(),
     stabilityAnalysis: stabilityAnalysisSchema.nullable(),

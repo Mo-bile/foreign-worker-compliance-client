@@ -10,7 +10,7 @@ export const MANAGEMENT_GRADE_LABELS: Record<ManagementGrade, string> = {
 
 export const MANAGEMENT_GRADE_COLORS: Record<ManagementGrade, string> = {
   EXCELLENT: "text-signal-green",
-  GOOD: "text-signal-blue",
+  GOOD: "text-signal-orange",
   CAUTION: "text-signal-yellow",
   RISK: "text-signal-red",
 };
