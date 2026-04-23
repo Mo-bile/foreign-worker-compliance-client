@@ -8,6 +8,7 @@ describe("benchmarkResponseSchema", () => {
       companyId: 1,
       analyzedAt: "2026-04-11T09:00:00Z",
       managementScore: 50,
+      managementGrade: "CAUTION",
       aiReport: "**테스트** 리포트",
       wageAnalysis: {
         companyAvgWage: 260,
@@ -62,6 +63,7 @@ describe("benchmarkResponseSchema", () => {
       companyId: 1,
       analyzedAt: "2026-04-11T09:00:00Z",
       managementScore: 50,
+      managementGrade: "CAUTION",
       aiReport: "리포트",
       wageAnalysis: null,
       stabilityAnalysis: null,
@@ -93,6 +95,77 @@ describe("benchmarkResponseSchema", () => {
   it("필수 필드 누락 시 파싱 실패", () => {
     expect(() => benchmarkResponseSchema.parse({})).toThrow();
     expect(() => benchmarkResponseSchema.parse({ id: 1 })).toThrow();
+  });
+
+  it("managementGrade와_managementScore_경계값이_일치하지_않으면_파싱_실패", () => {
+    const base = {
+      id: 1,
+      companyId: 1,
+      analyzedAt: "2026-04-11T09:00:00Z",
+      managementScore: 89,
+      managementGrade: "EXCELLENT",
+      aiReport: "리포트",
+      wageAnalysis: null,
+      stabilityAnalysis: null,
+      managementCheck: {
+        totalItems: 10,
+        passedItems: 9,
+        score: 89,
+        items: Array.from({ length: 10 }, (_, i) => ({
+          category: "테스트",
+          label: `항목 ${i + 1}`,
+          passed: i < 9,
+          required: true,
+        })),
+      },
+      positioningAnalysis: {
+        region: "경기도",
+        industryCategory: "식료품제조업",
+        regionalTotal: 100,
+        industryTotal: 50,
+        companyForeignWorkerCount: 5,
+        companyShare: 0.1,
+        sizeCategory: "소규모",
+      },
+    };
+
+    expect(() => benchmarkResponseSchema.parse(base)).toThrow();
+  });
+
+  it("managementGrade_EXCELLENT과_score_90_이상이면_파싱_성공", () => {
+    const base = {
+      id: 1,
+      companyId: 1,
+      analyzedAt: "2026-04-11T09:00:00Z",
+      managementScore: 90,
+      managementGrade: "EXCELLENT",
+      aiReport: "리포트",
+      wageAnalysis: null,
+      stabilityAnalysis: null,
+      managementCheck: {
+        totalItems: 10,
+        passedItems: 9,
+        score: 90,
+        items: Array.from({ length: 10 }, (_, i) => ({
+          category: "테스트",
+          label: `항목 ${i + 1}`,
+          passed: i < 9,
+          required: true,
+        })),
+      },
+      positioningAnalysis: {
+        region: "경기도",
+        industryCategory: "식료품제조업",
+        regionalTotal: 100,
+        industryTotal: 50,
+        companyForeignWorkerCount: 5,
+        companyShare: 0.1,
+        sizeCategory: "소규모",
+      },
+    };
+
+    const result = benchmarkResponseSchema.parse(base);
+    expect(result.managementGrade).toBe("EXCELLENT");
   });
 });
 

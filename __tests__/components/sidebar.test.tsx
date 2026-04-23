@@ -29,4 +29,9 @@ describe("Sidebar", () => {
     const link = screen.getByText("법령·리포트").closest("a");
     expect(link).toHaveClass("bg-secondary");
   });
+
+  it("데드라인 관리 항목이 더 이상 존재하지 않는다", () => {
+    render(<Sidebar />);
+    expect(screen.queryByText("데드라인 관리")).not.toBeInTheDocument();
+  });
 });
