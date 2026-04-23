@@ -42,7 +42,7 @@ function sortDeadlines(
 interface WorkerDeadlineTimelineProps {
   readonly deadlines: readonly ComplianceDeadlineResponse[] | undefined;
   readonly isLoading: boolean;
-  readonly isError: boolean;
+  readonly isError?: boolean;
 }
 
 export function WorkerDeadlineTimeline({

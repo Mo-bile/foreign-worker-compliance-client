@@ -1,6 +1,5 @@
 "use client";
 
-import { CircleAlert } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
