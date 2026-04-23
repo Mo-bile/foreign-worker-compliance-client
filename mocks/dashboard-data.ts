@@ -58,7 +58,7 @@ export const mockDashboardRaw: DashboardRawResponse = {
     { insuranceType: "INDUSTRIAL_ACCIDENT", mandatoryCount: 12, totalWorkers: 12 },
   ],
   complianceScore: {
-    total: 73,
+    score: 73,
     breakdown: [
       { category: "INSURANCE", score: 92 },
       { category: "DEADLINE", score: 65 },
@@ -116,7 +116,7 @@ export const mockDashboardRaw: DashboardRawResponse = {
       workerName: "Tran E",
       visaType: "E9",
       deadlineType: "CHANGE_REPORT",
-      status: "PENDING",
+      status: "APPROACHING",
       dDay: -58,
       dueDate: "2026-05-26",
     },

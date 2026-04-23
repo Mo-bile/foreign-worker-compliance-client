@@ -322,7 +322,7 @@ function generateOverdueDeadline(id: number): ComplianceDeadlineResponse {
 function generateUpcomingDeadline(id: number): ComplianceDeadlineResponse {
   const typeIdx = id % SAMPLE_DEADLINE_TYPES.length;
   const type = SAMPLE_DEADLINE_TYPES[typeIdx];
-  const statuses = ["APPROACHING", "URGENT", "PENDING"] as const;
+  const statuses = ["APPROACHING", "URGENT"] as const;
   const workerId = (id % 25) + 1;
   return {
     id,
@@ -330,7 +330,7 @@ function generateUpcomingDeadline(id: number): ComplianceDeadlineResponse {
     workerName: getWorkerName(workerId),
     deadlineType: type,
     dueDate: `2026-${String((id % 12) + 1).padStart(2, "0")}-${String((id % 28) + 1).padStart(2, "0")}`,
-    status: statuses[id % 3],
+    status: statuses[id % 2],
     description: SAMPLE_DEADLINE_DESCS[type],
   };
 }

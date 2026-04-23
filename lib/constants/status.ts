@@ -11,10 +11,9 @@ export const DEADLINE_STATUS_BADGE_STYLES: Record<DeadlineStatus, string> = {
     "bg-[var(--signal-green-bg)] text-[var(--signal-green)] hover:bg-[var(--signal-green-bg)]",
 } as const;
 
-type ChartableStatus = Exclude<DeadlineStatus, "OVERDUE" | "COMPLETED">;
+type ChartableStatus = Exclude<DeadlineStatus, "OVERDUE" | "COMPLETED" | "PENDING">;
 
 export const DEADLINE_STATUS_CHART_COLORS: Record<ChartableStatus, string> = {
   URGENT: "var(--signal-orange)",
   APPROACHING: "var(--signal-yellow)",
-  PENDING: "var(--signal-green)",
 } as const;
