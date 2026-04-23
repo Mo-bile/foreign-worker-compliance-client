@@ -11,7 +11,6 @@ import {
   Lightbulb,
   BarChart3,
   FileText,
-  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -44,8 +43,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
     label: "지속 관리",
     items: [
       { href: "/compliance", label: "데드라인 관리", icon: AlertTriangle },
-      { href: "/legal-changes", label: "법령 변경 알림", icon: FileText },
-      { href: "/reports", label: "컴플라이언스 리포트", icon: ClipboardList },
+      { href: "/legal", label: "법령·리포트", icon: FileText },
     ],
   },
 ];

@@ -1,6 +1,6 @@
 "use client";
 
-import { OctagonAlert } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,18 +19,15 @@ interface ErrorDialogProps {
 export function ErrorDialog({ message, onClose }: ErrorDialogProps) {
   return (
     <AlertDialog open={message !== null}>
-      <AlertDialogContent className="max-w-sm">
-        <AlertDialogHeader className="items-center text-center">
-          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-signal-red-bg">
-            <OctagonAlert className="h-6 w-6 text-signal-red" />
-          </div>
-          <AlertDialogTitle className="sr-only">알림</AlertDialogTitle>
-          <AlertDialogDescription className="text-sm text-foreground">
+      <AlertDialogContent className="max-w-[340px] gap-4 px-5 pb-5 pt-6">
+        <AlertDialogHeader className="space-y-0">
+          <AlertDialogTitle className="sr-only">오류 안내</AlertDialogTitle>
+          <AlertDialogDescription className="text-center text-[14px] leading-relaxed text-foreground">
             {message}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="justify-center sm:justify-center">
-          <AlertDialogAction onClick={onClose} className="w-full">
+        <AlertDialogFooter className="sm:justify-stretch">
+          <AlertDialogAction onClick={onClose} className="h-9 w-full">
             확인
           </AlertDialogAction>
         </AlertDialogFooter>
