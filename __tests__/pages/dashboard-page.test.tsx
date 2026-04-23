@@ -51,7 +51,7 @@ describe("DashboardPage", () => {
     expect(screen.getByText("4대보험 현황")).toBeDefined();
     expect(screen.getByText("AI 인사이트")).toBeDefined();
     expect(screen.getByText(/현재 상태 요약/)).toBeDefined();
-    expect(screen.getByText("컴플라이언스 점수")).toBeDefined();
+    expect(screen.getByText("통합 컴플라이언스 점수")).toBeDefined();
     expect(screen.getByText("30일 타임라인")).toBeDefined();
   });
 
