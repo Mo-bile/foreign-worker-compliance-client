@@ -185,7 +185,7 @@ export function transformDashboardResponse(raw: DashboardRawResponse): Dashboard
     visaDistribution: raw.visaDistribution.map(transformVisaDistribution),
     insuranceSummary: raw.insuranceSummary.map(transformInsuranceSummary),
     complianceScore: {
-      total: raw.complianceScore.total,
+      score: raw.complianceScore.score,
       breakdown: raw.complianceScore.breakdown.map(transformComplianceBreakdown),
     },
     aiInsight: raw.aiInsight,

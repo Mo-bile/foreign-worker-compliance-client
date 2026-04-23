@@ -19,7 +19,7 @@ describe("mockDashboardRaw", () => {
   });
 
   it("complianceScore_total이_73이다", () => {
-    expect(mockDashboardRaw.complianceScore.total).toBe(73);
+    expect(mockDashboardRaw.complianceScore.score).toBe(73);
     expect(mockDashboardRaw.complianceScore.breakdown).toHaveLength(2);
   });
 

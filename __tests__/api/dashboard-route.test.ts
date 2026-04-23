@@ -27,7 +27,7 @@ describe("GET /api/dashboard", () => {
     expect(data.alertGroups.length).toBeGreaterThan(0);
     expect(data.alertGroups[0].urgency).toBeDefined();
     expect(data.alertGroups[0].label).toBeDefined();
-    expect(data.complianceScore.total).toBe(73);
+    expect(data.complianceScore.score).toBe(73);
     expect(data.insuranceSummary[0].label).toBeDefined();
     expect(data.timeline[0].urgency).toBeDefined();
   });

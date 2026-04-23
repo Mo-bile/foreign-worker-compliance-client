@@ -29,7 +29,7 @@ describe("useDashboard", () => {
 
     expect(result.current.data?.stats.totalWorkers).toBe(12);
     expect(result.current.data?.alertGroups.length).toBeGreaterThan(0);
-    expect(result.current.data?.complianceScore.total).toBe(73);
+    expect(result.current.data?.complianceScore.score).toBe(73);
   });
 
   it("companyId가_undefined이면_쿼리를_비활성화한다", () => {
