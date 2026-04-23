@@ -1,6 +1,7 @@
 "use client";
 
 import { VISA_TYPE_SHORT } from "@/types/api";
+import Link from "next/link";
 import { Users, Shield, Clock, AlertTriangle } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { AlertGroupCard } from "@/components/dashboard/alert-group-card";
@@ -85,14 +86,22 @@ export default function DashboardPage() {
               : undefined
           }
         />
-        <StatCard
-          title="다가오는 데드라인"
-          value={stats.upcomingDeadlines}
-          icon={Clock}
-          isLoading={false}
-          className="border-t-[color:var(--signal-orange)]"
-          subtitle={`D-7 이내 ${stats.deadlineBreakdown.d7}건 · D-30 이내 ${stats.deadlineBreakdown.d30}건`}
-        />
+        <div>
+          <StatCard
+            title="다가오는 데드라인"
+            value={stats.upcomingDeadlines}
+            icon={Clock}
+            isLoading={false}
+            className="border-t-[color:var(--signal-orange)]"
+            subtitle={`D-7 이내 ${stats.deadlineBreakdown.d7}건 · D-30 이내 ${stats.deadlineBreakdown.d30}건`}
+          />
+          <Link
+            href="/compliance"
+            className="mt-1.5 block text-center text-xs text-primary hover:underline"
+          >
+            전체 데드라인 보기 →
+          </Link>
+        </div>
         <StatCard
           title="긴급 조치 필요"
           value={stats.urgentActions}

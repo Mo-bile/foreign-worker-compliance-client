@@ -6,7 +6,6 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   Users,
-  AlertTriangle,
   Building2,
   Lightbulb,
   BarChart3,
@@ -42,7 +41,6 @@ const NAV_SECTIONS: readonly NavSection[] = [
   {
     label: "지속 관리",
     items: [
-      { href: "/compliance", label: "데드라인 관리", icon: AlertTriangle },
       { href: "/legal", label: "법령·리포트", icon: FileText },
     ],
   },
