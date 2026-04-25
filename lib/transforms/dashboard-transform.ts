@@ -45,7 +45,9 @@ const ALERT_TITLE_MAP: Record<DeadlineType, string> = {
   EMPLOYMENT_INSURANCE_ENROLLMENT: "고용보험 취득신고",
   INDUSTRIAL_ACCIDENT_ENROLLMENT: "산재보험 취득신고",
   CONTRACT_RENEWAL: "근로계약 갱신",
-  CHANGE_REPORT: "고용변동 신고",
+  CHANGE_REPORT: "고용변동신고 (15일 이내)",
+  EXIT_GUARANTEE_INSURANCE: "출국만기보험",
+  WAGE_GUARANTEE_INSURANCE: "임금체불보증보험",
 };
 
 const INSURANCE_LABEL_MAP: Record<string, string> = {

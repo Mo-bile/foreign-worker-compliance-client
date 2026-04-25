@@ -42,7 +42,7 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
         </span>
         {change.dDay != null && (
           <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            D-{change.dDay}
+            {change.dDay > 0 ? `D+${change.dDay}` : `D${change.dDay}`}
           </span>
         )}
       </div>
@@ -85,9 +85,12 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
             </div>
           ) : data ? (
             <>
-              <ImpactBox impacts={data.impacts} />
-              <AiInsightBlock html={data.aiAnalysis} />
-              <ActionRow actions={data.actions} />
+              <ImpactBox
+                level={data.level}
+                description={data.description}
+                actions={data.actions}
+                impacts={(data as Record<string, unknown>).impacts as readonly string[] | undefined}
+              />
             </>
           ) : null}
         </div>
