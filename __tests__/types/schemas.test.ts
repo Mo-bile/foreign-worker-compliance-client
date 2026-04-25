@@ -153,8 +153,10 @@ describe("enum 상수", () => {
     expect(INSURANCE_STATUSES).toHaveLength(5);
   });
 
-  it("DEADLINE_TYPES는_7개_값을_가지고_HEALTH_INSURANCE_ENROLLMENT를_포함한다", () => {
-    expect(DEADLINE_TYPES).toHaveLength(7);
+  it("DEADLINE_TYPES는_9개_값을_가지고_전용보험_2종을_포함한다", () => {
+    expect(DEADLINE_TYPES).toHaveLength(9);
     expect(DEADLINE_TYPES).toContain("HEALTH_INSURANCE_ENROLLMENT");
+    expect(DEADLINE_TYPES).toContain("EXIT_GUARANTEE_INSURANCE");
+    expect(DEADLINE_TYPES).toContain("WAGE_GUARANTEE_INSURANCE");
   });
 });

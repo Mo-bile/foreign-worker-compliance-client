@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InsuranceBadge } from "@/components/workers/insurance-badge";
+import { H2Badge } from "@/components/workers/h2-badge";
+import { SpecialtyInsuranceCard } from "@/components/workers/specialty-insurance-card";
 import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-timeline";
 import { useWorker } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
@@ -66,6 +68,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
               <dd className="font-medium">
                 <span className="font-mono text-xs">{w.visaTypeCode}</span>
                 <span className="ml-1.5">{w.visaType}</span>
+                <H2Badge visaTypeCode={w.visaTypeCode} />
               </dd>
             </div>
             <div>
@@ -121,6 +124,8 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
           )}
         </CardContent>
       </Card>
+
+      <SpecialtyInsuranceCard visaTypeCode={w.visaTypeCode} deadlines={deadlines.data ?? []} />
 
       <WorkerDeadlineTimeline
         deadlines={deadlines.data}
