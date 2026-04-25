@@ -82,7 +82,11 @@ export default function BenchmarkPage() {
 
       {/* 상단: Score Ring + 4축 요약 Stat Cards */}
       <div className="grid grid-cols-[240px_1fr] gap-4">
-        <ScoreRingCard managementScore={latest.managementScore} analyzedAt={latest.analyzedAt} />
+        <ScoreRingCard
+          managementScore={latest.managementScore}
+          grade={latest.managementGrade}
+          analyzedAt={latest.analyzedAt}
+        />
         <BenchmarkStatCards benchmark={latest} />
       </div>
 

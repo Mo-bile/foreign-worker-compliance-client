@@ -1,37 +1,47 @@
-import type { SignalColor } from "./shared";
+import { z } from "zod";
 
-// ─── Legal Changes List ─────────────────────────────
-export type LegalStatus = "action_required" | "reference" | "resolved";
-export type LegalSeverity = "critical" | "warning" | "info" | "resolved";
+export const LEGAL_CATEGORIES = [
+  "IMMIGRATION",
+  "LABOR",
+  "WAGE_RETIREMENT",
+  "SAFETY",
+  "INSURANCE",
+] as const;
 
-export interface LegalChange {
-  readonly id: string;
-  readonly title: string;
-  readonly icon: string;
-  readonly lawName: string;
-  readonly effectiveDate: string;
-  readonly detectedDate: string;
-  readonly severity: LegalSeverity;
-  readonly status: LegalStatus;
-  readonly badge: { readonly text: string; readonly color: SignalColor };
-  readonly dDay?: number;
-}
+export const LEGAL_CHANGE_TYPES = ["AMENDMENT", "ENFORCEMENT"] as const;
 
-export interface LegalChangesResponse {
-  readonly changes: readonly LegalChange[];
-  readonly lastSyncedAt: string;
-}
+export const IMPACT_LEVELS = ["HIGH", "MEDIUM", "LOW"] as const;
 
-// ─── Legal Impact (Detail) ──────────────────────────
-export interface LegalImpact {
-  readonly changeId: string;
-  readonly impacts: readonly string[];
-  readonly aiAnalysis: string;
-  readonly actions: readonly LegalAction[];
-}
+export const legalCategorySchema = z.enum(LEGAL_CATEGORIES);
 
-export interface LegalAction {
-  readonly label: string;
-  readonly primary?: boolean;
-  readonly href?: string;
-}
+export const legalChangeTypeSchema = z.enum(LEGAL_CHANGE_TYPES);
+
+export const impactLevelSchema = z.enum(IMPACT_LEVELS);
+
+export const legalChangeSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  lawName: z.string(),
+  category: legalCategorySchema,
+  categoryName: z.string(),
+  changeType: legalChangeTypeSchema,
+  changeTypeName: z.string(),
+  effectiveDate: z.string(),
+  summary: z.string(),
+  acknowledged: z.boolean().optional().default(false),
+});
+
+export const legalChangesResponseSchema = z.array(legalChangeSchema);
+
+export const legalImpactSchema = z.object({
+  level: impactLevelSchema,
+  actions: z.array(z.string()),
+  description: z.string(),
+});
+
+export type LegalCategory = z.infer<typeof legalCategorySchema>;
+export type LegalChangeType = z.infer<typeof legalChangeTypeSchema>;
+export type ImpactLevel = z.infer<typeof impactLevelSchema>;
+export type LegalChange = z.infer<typeof legalChangeSchema>;
+export type LegalChangesResponse = z.infer<typeof legalChangesResponseSchema>;
+export type LegalImpact = z.infer<typeof legalImpactSchema>;
