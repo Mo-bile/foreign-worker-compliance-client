@@ -96,6 +96,8 @@ export const DEADLINE_TYPES = [
   "INDUSTRIAL_ACCIDENT_ENROLLMENT",
   "CHANGE_REPORT",
   "CONTRACT_RENEWAL",
+  "EXIT_GUARANTEE_INSURANCE",
+  "WAGE_GUARANTEE_INSURANCE",
 ] as const;
 export type DeadlineType = (typeof DEADLINE_TYPES)[number];
 
@@ -213,8 +215,10 @@ export const DEADLINE_TYPE_LABELS: Record<DeadlineType, string> = {
   HEALTH_INSURANCE_ENROLLMENT: "건강보험 취득신고",
   EMPLOYMENT_INSURANCE_ENROLLMENT: "고용보험 취득신고",
   INDUSTRIAL_ACCIDENT_ENROLLMENT: "산재보험 취득신고",
-  CHANGE_REPORT: "변경 신고",
+  CHANGE_REPORT: "고용변동신고 (15일 이내)",
   CONTRACT_RENEWAL: "계약 갱신",
+  EXIT_GUARANTEE_INSURANCE: "출국만기보험",
+  WAGE_GUARANTEE_INSURANCE: "임금체불보증보험",
 };
 
 export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
