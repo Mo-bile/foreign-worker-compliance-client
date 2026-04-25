@@ -17,6 +17,7 @@ import type {
   WorkerResponse,
   WorkerStatus,
 } from "@/types/api";
+import { H2Badge } from "./h2-badge";
 
 const VISA_FILTER_LABELS: Record<VisaType, string> = Object.fromEntries(
   VISA_TYPES.map((v) => [v, `${v} — ${VISA_TYPE_LABELS[v]}`]),
@@ -171,6 +172,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     <TableCell>
                       <span className="font-mono text-xs">{worker.visaTypeCode}</span>
                       <span className="ml-1.5 text-muted-foreground">{worker.visaType}</span>
+                      <H2Badge visaTypeCode={worker.visaTypeCode} />
                     </TableCell>
                     <TableCell>{worker.visaExpiryDate}</TableCell>
                     <TableCell>
