@@ -156,6 +156,40 @@ export default function ReportsPage() {
   if (isLoading) return <ReportSkeleton />;
 
   if (isError) {
+    const is404 = error?.message?.includes("404") || error?.message?.includes("not found");
+    if (is404) {
+      return (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="border-b">
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <CardTitle>통합 컴플라이언스 점수</CardTitle>
+                <div className="w-full md:w-56">
+                  <Select value={selectedYearMonth} onValueChange={setYearMonth}>
+                    <SelectTrigger className="w-full" aria-label="기준 월 선택">
+                      <SelectValue placeholder="기준 월 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {yearMonthOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="py-16 text-center">
+              <p className="text-sm text-muted-foreground">
+                해당 월의 리포트가 없습니다. 다른 월을 선택해주세요.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
     return (
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
         <p className="text-sm font-medium text-destructive">리포트 조회에 실패했습니다</p>

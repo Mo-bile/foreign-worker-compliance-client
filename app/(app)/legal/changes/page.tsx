@@ -36,9 +36,8 @@ function getDDay(effectiveDate: string): number | undefined {
   const today = new Date();
   const targetDate = new Date(target.getFullYear(), target.getMonth(), target.getDate());
   const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const diffDays = Math.ceil((targetDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
-
-  return diffDays >= 0 ? diffDays : undefined;
+  // dDay 규약: 양수 = 초과(overdue), 0 = 당일, 음수 = N일 남음
+  return Math.ceil((todayDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 function toTimelineChange(change: LegalChange): TimelineLegalChange {
@@ -72,8 +71,9 @@ function applyFilter(
 ): readonly TimelineLegalChange[] {
   switch (filter) {
     case "all":
-    case "affected":
       return changes;
+    case "affected":
+      return changes.filter((change) => !change.acknowledged);
     case "action_required":
       return changes.filter((change) => !change.acknowledged);
     case "resolved":

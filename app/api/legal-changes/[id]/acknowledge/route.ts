@@ -11,12 +11,9 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   }
 
   try {
-    await apiClient.post<unknown>(`/api/legal-changes/${legalChangeId}/acknowledge`, {});
+    await apiClient.postTrigger(`/api/legal-changes/${legalChangeId}/acknowledge`);
     return new NextResponse(null, { status: 201 });
   } catch (error) {
-    if (error instanceof SyntaxError) {
-      return new NextResponse(null, { status: 201 });
-    }
     return handleRouteError(error, `POST /api/legal-changes/${legalChangeId}/acknowledge`);
   }
 }

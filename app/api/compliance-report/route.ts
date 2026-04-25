@@ -16,6 +16,10 @@ export async function GET(request: NextRequest) {
   }
 
   const yearMonth = request.nextUrl.searchParams.get("yearMonth");
+  if (yearMonth !== null && !/^\d{4}-(0[1-9]|1[0-2])$/.test(yearMonth)) {
+    return NextResponse.json({ message: "잘못된 날짜 형식입니다 (YYYY-MM)" }, { status: 400 });
+  }
+
   const searchParams = new URLSearchParams({ companyId: String(companyId) });
   if (yearMonth) {
     searchParams.set("yearMonth", yearMonth);
