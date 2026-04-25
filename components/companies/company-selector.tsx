@@ -36,7 +36,11 @@ export function CompanySelector() {
       onValueChange={(value) => setSelectedCompanyId(Number(value))}
     >
       <SelectTrigger className="w-52" aria-label="사업장 선택">
-        <SelectValue placeholder="사업장 선택" />
+        <span className="truncate">
+          {selectedCompanyId != null
+            ? (companies.find((c) => c.id === selectedCompanyId)?.name ?? "사업장 선택")
+            : "사업장 선택"}
+        </span>
       </SelectTrigger>
       <SelectContent>
         {companies.map((company) => (

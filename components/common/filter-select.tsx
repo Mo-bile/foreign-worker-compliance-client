@@ -23,10 +23,17 @@ export function FilterSelect<T extends string>({
   labelMap,
   className = "w-48",
 }: FilterSelectProps<T>) {
+  const displayLabel =
+    value === "ALL"
+      ? placeholder
+      : labelMap
+        ? labelMap[value as T]
+        : value;
+
   return (
     <Select value={value as string} onValueChange={(v) => onValueChange(v as T | "ALL")}>
       <SelectTrigger className={className} aria-label={placeholder}>
-        <SelectValue placeholder={placeholder} />
+        <span className="truncate">{displayLabel}</span>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="ALL">전체</SelectItem>
