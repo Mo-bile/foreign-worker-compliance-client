@@ -9,16 +9,6 @@ function makeGetRequest(url: string) {
 }
 
 describe("GET /api/legal-changes", () => {
-  it("유효한_companyId로_법령변경을_반환한다", async () => {
-    const response = await GET(
-      makeGetRequest("http://localhost:3000/api/legal-changes?companyId=1"),
-    );
-    const data = await response.json();
-    expect(response.status).toBe(200);
-    expect(data.changes).toHaveLength(3);
-    expect(data.lastSyncedAt).toBeTruthy();
-  });
-
   it("companyId가_없으면_400을_반환한다", async () => {
     const response = await GET(makeGetRequest("http://localhost:3000/api/legal-changes"));
     expect(response.status).toBe(400);

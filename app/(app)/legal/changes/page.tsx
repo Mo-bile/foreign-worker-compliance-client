@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useCompanyContext } from "@/lib/contexts/company-context";
+import { CATEGORY_ICONS } from "@/lib/constants/legal-change";
 import { useLegalChanges } from "@/lib/queries/use-legal-changes";
 import { FilterBar } from "@/components/legal/filter-bar";
 import type { FilterValue } from "@/components/legal/filter-bar";
@@ -9,17 +10,74 @@ import { SyncStatus } from "@/components/legal/sync-status";
 import { LegalTimeline } from "@/components/legal/legal-timeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LegalChange } from "@/types/legal";
+import type { SignalColor } from "@/types/shared";
 
-function applyFilter(changes: readonly LegalChange[], filter: FilterValue): readonly LegalChange[] {
+type LegalStatus = "action_required" | "reference" | "resolved";
+type LegalSeverity = "critical" | "warning" | "resolved";
+
+interface TimelineLegalChange extends LegalChange {
+  readonly icon: string;
+  readonly detectedDate: string;
+  readonly severity: LegalSeverity;
+  readonly status: LegalStatus;
+  readonly badge: {
+    readonly text: string;
+    readonly color: SignalColor;
+  };
+  readonly dDay?: number;
+}
+
+function getDDay(effectiveDate: string): number | undefined {
+  const target = new Date(effectiveDate);
+  if (Number.isNaN(target.getTime())) {
+    return undefined;
+  }
+
+  const today = new Date();
+  const targetDate = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const diffDays = Math.ceil((targetDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
+
+  return diffDays >= 0 ? diffDays : undefined;
+}
+
+function toTimelineChange(change: LegalChange): TimelineLegalChange {
+  const status: LegalStatus = change.acknowledged
+    ? "resolved"
+    : change.changeType === "ENFORCEMENT"
+      ? "action_required"
+      : "reference";
+  const severity: LegalSeverity = status === "resolved" ? "resolved" : status === "action_required" ? "critical" : "warning";
+  const badge =
+    status === "resolved"
+      ? { text: "확인 완료", color: "green" as const }
+      : status === "action_required"
+        ? { text: "조치 필요", color: "red" as const }
+        : { text: "참고", color: "orange" as const };
+
+  return {
+    ...change,
+    icon: CATEGORY_ICONS[change.category],
+    detectedDate: change.effectiveDate,
+    severity,
+    status,
+    badge,
+    dDay: status === "resolved" ? undefined : getDDay(change.effectiveDate),
+  };
+}
+
+function applyFilter(
+  changes: readonly TimelineLegalChange[],
+  filter: FilterValue,
+): readonly TimelineLegalChange[] {
   switch (filter) {
     case "all":
-      return changes;
     case "affected":
-      return changes.filter((c) => c.status !== "resolved");
+      return changes;
     case "action_required":
-      return changes.filter((c) => c.status === "action_required");
+      return changes.filter((change) => !change.acknowledged);
     case "resolved":
-      return changes.filter((c) => c.status === "resolved");
+      return changes.filter((change) => change.acknowledged);
     default: {
       const _exhaustive: never = filter;
       return changes;
@@ -32,9 +90,10 @@ export default function LegalChangesPage() {
   const { data, isLoading, isError, error, refetch } = useLegalChanges(selectedCompanyId);
   const [filter, setFilter] = useState<FilterValue>("all");
 
+  const timelineChanges = useMemo(() => (data ?? []).map(toTimelineChange), [data]);
   const filteredChanges = useMemo(
-    () => applyFilter(data?.changes ?? [], filter),
-    [data?.changes, filter],
+    () => applyFilter(timelineChanges, filter),
+    [timelineChanges, filter],
   );
 
   if (selectedCompanyId == null) {
@@ -68,7 +127,7 @@ export default function LegalChangesPage() {
 
   if (!data) return <LegalChangesSkeleton />;
 
-  if (data.changes.length === 0) {
+  if (timelineChanges.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-lg font-semibold">등록된 법령 변경이 없습니다</p>
@@ -80,7 +139,7 @@ export default function LegalChangesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <FilterBar activeFilter={filter} onFilterChange={setFilter} />
-        <SyncStatus lastSyncedAt={data.lastSyncedAt} />
+        <SyncStatus />
       </div>
       {filteredChanges.length === 0 ? (
         <div className="py-12 text-center">
