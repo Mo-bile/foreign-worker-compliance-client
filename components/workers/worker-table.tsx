@@ -57,6 +57,21 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   const [visaFilter, setVisaFilter] = useState<VisaType | "ALL">("ALL");
   const [statusFilter, setStatusFilter] = useState<WorkerStatus | "ALL">("ALL");
   const [insuranceFilter, setInsuranceFilter] = useState<InsuranceStatus | "ALL">("ALL");
+  const [sortKey, setSortKey] = useState<string>("status");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  const toggleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+    setPage(1);
+  };
+
+  const sortIndicator = (key: string) =>
+    sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "";
   const [page, setPage] = useState(1);
 
   const handleSearchChange = (value: string) => {
@@ -98,7 +113,33 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
     return true;
   });
 
-  const paginated = paginateItems(filteredWorkers, page);
+  const STATUS_PRIORITY: Record<string, number> = { ACTIVE: 0, INACTIVE: 1, TERMINATED: 2 };
+
+  const sortedWorkers = [...filteredWorkers].sort((a, b) => {
+    let cmp = 0;
+    switch (sortKey) {
+      case "name":
+        cmp = a.name.localeCompare(b.name, "ko");
+        break;
+      case "nationality":
+        cmp = a.nationality.localeCompare(b.nationality, "ko");
+        break;
+      case "visaType":
+        cmp = a.visaTypeCode.localeCompare(b.visaTypeCode);
+        break;
+      case "visaExpiry":
+        cmp = a.visaExpiryDate.localeCompare(b.visaExpiryDate);
+        break;
+      case "status":
+        cmp = (STATUS_PRIORITY[a.statusCode] ?? 9) - (STATUS_PRIORITY[b.statusCode] ?? 9);
+        break;
+      default:
+        cmp = 0;
+    }
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
+  const paginated = paginateItems(sortedWorkers, page);
 
   if (isLoading) {
     return <WorkerTableSkeleton />;
@@ -148,11 +189,11 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>이름</TableHead>
-                <TableHead>국적</TableHead>
-                <TableHead>비자 유형</TableHead>
-                <TableHead>비자 만료일</TableHead>
-                <TableHead>상태</TableHead>
+                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("name")}>이름{sortIndicator("name")}</TableHead>
+                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("nationality")}>국적{sortIndicator("nationality")}</TableHead>
+                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("visaType")}>비자 유형{sortIndicator("visaType")}</TableHead>
+                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("visaExpiry")}>비자 만료일{sortIndicator("visaExpiry")}</TableHead>
+                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("status")}>상태{sortIndicator("status")}</TableHead>
                 <TableHead>보험</TableHead>
               </TableRow>
             </TableHeader>

@@ -29,7 +29,7 @@ describe("WorkerTable", () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     const statusTrigger = screen.getByRole("combobox", { name: "상태 전체" });
     await userEvent.click(statusTrigger);
-    const option = screen.getByRole("option", { name: "활성" });
+    const option = screen.getByRole("option", { name: "재직중" });
     await userEvent.click(option);
     const activeCount = mockWorkers.filter((w) => w.statusCode === "ACTIVE").length;
     expect(screen.getByText(new RegExp(`총 ${activeCount}건`))).toBeDefined();

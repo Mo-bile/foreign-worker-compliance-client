@@ -115,8 +115,8 @@ export const WORKER_STATUSES = ["ACTIVE", "INACTIVE", "TERMINATED"] as const;
 export type WorkerStatus = (typeof WORKER_STATUSES)[number];
 
 export const WORKER_STATUS_LABELS: Record<WorkerStatus, string> = {
-  ACTIVE: "활성",
-  INACTIVE: "비활성",
+  ACTIVE: "재직중",
+  INACTIVE: "휴직",
   TERMINATED: "퇴사",
 };
 
