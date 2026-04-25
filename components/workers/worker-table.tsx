@@ -217,7 +217,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     </TableCell>
                     <TableCell>{worker.visaExpiryDate}</TableCell>
                     <TableCell>
-                      <span className={statusClass}>{worker.status}</span>
+                      <span className={statusClass}>{WORKER_STATUS_LABELS[worker.statusCode]}</span>
                     </TableCell>
                     <TableCell>
                       <InsuranceSummaryCell eligibilities={worker.insuranceEligibilities} />

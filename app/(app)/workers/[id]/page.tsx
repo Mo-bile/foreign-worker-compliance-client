@@ -15,6 +15,7 @@ import { InsuranceBadge } from "@/components/workers/insurance-badge";
 import { H2Badge } from "@/components/workers/h2-badge";
 import { SpecialtyInsuranceCard } from "@/components/workers/specialty-insurance-card";
 import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-timeline";
+import { WORKER_STATUS_LABELS } from "@/types/api";
 import { useWorker } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
 
@@ -77,7 +78,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">상태</dt>
-              <dd className="font-medium">{w.status}</dd>
+              <dd className="font-medium">{WORKER_STATUS_LABELS[w.statusCode]}</dd>
             </div>
           </dl>
         </CardContent>
