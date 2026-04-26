@@ -87,7 +87,6 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
                 level={data.level}
                 description={data.description}
                 actions={data.actions}
-                impacts={(data as Record<string, unknown>).impacts as readonly string[] | undefined}
               />
             </>
           ) : null}

@@ -198,6 +198,44 @@ describe("transformDashboardResponse", () => {
       expect(visaGroup?.label).toBe("비자 만료 임박");
     });
 
+    it("출국만기보험 deadlineType에 ALERT_TITLE_MAP 한글 레이블을 사용한다", () => {
+      const raw: DashboardRawResponse = {
+        ...baseRaw,
+        alerts: [
+          {
+            ...baseRaw.alerts[0],
+            deadlineType: "EXIT_GUARANTEE_INSURANCE",
+            description: "출국만기보험 가입 필요",
+          },
+        ],
+      };
+
+      const result = transformDashboardResponse(raw);
+      const insuranceGroup = result.alertGroups.find(
+        (g) => g.deadlineType === "EXIT_GUARANTEE_INSURANCE",
+      );
+      expect(insuranceGroup?.label).toBe("출국만기보험");
+    });
+
+    it("임금체불보증보험 deadlineType에 ALERT_TITLE_MAP 한글 레이블을 사용한다", () => {
+      const raw: DashboardRawResponse = {
+        ...baseRaw,
+        alerts: [
+          {
+            ...baseRaw.alerts[0],
+            deadlineType: "WAGE_GUARANTEE_INSURANCE",
+            description: "임금체불보증보험 가입 필요",
+          },
+        ],
+      };
+
+      const result = transformDashboardResponse(raw);
+      const insuranceGroup = result.alertGroups.find(
+        (g) => g.deadlineType === "WAGE_GUARANTEE_INSURANCE",
+      );
+      expect(insuranceGroup?.label).toBe("임금체불보증보험");
+    });
+
     it("href가 /compliance?type={deadlineType} 형태이다", () => {
       const result = transformDashboardResponse(baseRaw);
       const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");

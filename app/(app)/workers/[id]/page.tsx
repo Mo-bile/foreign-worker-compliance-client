@@ -15,16 +15,9 @@ import { InsuranceBadge } from "@/components/workers/insurance-badge";
 import { H2Badge } from "@/components/workers/h2-badge";
 import { SpecialtyInsuranceCard } from "@/components/workers/specialty-insurance-card";
 import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-timeline";
-import { NATIONALITY_LABELS, VISA_TYPE_LABELS, WORKER_STATUS_LABELS } from "@/types/api";
+import { NATIONALITY_LABELS, VISA_TYPE_LABELS, WORKER_STATUS_LABELS, INSURANCE_TYPE_LABELS } from "@/types/api";
 import { useWorker } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
-
-const INSURANCE_TYPE_LABELS: Record<string, string> = {
-  NATIONAL_PENSION: "국민연금",
-  HEALTH_INSURANCE: "건강보험",
-  EMPLOYMENT_INSURANCE: "고용보험",
-  INDUSTRIAL_ACCIDENT: "산재보험",
-};
 
 export default function WorkerDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);

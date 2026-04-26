@@ -121,7 +121,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
         cmp = a.name.localeCompare(b.name, "ko");
         break;
       case "nationality":
-        cmp = a.nationality.localeCompare(b.nationality, "ko");
+        cmp = (NATIONALITY_LABELS[a.nationality] ?? a.nationality).localeCompare(NATIONALITY_LABELS[b.nationality] ?? b.nationality, "ko");
         break;
       case "visaType":
         cmp = a.visaType.localeCompare(b.visaType);

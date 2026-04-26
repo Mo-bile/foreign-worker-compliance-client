@@ -10,12 +10,11 @@ interface ImpactBoxProps {
   readonly level?: string;
   readonly description?: string;
   readonly actions?: readonly string[];
-  /** @deprecated 구 형식 호환 — impacts 배열 */
-  readonly impacts?: readonly string[];
 }
 
-export function ImpactBox({ level, description, actions, impacts }: ImpactBoxProps) {
+export function ImpactBox({ level, description, actions }: ImpactBoxProps) {
   const levelStyle = level ? LEVEL_STYLES[level] : undefined;
+  const hasContent = level || description || (actions && actions.length > 0);
 
   return (
     <div className="rounded-lg bg-secondary p-4">
@@ -32,6 +31,9 @@ export function ImpactBox({ level, description, actions, impacts }: ImpactBoxPro
           </span>
         )}
       </div>
+      {!hasContent && (
+        <p className="text-sm text-muted-foreground">영향 분석 데이터가 없습니다</p>
+      )}
       {description && (
         <p className="mb-2 text-sm text-muted-foreground">{description}</p>
       )}
@@ -40,15 +42,6 @@ export function ImpactBox({ level, description, actions, impacts }: ImpactBoxPro
           {actions.map((action) => (
             <li key={action} className="text-sm text-muted-foreground">
               → {action}
-            </li>
-          ))}
-        </ul>
-      )}
-      {impacts && impacts.length > 0 && !actions && (
-        <ul className="space-y-1">
-          {impacts.map((impact) => (
-            <li key={impact} className="text-sm text-muted-foreground">
-              → {impact}
             </li>
           ))}
         </ul>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { WorkerTable } from "@/components/workers/worker-table";
 import { mockWorkers } from "@/mocks/data";
@@ -17,6 +17,20 @@ describe("WorkerTable", () => {
   it("25건_근로자를_첫_페이지_20건으로_표시한다", () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     expect(screen.getByText(/총 25건 중 1-20/)).toBeDefined();
+  });
+
+  it("기본_정렬은_상태_오름차순이다_재직중이_먼저_나온다", () => {
+    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+    const rows = screen.getAllByRole("row");
+    expect(within(rows[1]).getByText("재직중")).toBeDefined();
+  });
+
+  it("상태_헤더_클릭시_정렬_방향이_토글된다", async () => {
+    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+    const statusHeader = screen.getByRole("columnheader", { name: "상태 ↑" });
+    expect(statusHeader).toBeDefined();
+    await userEvent.click(statusHeader);
+    expect(screen.getByRole("columnheader", { name: "상태 ↓" })).toBeDefined();
   });
 
   it("다음_페이지로_이동하면_나머지_5건을_표시한다", async () => {
@@ -41,7 +55,7 @@ describe("WorkerTable", () => {
     expect(screen.getByText(/총 25건 중 21-25/)).toBeDefined();
     const visaTrigger = screen.getByRole("combobox", { name: "비자 유형 전체" });
     await userEvent.click(visaTrigger);
-    const e9Option = screen.getByRole("option", { name: /E9/ });
+    const e9Option = await screen.findByRole("option", { name: /E9/ });
     await userEvent.click(e9Option);
     expect(screen.getByText(/총 \d+건 중 1-/)).toBeDefined();
   });

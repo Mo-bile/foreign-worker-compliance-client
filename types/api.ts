@@ -139,6 +139,13 @@ export const INSURANCE_STATUS_LABELS: Record<InsuranceStatus, string> = {
   EXEMPT: "가입제외",
 };
 
+export const INSURANCE_TYPE_LABELS: Record<string, string> = {
+  NATIONAL_PENSION: "국민연금",
+  HEALTH_INSURANCE: "건강보험",
+  EMPLOYMENT_INSURANCE: "고용보험",
+  INDUSTRIAL_ACCIDENT: "산재보험",
+};
+
 // ─── Region ─────────────────────────────────────────────
 export const REGIONS = [
   "SEOUL",

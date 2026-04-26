@@ -10,6 +10,11 @@ describe("InsuranceBadge", () => {
     expect(badge.className).toContain("signal-blue");
   });
 
+  it("label이_없으면_MANDATORY_status의_한글_라벨을_렌더링한다", () => {
+    render(<InsuranceBadge status="MANDATORY" />);
+    expect(screen.getByText("의무가입")).toBeDefined();
+  });
+
   it("FULL_MANDATORY는_blue_스타일로_렌더링한다", () => {
     render(<InsuranceBadge status="FULL_MANDATORY" label="전부 의무적용" />);
     const badge = screen.getByText("전부 의무적용");
@@ -36,6 +41,11 @@ describe("InsuranceBadge", () => {
     const badge = screen.getByText("가입제외");
     expect(badge).toBeDefined();
     expect(badge.className).toContain("signal-green");
+  });
+
+  it("label이_없으면_EXEMPT_status의_한글_라벨을_렌더링한다", () => {
+    render(<InsuranceBadge status="EXEMPT" />);
+    expect(screen.getByText("가입제외")).toBeDefined();
   });
 
   it("알_수_없는_status는_기본_스타일로_렌더링한다", () => {
