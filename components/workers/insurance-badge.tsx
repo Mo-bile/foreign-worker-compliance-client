@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { INSURANCE_STATUS_LABELS } from "@/types/api";
 import type { InsuranceStatus } from "@/types/api";
 
 const STATUS_STYLES: Record<InsuranceStatus, string> = {
@@ -15,14 +16,14 @@ const STATUS_STYLES: Record<InsuranceStatus, string> = {
 };
 
 interface InsuranceBadgeProps {
-  readonly statusCode: InsuranceStatus;
-  readonly label: string;
+  readonly status: InsuranceStatus;
+  readonly label?: string;
 }
 
-export function InsuranceBadge({ statusCode, label }: InsuranceBadgeProps) {
+export function InsuranceBadge({ status, label }: InsuranceBadgeProps) {
   return (
-    <Badge variant="secondary" className={STATUS_STYLES[statusCode] ?? ""}>
-      {label}
+    <Badge variant="secondary" className={STATUS_STYLES[status] ?? ""}>
+      {label ?? INSURANCE_STATUS_LABELS[status]}
     </Badge>
   );
 }

@@ -76,19 +76,12 @@ export const positioningAnalysisSchema = z
   .object({
     region: z.string(),
     industryCategory: z.string(),
-    regionName: z.string().optional(),
-    industryCategoryName: z.string().optional(),
     regionalTotal: z.number(),
     industryTotal: z.number(),
     companyForeignWorkerCount: z.number(),
     companyShare: z.number(),
     sizeCategory: z.enum(["소규모", "중소규모", "중규모", "대규모"]),
-  })
-  .transform((data) => ({
-    ...data,
-    regionName: data.regionName ?? data.region,
-    industryCategoryName: data.industryCategoryName ?? data.industryCategory,
-  }));
+  });
 export type PositioningAnalysis = z.infer<typeof positioningAnalysisSchema>;
 
 // ─── Benchmark Response ─────────────────────────────────────

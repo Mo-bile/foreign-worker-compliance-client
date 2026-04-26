@@ -60,7 +60,7 @@ export function WorkerForm() {
       name: "",
       dateOfBirth: "",
       passportNumber: "",
-      nationalityCode: undefined,
+      nationality: undefined,
       visaType: undefined,
       visaExpiryDate: "",
       entryDate: "",
@@ -163,16 +163,16 @@ export function WorkerForm() {
 
           {/* 국적 */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="nationalityCode">국적</Label>
+            <Label htmlFor="nationality">국적</Label>
             <Controller
-              name="nationalityCode"
+              name="nationality"
               control={control}
               render={({ field }) => (
                 <Select value={field.value ?? ""} onValueChange={(value) => field.onChange(value)}>
                   <SelectTrigger
-                    id="nationalityCode"
+                    id="nationality"
                     aria-label="국적"
-                    aria-invalid={!!errors.nationalityCode}
+                    aria-invalid={!!errors.nationality}
                     className="w-full"
                   >
                     <SelectValue placeholder="국적 선택" />
@@ -187,8 +187,8 @@ export function WorkerForm() {
                 </Select>
               )}
             />
-            {errors.nationalityCode && (
-              <p className="text-sm text-destructive">{errors.nationalityCode.message}</p>
+            {errors.nationality && (
+              <p className="text-sm text-destructive">{errors.nationality.message}</p>
             )}
           </div>
 

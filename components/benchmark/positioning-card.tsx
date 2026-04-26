@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { INDUSTRY_CATEGORY_LABELS, REGION_LABELS } from "@/types/api";
 import type { PositioningAnalysis } from "@/types/benchmark";
 import { DataSourceMeta } from "./data-source-meta";
 
@@ -10,14 +11,18 @@ interface PositioningCardProps {
 
 export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
   const {
-    regionName,
-    industryCategoryName,
+    region,
+    industryCategory,
     regionalTotal,
     industryTotal,
     companyForeignWorkerCount,
     companyShare,
     sizeCategory,
   } = positioningAnalysis;
+  const regionLabel = REGION_LABELS[region as keyof typeof REGION_LABELS] ?? region;
+  const industryCategoryLabel =
+    INDUSTRY_CATEGORY_LABELS[industryCategory as keyof typeof INDUSTRY_CATEGORY_LABELS] ??
+    industryCategory;
 
   const items = [
     { label: "지역 외국인 총수", value: regionalTotal.toLocaleString("ko-KR"), unit: "명" },
@@ -25,7 +30,7 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
       label: "업종 외국인 수",
       value: industryTotal.toLocaleString("ko-KR"),
       unit: "명",
-      sub: industryCategoryName,
+      sub: industryCategoryLabel,
     },
     { label: "귀사 고용", value: companyForeignWorkerCount.toLocaleString("ko-KR"), unit: "명" },
     { label: "귀사 점유율", value: (companyShare * 100).toFixed(1), unit: "%" },
@@ -37,7 +42,7 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold">📍 지역·업종 포지셔닝</h3>
           <span className="rounded-full bg-[oklch(0.95_0.03_255)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_255)]">
-            {regionName}
+            {regionLabel}
           </span>
         </div>
 

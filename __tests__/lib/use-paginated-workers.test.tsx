@@ -60,12 +60,12 @@ describe("usePaginatedWorkers", () => {
     ).toBe(true);
   });
 
-  it("국적_레이블로_검색_필터가_적용된다", async () => {
+  it("국적_코드로_검색_필터가_적용된다", async () => {
     const { result } = renderHook(
       () =>
         usePaginatedWorkers(1, {
           page: 1,
-          search: "베트남",
+          search: "VIETNAM",
           visaType: "ALL",
           status: "ALL",
           insuranceStatus: "ALL",
@@ -76,7 +76,8 @@ describe("usePaginatedWorkers", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.workers).toBeDefined();
-    expect(result.current.workers!.items.every((w) => w.nationalityCode === "VIETNAM")).toBe(
+    expect(result.current.workers!.items.length).toBeGreaterThan(0);
+    expect(result.current.workers!.items.every((w) => w.nationality === "VIETNAM")).toBe(
       true,
     );
   });
@@ -97,7 +98,7 @@ describe("usePaginatedWorkers", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.workers).toBeDefined();
-    expect(result.current.workers!.items.every((w) => w.visaTypeCode === "E9")).toBe(true);
+    expect(result.current.workers!.items.every((w) => w.visaType === "E9")).toBe(true);
   });
 
   it("상태_필터가_적용된다", async () => {
@@ -116,7 +117,7 @@ describe("usePaginatedWorkers", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.workers).toBeDefined();
-    expect(result.current.workers!.items.every((w) => w.statusCode === "ACTIVE")).toBe(true);
+    expect(result.current.workers!.items.every((w) => w.status === "ACTIVE")).toBe(true);
   });
 
   it("보험_상태_필터가_적용된다", async () => {
@@ -137,7 +138,7 @@ describe("usePaginatedWorkers", () => {
     expect(result.current.workers).toBeDefined();
     expect(
       result.current.workers!.items.every((w) =>
-        w.insuranceEligibilities.some((ie) => ie.statusCode === "EXEMPT"),
+        w.insuranceEligibilities.some((ie) => ie.status === "EXEMPT"),
       ),
     ).toBe(true);
   });

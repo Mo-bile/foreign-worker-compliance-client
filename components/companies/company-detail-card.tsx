@@ -1,3 +1,4 @@
+import { INDUSTRY_CATEGORY_LABELS, REGION_LABELS } from "@/types/api";
 import type { CompanyResponse } from "@/types/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -20,14 +21,14 @@ export function CompanyDetailCard({ company }: CompanyDetailCardProps) {
           <div>
             <dt className="text-sm text-muted-foreground">지역</dt>
             <dd className="font-medium">
-              {company.regionName}
+              {REGION_LABELS[company.region] ?? company.region}
               {company.subRegion ? ` ${company.subRegion}` : ""}
             </dd>
           </div>
           <div>
             <dt className="text-sm text-muted-foreground">업종</dt>
             <dd className="font-medium">
-              {company.industryCategoryName}
+              {INDUSTRY_CATEGORY_LABELS[company.industryCategory] ?? company.industryCategory}
               {company.industrySubCategory ? ` (${company.industrySubCategory})` : ""}
             </dd>
           </div>

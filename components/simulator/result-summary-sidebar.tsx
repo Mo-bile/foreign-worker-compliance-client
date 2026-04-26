@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { REGION_LABELS } from "@/types/api";
 import type { SimulationRequest } from "@/types/simulator";
 import type { CompanyResponse } from "@/types/api";
 
@@ -33,7 +34,8 @@ export function ResultSummarySidebar({
             <strong className="text-foreground">희망 채용:</strong> {request.desiredWorkers}명
           </p>
           <p>
-            <strong className="text-foreground">사업장:</strong> {company?.regionName ?? "—"}
+            <strong className="text-foreground">사업장:</strong>{" "}
+            {company ? (REGION_LABELS[company.region] ?? company.region) : "—"}
           </p>
           <p>
             <strong className="text-foreground">{isExceeded ? "상태:" : "예상 점수:"}</strong>{" "}

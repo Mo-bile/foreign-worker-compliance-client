@@ -5,7 +5,7 @@ import { CheckCircle, Activity, Lightbulb, Loader2, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { E9_NATIONALITIES, DESIRED_TIMINGS, DESIRED_TIMING_LABELS } from "@/types/simulator";
 import { cn } from "@/lib/utils";
-import { INDUSTRY_CATEGORY_LABELS, NATIONALITY_LABELS } from "@/types/api";
+import { INDUSTRY_CATEGORY_LABELS, NATIONALITY_LABELS, REGION_LABELS } from "@/types/api";
 import type { SimulationRequest } from "@/types/simulator";
 import type { CompanyResponse, IndustryCategory } from "@/types/api";
 import type { ScoringPolicyItem } from "@/types/metadata";
@@ -167,7 +167,8 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">
-                {company.regionName} · {company.industryCategoryName} · 상시근로자{" "}
+                {REGION_LABELS[company.region] ?? company.region} ·{" "}
+                {INDUSTRY_CATEGORY_LABELS[company.industryCategory] ?? company.industryCategory} · 상시근로자{" "}
                 {company.employeeCount}명
               </p>
             </div>
@@ -219,7 +220,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
                 <label className="text-[13px] font-medium">사업장 소재지</label>
                 <input
                   type="text"
-                  value={company?.regionName ?? ""}
+                  value={company ? (REGION_LABELS[company.region] ?? company.region) : ""}
                   readOnly
                   className="rounded-md border border-input bg-secondary px-3 py-2 text-sm text-muted-foreground"
                 />

@@ -10,7 +10,7 @@ describe("BenchmarkStatCards", () => {
     expect(screen.getByText(/260만원/)).toBeInTheDocument();
     expect(screen.getByText(/12\.5%/)).toBeInTheDocument();
     expect(screen.getByText(/8 \/ 10/)).toBeInTheDocument();
-    expect(screen.getByText(/경기도/)).toBeInTheDocument();
+    expect(screen.getByText(/경기/)).toBeInTheDocument();
   });
 
   it("nullable 축은 미입력으로 표시한다", () => {

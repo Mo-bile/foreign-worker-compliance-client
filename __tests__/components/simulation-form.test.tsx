@@ -19,10 +19,8 @@ const mockCompany: CompanyResponse = {
   name: "테스트 회사",
   businessNumber: "123-45-67890",
   region: "SEOUL",
-  regionName: "서울특별시",
   subRegion: null,
   industryCategory: "MANUFACTURING",
-  industryCategoryName: "제조업",
   industrySubCategory: null,
   employeeCount: 50,
   foreignWorkerCount: 5,
@@ -113,7 +111,7 @@ describe("SimulationForm", () => {
   describe("자동 입력 박스", () => {
     it("company가 제공되면 회사 정보를 표시한다", () => {
       renderForm();
-      expect(screen.getByText(/서울특별시/)).toBeDefined();
+      expect(screen.getByText(/서울/)).toBeDefined();
       expect(screen.getByText(/제조업/)).toBeDefined();
       expect(screen.getByText(/상시근로자/)).toBeDefined();
       expect(screen.getByText(/50명/)).toBeDefined();
@@ -438,7 +436,7 @@ describe("SimulationForm", () => {
 
     it("사업장 소재지가 회사 데이터에서 자동 입력된다", () => {
       renderForm();
-      const inputs = screen.getAllByDisplayValue("서울특별시");
+      const inputs = screen.getAllByDisplayValue("서울");
       const readonlyInput = inputs.find(
         (el) => el.tagName === "INPUT" && (el as HTMLInputElement).readOnly,
       );

@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { INDUSTRY_CATEGORY_LABELS, REGION_LABELS } from "@/types/api";
 import type { BenchmarkResponse } from "@/types/benchmark";
 
 interface BenchmarkStatCardsProps {
@@ -18,6 +19,13 @@ interface StatCardData {
 
 function getStatCards(benchmark: BenchmarkResponse): StatCardData[] {
   const { wageAnalysis, stabilityAnalysis, managementCheck, positioningAnalysis } = benchmark;
+  const regionLabel =
+    REGION_LABELS[positioningAnalysis.region as keyof typeof REGION_LABELS] ??
+    positioningAnalysis.region;
+  const industryCategoryLabel =
+    INDUSTRY_CATEGORY_LABELS[
+      positioningAnalysis.industryCategory as keyof typeof INDUSTRY_CATEGORY_LABELS
+    ] ?? positioningAnalysis.industryCategory;
 
   return [
     {
@@ -53,8 +61,8 @@ function getStatCards(benchmark: BenchmarkResponse): StatCardData[] {
     },
     {
       label: "지역·업종",
-      value: positioningAnalysis.regionName,
-      sub: `${positioningAnalysis.industryCategoryName} · ${positioningAnalysis.companyForeignWorkerCount}명 고용`,
+      value: regionLabel,
+      sub: `${industryCategoryLabel} · ${positioningAnalysis.companyForeignWorkerCount}명 고용`,
       accentColor: "border-t-[oklch(0.6_0.15_255)]",
       bgColor: "bg-[oklch(0.95_0.03_255)]",
       icon: "📍",

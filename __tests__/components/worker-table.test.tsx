@@ -31,7 +31,7 @@ describe("WorkerTable", () => {
     await userEvent.click(statusTrigger);
     const option = screen.getByRole("option", { name: "재직중" });
     await userEvent.click(option);
-    const activeCount = mockWorkers.filter((w) => w.statusCode === "ACTIVE").length;
+    const activeCount = mockWorkers.filter((w) => w.status === "ACTIVE").length;
     expect(screen.getByText(new RegExp(`총 ${activeCount}건`))).toBeDefined();
   });
 
@@ -58,7 +58,7 @@ describe("WorkerTable", () => {
     const option = await screen.findByRole("option", { name: "가입제외" });
     await userEvent.click(option);
     const expectedCount = mockWorkers.filter((w) =>
-      w.insuranceEligibilities.some((ie) => ie.statusCode === "EXEMPT"),
+      w.insuranceEligibilities.some((ie) => ie.status === "EXEMPT"),
     ).length;
     expect(expectedCount).toBeGreaterThan(0);
     expect(screen.getByText(new RegExp(`총 ${expectedCount}건`))).toBeDefined();

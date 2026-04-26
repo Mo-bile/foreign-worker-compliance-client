@@ -67,8 +67,6 @@ export const mockBenchmarkResponse: BenchmarkResponse = {
   positioningAnalysis: {
     region: "GYEONGGI",
     industryCategory: "MANUFACTURING",
-    regionName: "경기도",
-    industryCategoryName: "식료품제조업",
     regionalTotal: 245000,
     industryTotal: 92386,
     companyForeignWorkerCount: 12,
@@ -109,8 +107,6 @@ export const mockBenchmarkEmpty: BenchmarkResponse = {
   positioningAnalysis: {
     region: "GYEONGGI",
     industryCategory: "MANUFACTURING",
-    regionName: "경기도",
-    industryCategoryName: "식료품제조업",
     regionalTotal: 245000,
     industryTotal: 92386,
     companyForeignWorkerCount: 12,

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   VISA_TYPES,
   VISA_TYPE_LABELS,
+  NATIONALITY_LABELS,
   WORKER_STATUSES,
   WORKER_STATUS_LABELS,
   INSURANCE_STATUSES,
@@ -27,8 +28,6 @@ const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
   ACTIVE:
     "bg-[var(--signal-green-bg)] text-[var(--signal-green)] px-2 py-0.5 rounded-full text-xs font-medium",
   INACTIVE:
-    "bg-[var(--signal-gray-bg)] text-[var(--signal-gray)] px-2 py-0.5 rounded-full text-xs font-medium",
-  TERMINATED:
     "bg-[var(--signal-red-bg)] text-[var(--signal-red)] px-2 py-0.5 rounded-full text-xs font-medium",
 };
 import {
@@ -98,22 +97,22 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   };
 
   const filteredWorkers = workers.filter((worker) => {
-    const nationalityLabel = worker.nationality;
+    const nationalityLabel = NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
     const matchesSearch =
       search.trim() === "" ||
       worker.name.toLowerCase().includes(search.toLowerCase()) ||
       nationalityLabel.toLowerCase().includes(search.toLowerCase());
-    const matchesVisa = visaFilter === "ALL" || worker.visaTypeCode === visaFilter;
+    const matchesVisa = visaFilter === "ALL" || worker.visaType === visaFilter;
 
     if (!matchesSearch || !matchesVisa) return false;
-    if (statusFilter !== "ALL" && worker.statusCode !== statusFilter) return false;
+    if (statusFilter !== "ALL" && worker.status !== statusFilter) return false;
     if (insuranceFilter !== "ALL") {
-      if (!worker.insuranceEligibilities.some((ie) => ie.statusCode === insuranceFilter)) return false;
+      if (!worker.insuranceEligibilities.some((ie) => ie.status === insuranceFilter)) return false;
     }
     return true;
   });
 
-  const STATUS_PRIORITY: Record<string, number> = { ACTIVE: 0, INACTIVE: 1, TERMINATED: 2 };
+  const STATUS_PRIORITY: Record<string, number> = { ACTIVE: 0, INACTIVE: 1 };
 
   const sortedWorkers = [...filteredWorkers].sort((a, b) => {
     let cmp = 0;
@@ -125,13 +124,13 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
         cmp = a.nationality.localeCompare(b.nationality, "ko");
         break;
       case "visaType":
-        cmp = a.visaTypeCode.localeCompare(b.visaTypeCode);
+        cmp = a.visaType.localeCompare(b.visaType);
         break;
       case "visaExpiry":
         cmp = a.visaExpiryDate.localeCompare(b.visaExpiryDate);
         break;
       case "status":
-        cmp = (STATUS_PRIORITY[a.statusCode] ?? 9) - (STATUS_PRIORITY[b.statusCode] ?? 9);
+        cmp = (STATUS_PRIORITY[a.status] ?? 9) - (STATUS_PRIORITY[b.status] ?? 9);
         break;
       default:
         cmp = 0;
@@ -199,8 +198,8 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
             </TableHeader>
             <TableBody>
               {paginated.items.map((worker) => {
-                const nationalityLabel = worker.nationality;
-                const statusClass = WORKER_STATUS_COLORS[worker.statusCode];
+                const nationalityLabel = NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
+                const statusClass = WORKER_STATUS_COLORS[worker.status];
 
                 return (
                   <TableRow
@@ -211,13 +210,13 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     <TableCell className="font-medium">{worker.name}</TableCell>
                     <TableCell>{nationalityLabel}</TableCell>
                     <TableCell>
-                      <span className="font-mono text-xs">{worker.visaTypeCode}</span>
-                      <span className="ml-1.5 text-muted-foreground">{worker.visaType}</span>
-                      <H2Badge visaTypeCode={worker.visaTypeCode} />
+                      <span className="font-mono text-xs">{worker.visaType}</span>
+                      <span className="ml-1.5 text-muted-foreground">{VISA_TYPE_LABELS[worker.visaType]}</span>
+                      <H2Badge visaType={worker.visaType} />
                     </TableCell>
                     <TableCell>{worker.visaExpiryDate}</TableCell>
                     <TableCell>
-                      <span className={statusClass}>{WORKER_STATUS_LABELS[worker.statusCode]}</span>
+                      <span className={statusClass}>{WORKER_STATUS_LABELS[worker.status]}</span>
                     </TableCell>
                     <TableCell>
                       <InsuranceSummaryCell eligibilities={worker.insuranceEligibilities} />
@@ -247,12 +246,12 @@ function InsuranceSummaryCell({
 }) {
   const mandatoryLikeStatuses = new Set(["MANDATORY", "FULL_MANDATORY", "AUTO_BENEFITS_OPT_IN"]);
   const mandatory = eligibilities.filter((eligibility) =>
-    mandatoryLikeStatuses.has(eligibility.statusCode),
+    mandatoryLikeStatuses.has(eligibility.status),
   ).length;
-  const exempt = eligibilities.filter((eligibility) => eligibility.statusCode === "EXEMPT").length;
+  const exempt = eligibilities.filter((eligibility) => eligibility.status === "EXEMPT").length;
   const optional = eligibilities.filter(
     (eligibility) =>
-      !mandatoryLikeStatuses.has(eligibility.statusCode) && eligibility.statusCode !== "EXEMPT",
+      !mandatoryLikeStatuses.has(eligibility.status) && eligibility.status !== "EXEMPT",
   ).length;
 
   const parts = [

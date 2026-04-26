@@ -139,8 +139,10 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
                 >
                   <TableCell className="font-medium">{c.name}</TableCell>
                   <TableCell className="font-mono text-xs">{c.businessNumber}</TableCell>
-                  <TableCell>{c.regionName}</TableCell>
-                  <TableCell>{c.industryCategoryName}</TableCell>
+                  <TableCell>{REGION_LABELS[c.region] ?? c.region}</TableCell>
+                  <TableCell>
+                    {INDUSTRY_CATEGORY_LABELS[c.industryCategory] ?? c.industryCategory}
+                  </TableCell>
                   <TableCell>{c.employeeCount}명</TableCell>
                   <TableCell>{c.foreignWorkerCount}명</TableCell>
                 </TableRow>

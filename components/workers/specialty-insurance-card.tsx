@@ -22,22 +22,22 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 interface SpecialtyInsuranceCardProps {
-  readonly visaTypeCode: string;
+  readonly visaType: string;
   readonly deadlines: readonly ComplianceDeadlineResponse[];
 }
 
 export function SpecialtyInsuranceCard({
-  visaTypeCode,
+  visaType,
   deadlines,
 }: SpecialtyInsuranceCardProps) {
-  if (visaTypeCode !== "E9" && visaTypeCode !== "H2") return null;
+  if (visaType !== "E9" && visaType !== "H2") return null;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           전용보험 (E-9/H-2)
-          <H2Badge visaTypeCode={visaTypeCode} />
+          <H2Badge visaType={visaType} />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -111,13 +111,12 @@ export const DEADLINE_STATUSES = [
 export type DeadlineStatus = (typeof DEADLINE_STATUSES)[number];
 
 // ─── WorkerStatus ────────────────────────────────────────────
-export const WORKER_STATUSES = ["ACTIVE", "INACTIVE", "TERMINATED"] as const;
+export const WORKER_STATUSES = ["ACTIVE", "INACTIVE"] as const;
 export type WorkerStatus = (typeof WORKER_STATUSES)[number];
 
 export const WORKER_STATUS_LABELS: Record<WorkerStatus, string> = {
   ACTIVE: "재직중",
-  INACTIVE: "휴직",
-  TERMINATED: "퇴사",
+  INACTIVE: "퇴사",
 };
 
 // ─── Filter Utility Type ─────────────────────────────────────
@@ -276,7 +275,7 @@ export const registerWorkerRequestSchema = z.object({
     .regex(isoDateRegex, "날짜 형식: YYYY-MM-DD")
     .refine((val) => new Date(val) <= new Date(), "미래 날짜는 입력할 수 없습니다"),
   passportNumber: z.string().optional(),
-  nationalityCode: z.enum(NATIONALITIES, { error: "국적을 선택해주세요" }),
+  nationality: z.enum(NATIONALITIES, { error: "국적을 선택해주세요" }),
   visaType: z.enum(VISA_TYPES, { error: "비자 유형을 선택해주세요" }),
   visaExpiryDate: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
   entryDate: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
@@ -300,10 +299,8 @@ export interface CompanyResponse {
   readonly name: string;
   readonly businessNumber: string;
   readonly region: Region;
-  readonly regionName: string;
   readonly subRegion: string | null;
   readonly industryCategory: IndustryCategory;
-  readonly industryCategoryName: string;
   readonly industrySubCategory: string | null;
   readonly employeeCount: number;
   readonly domesticInsuredCount: number | null;
@@ -319,9 +316,7 @@ export interface CompanyResponse {
 
 export interface InsuranceEligibilityDto {
   readonly insuranceType: string;
-  readonly insuranceTypeCode: string;
-  readonly status: string;
-  readonly statusCode: InsuranceStatus;
+  readonly status: InsuranceStatus;
   readonly reason: string;
   readonly note: string | null;
 }
@@ -329,14 +324,11 @@ export interface InsuranceEligibilityDto {
 export interface WorkerResponse {
   readonly id: number;
   readonly name: string;
-  readonly nationality: string;
-  readonly nationalityCode: Nationality;
-  readonly visaType: string;
-  readonly visaTypeCode: VisaType;
+  readonly nationality: Nationality;
+  readonly visaType: VisaType;
   readonly visaExpiryDate: string;
   readonly dateOfBirth: string;
-  readonly status: string;
-  readonly statusCode: WorkerStatus;
+  readonly status: WorkerStatus;
   readonly insuranceDisclaimer: string;
   readonly insuranceEligibilities: readonly InsuranceEligibilityDto[];
 }

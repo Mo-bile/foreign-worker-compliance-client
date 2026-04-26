@@ -7,10 +7,8 @@ export const mockCompanies: readonly CompanyResponse[] = [
     name: "한국전자 주식회사",
     businessNumber: "123-45-67890",
     region: "SEOUL",
-    regionName: "서울",
     subRegion: "강남구",
     industryCategory: "MANUFACTURING",
-    industryCategoryName: "제조업",
     industrySubCategory: "전자부품",
     employeeCount: 150,
     domesticInsuredCount: 120,
@@ -28,10 +26,8 @@ export const mockCompanies: readonly CompanyResponse[] = [
     name: "부산건설 주식회사",
     businessNumber: "234-56-78901",
     region: "BUSAN",
-    regionName: "부산",
     subRegion: "해운대구",
     industryCategory: "CONSTRUCTION",
-    industryCategoryName: "건설업",
     industrySubCategory: null,
     employeeCount: 80,
     domesticInsuredCount: null,
@@ -49,10 +45,8 @@ export const mockCompanies: readonly CompanyResponse[] = [
     name: "경기농업 영농조합",
     businessNumber: "345-67-89012",
     region: "GYEONGGI",
-    regionName: "경기",
     subRegion: "이천시",
     industryCategory: "AGRICULTURE",
-    industryCategoryName: "농업",
     industrySubCategory: "시설원예",
     employeeCount: 30,
     domesticInsuredCount: 15,
@@ -79,32 +73,7 @@ const SAMPLE_NATIONALITIES = [
   "NEPAL",
 ] as const;
 const SAMPLE_VISA_TYPES = ["E9", "H2", "E7", "E8", "F2", "F5", "F6", "E7_4"] as const;
-const SAMPLE_STATUSES = ["ACTIVE", "INACTIVE", "TERMINATED"] as const;
-const SAMPLE_NATIONALITY_LABELS: Record<string, string> = {
-  VIETNAM: "베트남",
-  CHINA: "중국",
-  INDONESIA: "인도네시아",
-  PHILIPPINES: "필리핀",
-  THAILAND: "태국",
-  CAMBODIA: "캄보디아",
-  MYANMAR: "미얀마",
-  NEPAL: "네팔",
-};
-const SAMPLE_VISA_LABELS: Record<string, string> = {
-  E9: "고용허가제 일반외국인",
-  H2: "외국국적동포",
-  E7: "전문직",
-  E8: "계절근로자",
-  F2: "거주",
-  F5: "영주",
-  F6: "결혼이민",
-  E7_4: "숙련기능인력",
-};
-const SAMPLE_STATUS_LABELS: Record<string, string> = {
-  ACTIVE: "재직중",
-  INACTIVE: "비활성",
-  TERMINATED: "퇴사",
-};
+const SAMPLE_STATUSES = ["ACTIVE", "INACTIVE"] as const;
 const SAMPLE_INSURANCE_CODES = [
   "MANDATORY",
   "FULL_MANDATORY",
@@ -112,70 +81,52 @@ const SAMPLE_INSURANCE_CODES = [
   "OPTIONAL_ON_APPLICATION",
   "EXEMPT",
 ] as const;
-const SAMPLE_INSURANCE_LABELS: Record<string, string> = {
-  MANDATORY: "의무가입",
-  FULL_MANDATORY: "전부 의무적용",
-  AUTO_BENEFITS_OPT_IN: "자동가입(급여신청형)",
-  OPTIONAL_ON_APPLICATION: "신청시가입",
-  EXEMPT: "가입제외",
-};
 const INSURANCE_DISCLAIMER =
   "본 판정은 관리 보조 목적이며 법적 자문이 아닙니다. 정확한 가입 요건은 관할 공단에 확인하세요.";
 
 function generateWorker(id: number): WorkerResponse {
   const natIdx = id % SAMPLE_NATIONALITIES.length;
   const visaIdx = id % SAMPLE_VISA_TYPES.length;
-  const statusIdx = id % SAMPLE_STATUSES.length;
+  const statusIdx = id % 2;
   const insIdx = id % SAMPLE_INSURANCE_CODES.length;
   const empInsIdx = (insIdx + 1) % SAMPLE_INSURANCE_CODES.length;
-  const nationalityCode = SAMPLE_NATIONALITIES[natIdx];
-  const visaTypeCode = SAMPLE_VISA_TYPES[visaIdx];
-  const statusCode = SAMPLE_STATUSES[statusIdx];
-  const pensionStatusCode = SAMPLE_INSURANCE_CODES[insIdx];
-  const employmentStatusCode = SAMPLE_INSURANCE_CODES[empInsIdx];
+  const nationality = SAMPLE_NATIONALITIES[natIdx];
+  const visaType = SAMPLE_VISA_TYPES[visaIdx];
+  const status = SAMPLE_STATUSES[statusIdx];
+  const pensionStatus = SAMPLE_INSURANCE_CODES[insIdx];
+  const employmentStatus = SAMPLE_INSURANCE_CODES[empInsIdx];
 
   return {
     id,
     name: `Worker-${id}`,
-    nationality: SAMPLE_NATIONALITY_LABELS[nationalityCode],
-    nationalityCode,
-    visaType: SAMPLE_VISA_LABELS[visaTypeCode],
-    visaTypeCode,
+    nationality,
+    visaType,
     visaExpiryDate: `2027-${String((id % 12) + 1).padStart(2, "0")}-15`,
     dateOfBirth: `${String(1980 + (id % 25))}-${String((id % 12) + 1).padStart(2, "0")}-${String(((id + 10) % 28) + 1).padStart(2, "0")}`,
-    status: SAMPLE_STATUS_LABELS[statusCode],
-    statusCode,
+    status,
     insuranceDisclaimer: INSURANCE_DISCLAIMER,
     insuranceEligibilities: [
       {
-        insuranceType: "국민연금",
-        insuranceTypeCode: "NATIONAL_PENSION",
-        status: SAMPLE_INSURANCE_LABELS[pensionStatusCode],
-        statusCode: pensionStatusCode,
-        reason: `${SAMPLE_INSURANCE_LABELS[pensionStatusCode]} 테스트 사유`,
+        insuranceType: "NATIONAL_PENSION",
+        status: pensionStatus,
+        reason: `${pensionStatus} 테스트 사유`,
         note: id % 4 === 0 ? "테스트 부가 안내" : null,
       },
       {
-        insuranceType: "건강보험",
-        insuranceTypeCode: "HEALTH_INSURANCE",
-        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
-        statusCode: "MANDATORY",
+        insuranceType: "HEALTH_INSURANCE",
+        status: "MANDATORY",
         reason: "외국인 근로자 전원 의무가입",
         note: null,
       },
       {
-        insuranceType: "고용보험",
-        insuranceTypeCode: "EMPLOYMENT_INSURANCE",
-        status: SAMPLE_INSURANCE_LABELS[employmentStatusCode],
-        statusCode: employmentStatusCode,
-        reason: `${SAMPLE_INSURANCE_LABELS[employmentStatusCode]} 테스트 사유`,
+        insuranceType: "EMPLOYMENT_INSURANCE",
+        status: employmentStatus,
+        reason: `${employmentStatus} 테스트 사유`,
         note: null,
       },
       {
-        insuranceType: "산재보험",
-        insuranceTypeCode: "INDUSTRIAL_ACCIDENT",
-        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
-        statusCode: "MANDATORY",
+        insuranceType: "INDUSTRIAL_ACCIDENT",
+        status: "MANDATORY",
         reason: "외국인 근로자 전원 의무가입",
         note: null,
       },
@@ -188,45 +139,34 @@ export const mockWorkers: readonly WorkerResponse[] = [
   {
     id: 1,
     name: "Nguyen Van A",
-    nationality: "베트남",
-    nationalityCode: "VIETNAM",
-    visaType: "고용허가제 일반외국인",
-    visaTypeCode: "E9",
+    nationality: "VIETNAM",
+    visaType: "E9",
     visaExpiryDate: "2026-12-31",
     dateOfBirth: "1995-03-15",
-    status: "재직중",
-    statusCode: "ACTIVE",
+    status: "ACTIVE",
     insuranceDisclaimer: INSURANCE_DISCLAIMER,
     insuranceEligibilities: [
       {
-        insuranceType: "국민연금",
-        insuranceTypeCode: "NATIONAL_PENSION",
-        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
-        statusCode: "MANDATORY",
+        insuranceType: "NATIONAL_PENSION",
+        status: "MANDATORY",
         reason: "일반 외국인 사회보장협정 미체결국",
         note: "사회보장협정 체결국으로 본국 가입증명서 제출 시 면제 가능",
       },
       {
-        insuranceType: "건강보험",
-        insuranceTypeCode: "HEALTH_INSURANCE",
-        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
-        statusCode: "MANDATORY",
+        insuranceType: "HEALTH_INSURANCE",
+        status: "MANDATORY",
         reason: "외국인 근로자 전원 의무가입",
         note: null,
       },
       {
-        insuranceType: "고용보험",
-        insuranceTypeCode: "EMPLOYMENT_INSURANCE",
-        status: SAMPLE_INSURANCE_LABELS.AUTO_BENEFITS_OPT_IN,
-        statusCode: "AUTO_BENEFITS_OPT_IN",
+        insuranceType: "EMPLOYMENT_INSURANCE",
+        status: "AUTO_BENEFITS_OPT_IN",
         reason: "E-9 피보험자격 자동취득",
         note: "실업급여·육아휴직 급여는 별도 신청 시 적용",
       },
       {
-        insuranceType: "산재보험",
-        insuranceTypeCode: "INDUSTRIAL_ACCIDENT",
-        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
-        statusCode: "MANDATORY",
+        insuranceType: "INDUSTRIAL_ACCIDENT",
+        status: "MANDATORY",
         reason: "외국인 근로자 전원 의무가입",
         note: null,
       },
@@ -235,45 +175,34 @@ export const mockWorkers: readonly WorkerResponse[] = [
   {
     id: 2,
     name: "Zhang Wei",
-    nationality: "중국",
-    nationalityCode: "CHINA",
-    visaType: "외국국적동포",
-    visaTypeCode: "H2",
+    nationality: "CHINA",
+    visaType: "H2",
     visaExpiryDate: "2027-06-15",
     dateOfBirth: "1988-11-20",
-    status: "재직중",
-    statusCode: "ACTIVE",
+    status: "ACTIVE",
     insuranceDisclaimer: INSURANCE_DISCLAIMER,
     insuranceEligibilities: [
       {
-        insuranceType: "국민연금",
-        insuranceTypeCode: "NATIONAL_PENSION",
-        status: SAMPLE_INSURANCE_LABELS.EXEMPT,
-        statusCode: "EXEMPT",
+        insuranceType: "NATIONAL_PENSION",
+        status: "EXEMPT",
         reason: "사회보장협정 체결국 근로자",
         note: null,
       },
       {
-        insuranceType: "건강보험",
-        insuranceTypeCode: "HEALTH_INSURANCE",
-        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
-        statusCode: "MANDATORY",
+        insuranceType: "HEALTH_INSURANCE",
+        status: "MANDATORY",
         reason: "외국인 근로자 전원 의무가입",
         note: null,
       },
       {
-        insuranceType: "고용보험",
-        insuranceTypeCode: "EMPLOYMENT_INSURANCE",
-        status: SAMPLE_INSURANCE_LABELS.AUTO_BENEFITS_OPT_IN,
-        statusCode: "AUTO_BENEFITS_OPT_IN",
+        insuranceType: "EMPLOYMENT_INSURANCE",
+        status: "AUTO_BENEFITS_OPT_IN",
         reason: "H-2 피보험자격 자동취득",
         note: "신규 발급 중단, 기존 체류자 한정",
       },
       {
-        insuranceType: "산재보험",
-        insuranceTypeCode: "INDUSTRIAL_ACCIDENT",
-        status: SAMPLE_INSURANCE_LABELS.MANDATORY,
-        statusCode: "MANDATORY",
+        insuranceType: "INDUSTRIAL_ACCIDENT",
+        status: "MANDATORY",
         reason: "외국인 근로자 전원 의무가입",
         note: null,
       },

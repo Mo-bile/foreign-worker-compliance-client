@@ -15,9 +15,16 @@ import { InsuranceBadge } from "@/components/workers/insurance-badge";
 import { H2Badge } from "@/components/workers/h2-badge";
 import { SpecialtyInsuranceCard } from "@/components/workers/specialty-insurance-card";
 import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-timeline";
-import { WORKER_STATUS_LABELS } from "@/types/api";
+import { NATIONALITY_LABELS, VISA_TYPE_LABELS, WORKER_STATUS_LABELS } from "@/types/api";
 import { useWorker } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
+
+const INSURANCE_TYPE_LABELS: Record<string, string> = {
+  NATIONAL_PENSION: "국민연금",
+  HEALTH_INSURANCE: "건강보험",
+  EMPLOYMENT_INSURANCE: "고용보험",
+  INDUSTRIAL_ACCIDENT: "산재보험",
+};
 
 export default function WorkerDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -62,14 +69,14 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">국적</dt>
-              <dd className="font-medium">{w.nationality}</dd>
+              <dd className="font-medium">{NATIONALITY_LABELS[w.nationality]}</dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">비자 유형</dt>
               <dd className="font-medium">
-                <span className="font-mono text-xs">{w.visaTypeCode}</span>
-                <span className="ml-1.5">{w.visaType}</span>
-                <H2Badge visaTypeCode={w.visaTypeCode} />
+                <span className="font-mono text-xs">{w.visaType}</span>
+                <span className="ml-1.5">{VISA_TYPE_LABELS[w.visaType]}</span>
+                <H2Badge visaType={w.visaType} />
               </dd>
             </div>
             <div>
@@ -78,7 +85,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">상태</dt>
-              <dd className="font-medium">{WORKER_STATUS_LABELS[w.statusCode]}</dd>
+              <dd className="font-medium">{WORKER_STATUS_LABELS[w.status]}</dd>
             </div>
           </dl>
         </CardContent>
@@ -105,9 +112,11 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
               <TableBody>
                 {w.insuranceEligibilities.map((ie) => (
                   <TableRow key={ie.insuranceType}>
-                    <TableCell className="font-medium">{ie.insuranceType}</TableCell>
+                    <TableCell className="font-medium">
+                      {INSURANCE_TYPE_LABELS[ie.insuranceType] ?? ie.insuranceType}
+                    </TableCell>
                     <TableCell>
-                      <InsuranceBadge statusCode={ie.statusCode} label={ie.status} />
+                      <InsuranceBadge status={ie.status} />
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       <div>{ie.reason}</div>
@@ -126,7 +135,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         </CardContent>
       </Card>
 
-      <SpecialtyInsuranceCard visaTypeCode={w.visaTypeCode} deadlines={deadlines.data ?? []} />
+      <SpecialtyInsuranceCard visaType={w.visaType} deadlines={deadlines.data ?? []} />
 
       <WorkerDeadlineTimeline
         deadlines={deadlines.data}

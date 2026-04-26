@@ -89,12 +89,12 @@ function filterWorkers(
       if (!matchesSearch) return false;
     }
 
-    if (params.visaType !== "ALL" && worker.visaTypeCode !== params.visaType) return false;
-    if (params.status !== "ALL" && worker.statusCode !== params.status) return false;
+    if (params.visaType !== "ALL" && worker.visaType !== params.visaType) return false;
+    if (params.status !== "ALL" && worker.status !== params.status) return false;
 
     if (params.insuranceStatus !== "ALL") {
       const hasMatch = worker.insuranceEligibilities.some(
-        (ie) => ie.statusCode === params.insuranceStatus,
+        (ie) => ie.status === params.insuranceStatus,
       );
       if (!hasMatch) return false;
     }
