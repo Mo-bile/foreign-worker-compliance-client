@@ -30,7 +30,7 @@ export function FilterSelect<T extends string>({
           {value === "ALL"
             ? placeholder
             : labelMap
-              ? labelMap[value as T]
+              ? (labelMap[value as T] ?? value)
               : value}
         </SelectValue>
       </SelectTrigger>

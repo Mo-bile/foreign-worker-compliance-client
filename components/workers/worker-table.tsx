@@ -24,6 +24,8 @@ const VISA_FILTER_LABELS: Record<VisaType, string> = Object.fromEntries(
   VISA_TYPES.map((v) => [v, `${v} — ${VISA_TYPE_LABELS[v]}`]),
 ) as Record<VisaType, string>;
 
+const STATUS_PRIORITY: Record<string, number> = { ACTIVE: 0, INACTIVE: 1 };
+
 const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
   ACTIVE:
     "bg-[var(--signal-green-bg)] text-[var(--signal-green)] px-2 py-0.5 rounded-full text-xs font-medium",
@@ -111,8 +113,6 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
     }
     return true;
   });
-
-  const STATUS_PRIORITY: Record<string, number> = { ACTIVE: 0, INACTIVE: 1 };
 
   const sortedWorkers = [...filteredWorkers].sort((a, b) => {
     let cmp = 0;

@@ -3,8 +3,6 @@
 import { useState, useId } from "react";
 import { useLegalImpact } from "@/lib/queries/use-legal-impact";
 import { ImpactBox } from "./impact-box";
-import { AiInsightBlock } from "./ai-insight-block";
-import { ActionRow } from "./action-row";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { BADGE_COLORS, BADGE_FALLBACK } from "@/lib/constants/signal-colors";
@@ -42,7 +40,7 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
         </span>
         {change.dDay != null && (
           <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            {change.dDay > 0 ? `D+${change.dDay}` : `D${change.dDay}`}
+            {change.dDay > 0 ? `D+${change.dDay}` : change.dDay === 0 ? "D-Day" : `D${change.dDay}`}
           </span>
         )}
       </div>
