@@ -6,6 +6,7 @@ import { ImpactBox } from "./impact-box";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { BADGE_COLORS, BADGE_FALLBACK } from "@/lib/constants/signal-colors";
+import { DISPLAY_STATUS_LABELS, DISPLAY_STATUS_COLORS, SOURCE_TYPE_LABELS } from "@/lib/constants/legal-change";
 import type { LegalChange } from "@/types/legal";
 
 interface LegalCardProps {
@@ -32,20 +33,17 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
       <p className="mt-1 text-xs text-muted-foreground">
         시행일: {change.effectiveDate} · 감지일: {change.detectedDate} · {change.lawName}
       </p>
-      <div className="mt-2 flex gap-2">
-        <span
-          className={cn(
-            "rounded-full px-2 py-0.5 text-xs font-medium",
-            BADGE_COLORS[change.badge.color] ?? BADGE_FALLBACK,
-          )}
-        >
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", DISPLAY_STATUS_COLORS[change.displayStatus]?.badge)}>
+          {DISPLAY_STATUS_LABELS[change.displayStatus]}
+          {change.displayStatus === "UPCOMING" && change.dDay != null && ` (D${change.dDay > 0 ? `+${change.dDay}` : change.dDay === 0 ? "-Day" : change.dDay})`}
+        </span>
+        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+          {SOURCE_TYPE_LABELS[change.sourceType]}
+        </span>
+        <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", BADGE_COLORS[change.badge.color] ?? BADGE_FALLBACK)}>
           {change.badge.text}
         </span>
-        {change.dDay != null && (
-          <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            {change.dDay > 0 ? `D+${change.dDay}` : change.dDay === 0 ? "D-Day" : `D${change.dDay}`}
-          </span>
-        )}
       </div>
     </>
   );
@@ -91,6 +89,16 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
                 description={data.description}
                 actions={data.actions}
               />
+              {change.officialSourceUrl && (
+                <a
+                  href={change.officialSourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  📎 공식 출처
+                </a>
+              )}
             </>
           ) : null}
         </div>

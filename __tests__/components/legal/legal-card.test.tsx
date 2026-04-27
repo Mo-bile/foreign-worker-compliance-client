@@ -24,6 +24,9 @@ const mockChange: LegalChange = {
   status: "reference",
   badge: { text: "참고", color: "orange" },
   dDay: 22,
+  displayStatus: "UPCOMING",
+  sourceType: "LAW",
+  officialSourceUrl: "https://www.law.go.kr/example",
 };
 
 const resolvedChange: LegalChange = {
@@ -36,6 +39,9 @@ const resolvedChange: LegalChange = {
   severity: "resolved",
   status: "resolved",
   badge: { text: "확인 완료", color: "green" },
+  displayStatus: "UPCOMING",
+  sourceType: "LAW",
+  officialSourceUrl: "https://www.law.go.kr/example",
 };
 
 describe("LegalCard", () => {
@@ -43,7 +49,8 @@ describe("LegalCard", () => {
     render(<LegalCard change={mockChange} companyId={1} />, { wrapper: Wrapper });
     expect(screen.getByText("고용허가제 시행규칙 개정")).toBeInTheDocument();
     expect(screen.getByText("참고")).toBeInTheDocument();
-    expect(screen.getByText("D+22")).toBeInTheDocument();
+    expect(screen.getByText("시행 예정 (D+22)")).toBeInTheDocument();
+    expect(screen.getByText("법률")).toBeInTheDocument();
   });
 
   it("expands on click to show body", async () => {

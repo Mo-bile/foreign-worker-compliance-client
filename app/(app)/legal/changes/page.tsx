@@ -148,14 +148,15 @@ export default function LegalChangesPage() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-[var(--signal-blue)]/20 bg-signal-blue-bg p-4 text-sm">
-        <p className="font-semibold text-signal-blue">✦ AI 기반 법령 영향 분석</p>
+      <div className="rounded-lg border border-[var(--signal-green)]/20 bg-signal-green-bg p-4 text-sm">
+        <p className="font-semibold text-signal-green">✅ 공식 출처 기반 법령 변경 데이터</p>
         <p className="mt-1 text-muted-foreground">
-          법령 영향 분석은 AI가 사업장 정보·근로자 분포·비자 구성을 기반으로 자동
-          생성합니다. 본 분석은 관리 보조 목적이며 법률 자문이 아닙니다.
+          본 데이터는 법제처·고용노동부·법무부·국민연금공단 등 공식 출처를 2026-04-25 기준으로
+          검증하여 수록한 실제 시행/예정 법령 변경입니다. 각 항목의 공식 출처 링크에서
+          원문 확인 가능합니다.
         </p>
         <p className="mt-1 text-xs text-muted-foreground/70">
-          ⚠️ 데모용 시드 데이터입니다. 실제 시행 일정은 법제처 또는 관할 기관에서 확인하세요.
+          ✦ 영향 분석은 AI가 사업장 정보를 기반으로 생성한 관리 보조 도구입니다.
         </p>
       </div>
       <div className="flex items-center justify-between">
