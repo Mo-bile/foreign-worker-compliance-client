@@ -19,7 +19,7 @@ export function ImpactBox({ level, description, actions }: ImpactBoxProps) {
   return (
     <div className="rounded-lg bg-secondary p-4">
       <div className="mb-2 flex items-center gap-2">
-        <h4 className="text-sm font-semibold">귀사 영향 분석</h4>
+        <h4 className="text-sm font-semibold">✦ AI 영향 분석</h4>
         {levelStyle && (
           <span
             className={cn(
@@ -32,7 +32,7 @@ export function ImpactBox({ level, description, actions }: ImpactBoxProps) {
         )}
       </div>
       {!hasContent && (
-        <p className="text-sm text-muted-foreground">영향 분석 데이터가 없습니다</p>
+        <p className="text-sm text-muted-foreground">AI 영향 분석 데이터가 없습니다</p>
       )}
       {description && (
         <p className="mb-2 text-sm text-muted-foreground">{description}</p>

@@ -24,7 +24,10 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
     <>
       <div className="flex items-center gap-2">
         <span className="text-xl">{change.icon}</span>
-        <span className="text-sm font-semibold">{change.title}</span>
+        <span className="text-sm font-semibold">
+          {change.title}
+          <span className="ml-1.5 text-[10px] text-signal-blue font-semibold">✦ AI</span>
+        </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
         시행일: {change.effectiveDate} · 감지일: {change.detectedDate} · {change.lawName}

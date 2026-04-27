@@ -11,14 +11,16 @@ const FILTERS: readonly { readonly value: FilterValue; readonly label: string }[
 
 interface FilterBarProps {
   readonly activeFilter: FilterValue;
+  readonly counts?: Readonly<Record<FilterValue, number>>;
   readonly onFilterChange: (filter: FilterValue) => void;
 }
 
-export function FilterBar({ activeFilter, onFilterChange }: FilterBarProps) {
+export function FilterBar({ activeFilter, counts, onFilterChange }: FilterBarProps) {
   return (
     <div role="group" aria-label="법령 필터" className="flex gap-2">
       {FILTERS.map(({ value, label }) => {
         const isActive = activeFilter === value;
+        const count = counts?.[value];
         return (
           <button
             key={value}
@@ -33,6 +35,7 @@ export function FilterBar({ activeFilter, onFilterChange }: FilterBarProps) {
             )}
           >
             {label}
+            {count != null ? ` (${count})` : null}
           </button>
         );
       })}

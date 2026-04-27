@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  NATIONALITIES,
   VISA_TYPES,
   VISA_TYPE_LABELS,
   NATIONALITY_LABELS,
@@ -14,6 +15,7 @@ import {
 import type {
   InsuranceEligibilityDto,
   InsuranceStatus,
+  Nationality,
   VisaType,
   WorkerResponse,
   WorkerStatus,
@@ -55,6 +57,7 @@ interface WorkerTableProps {
 export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [nationalityFilter, setNationalityFilter] = useState<Nationality | "ALL">("ALL");
   const [visaFilter, setVisaFilter] = useState<VisaType | "ALL">("ALL");
   const [statusFilter, setStatusFilter] = useState<WorkerStatus | "ALL">("ALL");
   const [insuranceFilter, setInsuranceFilter] = useState<InsuranceStatus | "ALL">("ALL");
@@ -80,6 +83,12 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
     setPage(1);
   };
 
+  const handleNationalityChange = (value: string | null) => {
+    if (!value) return;
+    setNationalityFilter(value as Nationality | "ALL");
+    setPage(1);
+  };
+
   const handleVisaChange = (value: string | null) => {
     if (!value) return;
     setVisaFilter(value as VisaType | "ALL");
@@ -99,11 +108,9 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   };
 
   const filteredWorkers = workers.filter((worker) => {
-    const nationalityLabel = NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
     const matchesSearch =
-      search.trim() === "" ||
-      worker.name.toLowerCase().includes(search.toLowerCase()) ||
-      nationalityLabel.toLowerCase().includes(search.toLowerCase());
+      search.trim() === "" || worker.name.toLowerCase().includes(search.toLowerCase());
+    if (nationalityFilter !== "ALL" && worker.nationality !== nationalityFilter) return false;
     const matchesVisa = visaFilter === "ALL" || worker.visaType === visaFilter;
 
     if (!matchesSearch || !matchesVisa) return false;
@@ -149,10 +156,18 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
         <Input
           type="text"
-          placeholder="이름 또는 국적으로 검색..."
+          placeholder="이름으로 검색..."
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           className="sm:max-w-xs"
+        />
+        <FilterSelect
+          value={nationalityFilter}
+          onValueChange={handleNationalityChange}
+          placeholder="국적 전체"
+          options={[...NATIONALITIES]}
+          labelMap={NATIONALITY_LABELS}
+          className="w-44"
         />
         <FilterSelect
           value={visaFilter}

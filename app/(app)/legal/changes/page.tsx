@@ -73,7 +73,6 @@ function applyFilter(
     case "all":
       return changes;
     case "affected":
-      return changes.filter((change) => !change.acknowledged);
     case "action_required":
       return changes.filter((change) => !change.acknowledged);
     case "resolved":
@@ -91,6 +90,18 @@ export default function LegalChangesPage() {
   const [filter, setFilter] = useState<FilterValue>("all");
 
   const timelineChanges = useMemo(() => (data ?? []).map(toTimelineChange), [data]);
+  const filterCounts = useMemo<Readonly<Record<FilterValue, number>>>(() => {
+    const changes = data ?? [];
+    const acknowledgedCount = changes.filter((change) => change.acknowledged).length;
+    const unacknowledgedCount = changes.length - acknowledgedCount;
+
+    return {
+      all: changes.length,
+      affected: unacknowledgedCount,
+      action_required: unacknowledgedCount,
+      resolved: acknowledgedCount,
+    };
+  }, [data]);
   const filteredChanges = useMemo(
     () => applyFilter(timelineChanges, filter),
     [timelineChanges, filter],
@@ -137,8 +148,18 @@ export default function LegalChangesPage() {
 
   return (
     <div className="space-y-4">
+      <div className="rounded-lg border border-[var(--signal-blue)]/20 bg-signal-blue-bg p-4 text-sm">
+        <p className="font-semibold text-signal-blue">✦ AI 기반 법령 영향 분석</p>
+        <p className="mt-1 text-muted-foreground">
+          법령 영향 분석은 AI가 사업장 정보·근로자 분포·비자 구성을 기반으로 자동
+          생성합니다. 본 분석은 관리 보조 목적이며 법률 자문이 아닙니다.
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground/70">
+          ⚠️ 데모용 시드 데이터입니다. 실제 시행 일정은 법제처 또는 관할 기관에서 확인하세요.
+        </p>
+      </div>
       <div className="flex items-center justify-between">
-        <FilterBar activeFilter={filter} onFilterChange={setFilter} />
+        <FilterBar activeFilter={filter} counts={filterCounts} onFilterChange={setFilter} />
         <SyncStatus />
       </div>
       {filteredChanges.length === 0 ? (

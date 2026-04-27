@@ -78,10 +78,21 @@ describe("WorkerTable", () => {
     expect(screen.getByText(new RegExp(`총 ${expectedCount}건`))).toBeDefined();
   });
 
+  it("국적_필터에서_베트남을_선택하면_베트남_근로자만_표시한다", async () => {
+    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+    const nationalityTrigger = screen.getByRole("combobox", { name: "국적 전체" });
+    await userEvent.click(nationalityTrigger);
+    const option = await screen.findByRole("option", { name: "베트남" });
+    await userEvent.click(option);
+    const expectedCount = mockWorkers.filter((w) => w.nationality === "VIETNAM").length;
+    expect(expectedCount).toBeGreaterThan(0);
+    expect(screen.getByText(new RegExp(`총 ${expectedCount}건`))).toBeDefined();
+  });
+
   it("필터_결과가_빈_경우_조건에_맞는_근로자가_없습니다_메시지를_표시한다", async () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
-    const searchInput = screen.getByPlaceholderText("이름 또는 국적으로 검색...");
-    await userEvent.type(searchInput, "존재하지않는이름XYZXYZ");
+    const searchInput = screen.getByPlaceholderText("이름으로 검색...");
+    await userEvent.type(searchInput, "베트남");
     expect(screen.getByText("조건에 맞는 근로자가 없습니다")).toBeDefined();
   });
 });
