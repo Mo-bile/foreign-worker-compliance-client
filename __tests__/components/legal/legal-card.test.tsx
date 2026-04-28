@@ -14,42 +14,50 @@ function Wrapper({ children }: { children: React.ReactNode }) {
 }
 
 const mockChange: LegalChange = {
-  id: "lc-1",
+  id: 1,
   title: "고용허가제 시행규칙 개정",
-  icon: "📋",
   lawName: "외국인근로자의 고용 등에 관한 법률 시행규칙",
+  category: "LABOR",
+  changeType: "ENFORCEMENT",
   effectiveDate: "2026-04-15",
-  detectedDate: "2026-03-18",
-  severity: "warning",
-  status: "reference",
-  badge: { text: "참고", color: "orange" },
-  dDay: 22,
+  summary: "사업장 변경 사유 확대",
+  severity: "HIGH",
+  acknowledged: false,
   displayStatus: "UPCOMING",
   sourceType: "LAW",
   officialSourceUrl: "https://www.law.go.kr/example",
-};
+  icon: "⚖️",
+  detectedDate: "2026-03-18",
+  status: "action_required",
+  badge: { text: "조치 필요", color: "red" },
+  dDay: -13,
+} as LegalChange;
 
 const resolvedChange: LegalChange = {
-  id: "lc-3",
+  id: 3,
   title: "한-캄보디아 사회보장협정",
-  icon: "🌐",
   lawName: "사회보장협정",
+  category: "INSURANCE",
+  changeType: "AMENDMENT",
   effectiveDate: "2026-03-01",
-  detectedDate: "2026-02-15",
-  severity: "resolved",
-  status: "resolved",
-  badge: { text: "확인 완료", color: "green" },
-  displayStatus: "UPCOMING",
+  summary: "캄보디아 국적 근로자 국민연금 이중가입 면제",
+  severity: "LOW",
+  acknowledged: true,
+  displayStatus: "IN_FORCE",
   sourceType: "LAW",
   officialSourceUrl: "https://www.law.go.kr/example",
-};
+  icon: "🏥",
+  detectedDate: "2026-02-15",
+  status: "resolved",
+  badge: { text: "확인 완료", color: "green" },
+} as LegalChange;
 
 describe("LegalCard", () => {
   it("renders card header with title and badge", () => {
     render(<LegalCard change={mockChange} companyId={1} />, { wrapper: Wrapper });
     expect(screen.getByText("고용허가제 시행규칙 개정")).toBeInTheDocument();
-    expect(screen.getByText("참고")).toBeInTheDocument();
-    expect(screen.getByText("시행 예정 (D+22)")).toBeInTheDocument();
+    expect(screen.getByText("조치 필요")).toBeInTheDocument();
+    expect(screen.getByText("시행 예정 (D-13)")).toBeInTheDocument();
     expect(screen.getByText("법률")).toBeInTheDocument();
   });
 

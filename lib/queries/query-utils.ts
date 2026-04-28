@@ -67,3 +67,23 @@ export async function mutateApi<T>(
     throw new Error(`${errorMessage} (응답 형식 오류)`, { cause: error });
   }
 }
+
+export async function mutateApiVoid(
+  endpoint: string,
+  method: string,
+  data: unknown,
+  errorMessage: string,
+): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(endpoint, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  } catch (error) {
+    throw new Error(errorMessage, { cause: error });
+  }
+  if (!res.ok) return throwResponseError(res, errorMessage);
+  // 204 No Content → body 없음
+}

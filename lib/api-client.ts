@@ -79,6 +79,18 @@ async function put<T>(path: string, body: unknown): Promise<T> {
   return handleResponse<T>(response);
 }
 
+async function putVoid(path: string, body: unknown): Promise<void> {
+  const response = await fetch(`${getBaseUrl()}${path}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    await handleResponse(response);
+  }
+  // 204 No Content → body 없음
+}
+
 async function patch(path: string): Promise<void> {
   const response = await fetch(`${getBaseUrl()}${path}`, {
     method: "PATCH",
@@ -101,4 +113,4 @@ async function postTrigger(path: string): Promise<void> {
   // 201 + Location, body 없음
 }
 
-export const apiClient = { get, post, postAndFollow, put, patch, postTrigger } as const;
+export const apiClient = { get, post, postAndFollow, put, putVoid, patch, postTrigger } as const;

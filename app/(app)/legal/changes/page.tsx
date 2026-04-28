@@ -13,12 +13,10 @@ import type { LegalChange } from "@/types/legal";
 import type { SignalColor } from "@/types/shared";
 
 type LegalStatus = "action_required" | "reference" | "resolved";
-type LegalSeverity = "critical" | "warning" | "resolved";
 
 interface TimelineLegalChange extends LegalChange {
   readonly icon: string;
   readonly detectedDate: string;
-  readonly severity: LegalSeverity;
   readonly status: LegalStatus;
   readonly badge: {
     readonly text: string;
@@ -43,14 +41,13 @@ function getDDay(effectiveDate: string): number | undefined {
 function toTimelineChange(change: LegalChange): TimelineLegalChange {
   const status: LegalStatus = change.acknowledged
     ? "resolved"
-    : change.changeType === "ENFORCEMENT"
+    : change.severity === "HIGH"
       ? "action_required"
       : "reference";
-  const severity: LegalSeverity = status === "resolved" ? "resolved" : status === "action_required" ? "critical" : "warning";
   const badge =
     status === "resolved"
       ? { text: "확인 완료", color: "green" as const }
-      : status === "action_required"
+      : change.severity === "HIGH"
         ? { text: "조치 필요", color: "red" as const }
         : { text: "참고", color: "orange" as const };
 
@@ -58,7 +55,6 @@ function toTimelineChange(change: LegalChange): TimelineLegalChange {
     ...change,
     icon: CATEGORY_ICONS[change.category],
     detectedDate: change.effectiveDate,
-    severity,
     status,
     badge,
     dDay: status === "resolved" ? undefined : getDDay(change.effectiveDate),

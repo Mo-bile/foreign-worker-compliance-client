@@ -32,6 +32,8 @@ export const DISPLAY_STATUS_LABELS: Record<DisplayStatus, string> = {
   UPCOMING: "시행 예정",
   RECENTLY_EFFECTIVE: "최근 시행됨 — 준수 필요",
   IN_FORCE: "기존 의무 (상시)",
+  ARCHIVED: "종료됨",
+  UNVERIFIED: "미검증",
 };
 
 export const DISPLAY_STATUS_COLORS: Record<
@@ -47,6 +49,14 @@ export const DISPLAY_STATUS_COLORS: Record<
     badge: "bg-muted text-muted-foreground",
     dot: "bg-muted-foreground",
   },
+  ARCHIVED: {
+    badge: "bg-muted text-muted-foreground",
+    dot: "bg-muted-foreground",
+  },
+  UNVERIFIED: {
+    badge: "bg-signal-orange-bg text-signal-orange",
+    dot: "bg-signal-orange",
+  },
 };
 
 export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
@@ -57,4 +67,5 @@ export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
   POLICY_NOTICE: "정책 공고",
   PRESS_RELEASE: "보도자료",
   GUIDANCE: "가이드",
+  CASELAW_RISK: "판례 리스크",
 };
