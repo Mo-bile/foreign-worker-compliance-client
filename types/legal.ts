@@ -16,6 +16,8 @@ export const DISPLAY_STATUSES = [
   "UPCOMING",
   "RECENTLY_EFFECTIVE",
   "IN_FORCE",
+  "ARCHIVED",
+  "UNVERIFIED",
 ] as const;
 
 export const SOURCE_TYPES = [
@@ -26,6 +28,7 @@ export const SOURCE_TYPES = [
   "POLICY_NOTICE",
   "PRESS_RELEASE",
   "GUIDANCE",
+  "CASELAW_RISK",
 ] as const;
 
 export const legalCategorySchema = z.enum(LEGAL_CATEGORIES);
@@ -46,7 +49,8 @@ export const legalChangeSchema = z.object({
   changeType: legalChangeTypeSchema,
   effectiveDate: z.string(),
   summary: z.string(),
-  acknowledged: z.boolean().optional().default(false),
+  severity: impactLevelSchema,
+  acknowledged: z.boolean().nullable(),
   displayStatus: displayStatusSchema,
   sourceType: sourceTypeSchema,
   officialSourceUrl: z.string().url().nullable(),

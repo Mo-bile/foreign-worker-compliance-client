@@ -1,7 +1,9 @@
 "use client";
 
 import { use } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -48,7 +50,12 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{w.name}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{w.name}</h1>
+        <Link href={`/workers/${workerId}/edit`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+          수정
+        </Link>
+      </div>
 
       <Card>
         <CardHeader>
@@ -80,6 +87,52 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
               <dt className="text-sm text-muted-foreground">상태</dt>
               <dd className="font-medium">{WORKER_STATUS_LABELS[w.status]}</dd>
             </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">계약 시작일</dt>
+              <dd className="font-medium">{w.contractStartDate}</dd>
+            </div>
+            {w.contractEndDate && (
+              <div>
+                <dt className="text-sm text-muted-foreground">계약 종료일</dt>
+                <dd className="font-medium">{w.contractEndDate}</dd>
+              </div>
+            )}
+            {w.jobPosition && (
+              <div>
+                <dt className="text-sm text-muted-foreground">직무</dt>
+                <dd className="font-medium">{w.jobPosition}</dd>
+              </div>
+            )}
+            {w.entryDate && (
+              <div>
+                <dt className="text-sm text-muted-foreground">입국일</dt>
+                <dd className="font-medium">{w.entryDate}</dd>
+              </div>
+            )}
+            {w.passportNumber && (
+              <div>
+                <dt className="text-sm text-muted-foreground">여권번호</dt>
+                <dd className="font-medium">{w.passportNumber}</dd>
+              </div>
+            )}
+            {w.registrationNumber && (
+              <div>
+                <dt className="text-sm text-muted-foreground">외국인등록번호</dt>
+                <dd className="font-medium">{w.registrationNumber}</dd>
+              </div>
+            )}
+            {w.contactPhone && (
+              <div>
+                <dt className="text-sm text-muted-foreground">연락처</dt>
+                <dd className="font-medium">{w.contactPhone}</dd>
+              </div>
+            )}
+            {w.contactEmail && (
+              <div>
+                <dt className="text-sm text-muted-foreground">이메일</dt>
+                <dd className="font-medium">{w.contactEmail}</dd>
+              </div>
+            )}
           </dl>
         </CardContent>
       </Card>

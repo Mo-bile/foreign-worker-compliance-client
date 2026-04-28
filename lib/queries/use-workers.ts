@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
   WorkerResponse,
   RegisterWorkerRequest,
+  UpdateWorkerRequest,
   VisaType,
   WorkerStatus,
   InsuranceStatus,
@@ -12,7 +13,7 @@ import type {
 import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 
-import { fetchApi, mutateApi } from "./query-utils";
+import { fetchApi, mutateApi, mutateApiVoid } from "./query-utils";
 
 export function useWorkers(companyId?: number | null) {
   return useQuery<readonly WorkerResponse[]>({
@@ -45,6 +46,24 @@ export function useRegisterWorker() {
       mutateApi<WorkerResponse>("/api/workers", "POST", data, "등록에 실패했습니다"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workers"] });
+    },
+  });
+}
+
+export function useUpdateWorker(workerId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, UpdateWorkerRequest>({
+    mutationFn: (data) =>
+      mutateApiVoid(
+        `/api/workers/${workerId}`,
+        "PUT",
+        data,
+        "근로자 수정에 실패했습니다",
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
+      queryClient.invalidateQueries({ queryKey: ["workers", workerId] });
     },
   });
 }

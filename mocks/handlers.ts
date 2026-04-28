@@ -48,6 +48,22 @@ const postWorker: Parameters<typeof http.post>[1] = async ({ request }) => {
   });
 };
 
+const putWorker: Parameters<typeof http.put>[1] = ({ params }) => {
+  const worker = mockWorkers.find((w) => w.id === Number(params.id));
+  if (!worker) {
+    return HttpResponse.json(
+      {
+        status: 404,
+        error: "Not Found",
+        message: "근로자를 찾을 수 없습니다",
+        timestamp: new Date().toISOString(),
+      },
+      { status: 404 },
+    );
+  }
+  return new HttpResponse(null, { status: 204 });
+};
+
 const getCompanies: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockCompanies);
 
 const getCompanyById: Parameters<typeof http.get>[1] = ({ params }) => {
@@ -163,10 +179,13 @@ const getLegalChanges: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockLegalChangesResponse);
 
 const getLegalImpact: Parameters<typeof http.get>[1] = ({ params }) => {
-  const impact = mockImpacts[params.id as string];
+  const impact = mockImpacts[Number(params.id)];
   if (!impact) return new HttpResponse(null, { status: 404 });
   return HttpResponse.json(impact);
 };
+
+const postAcknowledge: Parameters<typeof http.post>[1] = () =>
+  new HttpResponse(null, { status: 201 });
 
 const getReport: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockComplianceReport);
 
@@ -177,8 +196,11 @@ export const handlers = [
   http.get(`${BACKEND}/api/workers/:id`, getWorkerById),
   http.get(`${BACKEND}/api/workers`, getWorkers),
   http.post(`${BACKEND}/api/workers`, postWorker),
+  http.put(`${BACKEND}/api/workers/:id`, putWorker),
   http.get("*/api/workers/:id", getWorkerById),
   http.get("*/api/workers", getWorkers),
+  http.post("*/api/workers", postWorker),
+  http.put("*/api/workers/:id", putWorker),
 
   // Companies
   http.get(`${BACKEND}/api/companies/:id`, getCompanyById),
@@ -225,6 +247,8 @@ export const handlers = [
   // Legal Changes (impacts BEFORE legal-changes for correct matching)
   http.get(`${BACKEND}/api/legal-changes/:id/impacts`, getLegalImpact),
   http.get("*/api/legal-changes/:id/impacts", getLegalImpact),
+  http.post(`${BACKEND}/api/legal-changes/:id/acknowledge`, postAcknowledge),
+  http.post("*/api/legal-changes/:id/acknowledge", postAcknowledge),
   http.get(`${BACKEND}/api/legal-changes`, getLegalChanges),
   http.get("*/api/legal-changes", getLegalChanges),
 

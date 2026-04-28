@@ -35,7 +35,7 @@ function renderWithProviders(ui: React.ReactElement) {
 describe("WorkerForm", () => {
   it("필수_필드가_비어있으면_에러를_표시한다", async () => {
     const user = userEvent.setup();
-    renderWithProviders(<WorkerForm />);
+    renderWithProviders(<WorkerForm mode="create" />);
 
     const submitButton = screen.getByRole("button", { name: "등록" });
     await user.click(submitButton);
@@ -46,7 +46,7 @@ describe("WorkerForm", () => {
   });
 
   it("모든_필수_필드를_렌더링한다", async () => {
-    renderWithProviders(<WorkerForm />);
+    renderWithProviders(<WorkerForm mode="create" />);
 
     expect(screen.getByLabelText("이름")).toBeDefined();
     expect(screen.getByLabelText("생년월일")).toBeDefined();
