@@ -25,9 +25,7 @@ function formatDate(iso: string): string {
 
 export function NotificationLogTable({ logs }: NotificationLogTableProps) {
   if (logs.length === 0) {
-    return (
-      <p className="py-6 text-center text-sm text-muted-foreground">발송 기록이 없습니다</p>
-    );
+    return <p className="py-6 text-center text-sm text-muted-foreground">발송 기록이 없습니다</p>;
   }
 
   return (

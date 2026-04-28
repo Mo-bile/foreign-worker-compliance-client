@@ -58,13 +58,10 @@ export default function NotificationSettingsPage() {
             {company.isLoading ? (
               <Skeleton className="inline-block h-4 w-40" />
             ) : (
-              company.data?.contactEmail ?? "등록된 이메일 없음"
+              (company.data?.contactEmail ?? "등록된 이메일 없음")
             )}
           </p>
-          <Link
-            href="/settings/company"
-            className="text-sm text-primary hover:underline"
-          >
+          <Link href="/settings/company" className="text-sm text-primary hover:underline">
             이메일 변경 →
           </Link>
         </CardContent>

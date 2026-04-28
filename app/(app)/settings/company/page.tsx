@@ -68,10 +68,7 @@ export default function MyCompanyPage() {
           <p className="text-sm">
             소속 근로자 <span className="font-semibold">{workerCount}명</span>
           </p>
-          <Link
-            href="/workers"
-            className="text-sm text-primary hover:underline"
-          >
+          <Link href="/workers" className="text-sm text-primary hover:underline">
             근로자 관리 →
           </Link>
         </CardContent>

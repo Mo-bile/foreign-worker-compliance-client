@@ -29,7 +29,12 @@ interface CompanyEditModalProps {
   readonly currentEmail: string | null;
 }
 
-export function CompanyEditModal({ open, onClose, companyId, currentEmail }: CompanyEditModalProps) {
+export function CompanyEditModal({
+  open,
+  onClose,
+  companyId,
+  currentEmail,
+}: CompanyEditModalProps) {
   const updateMutation = useUpdateCompany();
 
   const {
