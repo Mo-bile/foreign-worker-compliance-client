@@ -8,6 +8,7 @@ import { server } from "@/mocks/server";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
+  useRouter: () => ({ push: vi.fn(), back: vi.fn(), replace: vi.fn() }),
 }));
 
 vi.mock("@/lib/contexts/company-context", () => ({
@@ -47,6 +48,10 @@ vi.mock("@/lib/queries/use-companies", () => ({
     isLoading: false,
     isError: false,
     error: null,
+  }),
+  useCreateCompany: () => ({
+    mutate: vi.fn(),
+    isPending: false,
   }),
   useUpdateCompany: () => ({
     mutate: vi.fn(),
@@ -212,29 +217,39 @@ describe("NotificationLogTable", () => {
 });
 
 describe("CompanyEditModal", () => {
+  const mockCompany = {
+    id: 1,
+    name: "테스트 회사",
+    businessNumber: "123-45-67890",
+    region: "SEOUL" as const,
+    subRegion: null,
+    industryCategory: "MANUFACTURING" as const,
+    industrySubCategory: null,
+    employeeCount: 50,
+    foreignWorkerCount: 5,
+    domesticInsuredCount: 30,
+    address: "서울시 종로구",
+    contactPhone: "02-1234-5678",
+    contactEmail: "test@demo.test",
+    averageForeignWorkerWage: null,
+    recentYearTerminationCount: null,
+    createdAt: "2026-01-01T00:00:00Z",
+    updatedAt: "2026-03-01T00:00:00Z",
+  };
+
   it("open=true일 때 모달이 표시된다", () => {
     renderWithQuery(
-      <CompanyEditModal
-        open={true}
-        onClose={vi.fn()}
-        companyId={1}
-        currentEmail="test@demo.test"
-      />,
+      <CompanyEditModal open={true} onClose={vi.fn()} company={mockCompany} />,
     );
-    expect(screen.getByText("연락처 이메일 변경")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("test@demo.test")).toBeInTheDocument();
+    expect(screen.getByText("사업장 정보 수정")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("테스트 회사")).toBeInTheDocument();
   });
 
   it("open=false일 때 모달이 표시되지 않는다", () => {
     renderWithQuery(
-      <CompanyEditModal
-        open={false}
-        onClose={vi.fn()}
-        companyId={1}
-        currentEmail="test@demo.test"
-      />,
+      <CompanyEditModal open={false} onClose={vi.fn()} company={mockCompany} />,
     );
-    expect(screen.queryByText("연락처 이메일 변경")).not.toBeInTheDocument();
+    expect(screen.queryByText("사업장 정보 수정")).not.toBeInTheDocument();
   });
 });
 

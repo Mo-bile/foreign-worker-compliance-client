@@ -77,8 +77,7 @@ export default function MyCompanyPage() {
       <CompanyEditModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        companyId={selectedCompanyId}
-        currentEmail={company.data.contactEmail}
+        company={company.data}
       />
     </div>
   );
