@@ -231,38 +231,47 @@ export function CompanyForm(props: CompanyFormProps) {
         placeholder="전자부품"
       />
 
-      <FormField
-        label="총 직원 수"
-        name="employeeCount"
-        register={register}
-        errors={errors}
-        type="number"
-        placeholder="50"
-        registerOptions={{ valueAsNumber: true }}
-        description="내·외국인 포함 상시근로자 수"
-      />
+      {/* 인원 정보 */}
+      <div className="space-y-4 rounded-lg border border-dashed p-4 md:col-span-2">
+        <p className="text-sm font-medium text-muted-foreground">
+          인원 정보 (고용 한도 산정에 사용)
+        </p>
 
-      <FormField
-        label="내국인 피보험자 수 (선택)"
-        name="domesticInsuredCount"
-        register={register}
-        errors={errors}
-        type="number"
-        placeholder="40"
-        registerOptions={{ setValueAs: (v: string) => (v === "" ? undefined : Number(v)) }}
-        description="고용허가제 고용 한도 산정 기준"
-      />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <FormField
+            label="총 직원 수"
+            name="employeeCount"
+            register={register}
+            errors={errors}
+            type="number"
+            placeholder="50"
+            registerOptions={{ valueAsNumber: true }}
+            description="내·외국인 포함 상시근로자"
+          />
 
-      <FormField
-        label="외국인 근로자 수"
-        name="foreignWorkerCount"
-        register={register}
-        errors={errors}
-        type="number"
-        placeholder="10"
-        registerOptions={{ valueAsNumber: true }}
-        description="현재 고용 중인 외국인 근로자 수"
-      />
+          <FormField
+            label="내국인 피보험자 수"
+            name="domesticInsuredCount"
+            register={register}
+            errors={errors}
+            type="number"
+            placeholder="40"
+            registerOptions={{ setValueAs: (v: string) => (v === "" ? undefined : Number(v)) }}
+            description="고용 한도 산정 기준 (선택)"
+          />
+
+          <FormField
+            label="외국인 근로자 수"
+            name="foreignWorkerCount"
+            register={register}
+            errors={errors}
+            type="number"
+            placeholder="10"
+            registerOptions={{ valueAsNumber: true }}
+            description="현재 고용 중인 외국인"
+          />
+        </div>
+      </div>
 
       <FormField
         label="주소"
