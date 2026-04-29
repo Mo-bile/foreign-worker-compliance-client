@@ -355,10 +355,10 @@ export function CompanyForm(props: CompanyFormProps) {
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className={variant === "plain" ? "space-y-4" : undefined}
+      className={variant === "plain" ? "space-y-6" : undefined}
     >
       {variant === "plain" ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">{formFields}</div>
+        <div className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">{formFields}</div>
       ) : (
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">{formFields}</CardContent>
       )}
