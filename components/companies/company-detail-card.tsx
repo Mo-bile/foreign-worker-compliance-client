@@ -1,16 +1,27 @@
+import { Pencil } from "lucide-react";
 import { INDUSTRY_CATEGORY_LABELS, REGION_LABELS } from "@/types/api";
 import type { CompanyResponse } from "@/types/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface CompanyDetailCardProps {
   readonly company: CompanyResponse;
+  readonly onEdit?: () => void;
 }
 
-export function CompanyDetailCard({ company }: CompanyDetailCardProps) {
+export function CompanyDetailCard({ company, onEdit }: CompanyDetailCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">사업장 정보</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base">사업장 정보</CardTitle>
+          {onEdit && (
+            <Button variant="ghost" size="sm" onClick={onEdit}>
+              <Pencil className="h-3.5 w-3.5" />
+              수정
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <dl className="grid gap-4 md:grid-cols-2">

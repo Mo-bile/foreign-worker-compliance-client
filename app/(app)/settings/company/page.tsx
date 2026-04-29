@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyDetailCard } from "@/components/companies/company-detail-card";
 import { CompanyEditModal } from "@/components/settings/company-edit-modal";
+import type { EditSection } from "@/components/settings/company-edit-modal";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import { useCompany } from "@/lib/queries/use-companies";
 import { useWorkers } from "@/lib/queries/use-workers";
@@ -16,7 +17,7 @@ export default function MyCompanyPage() {
   const { selectedCompanyId } = useCompanyContext();
   const company = useCompany(selectedCompanyId ?? 0);
   const workers = useWorkers(selectedCompanyId);
-  const [editOpen, setEditOpen] = useState(false);
+  const [editSection, setEditSection] = useState<EditSection | null>(null);
 
   if (selectedCompanyId == null) {
     return (
@@ -48,24 +49,24 @@ export default function MyCompanyPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">내 사업장 정보</h1>
-        <Button variant="outline" onClick={() => setEditOpen(true)}>
-          <Pencil className="h-4 w-4" />
-          정보 수정
-        </Button>
-      </div>
+      <h1 className="text-2xl font-bold">내 사업장 정보</h1>
 
       {/* 1. 사업장 기본 정보 */}
-      <CompanyDetailCard company={c} />
+      <CompanyDetailCard company={c} onEdit={() => setEditSection("info")} />
 
       {/* 2. 근로자·인원 정보 */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            근로자·인원 정보
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              근로자·인원 정보
+            </CardTitle>
+            <Button variant="ghost" size="sm" onClick={() => setEditSection("workers")}>
+              <Pencil className="h-3.5 w-3.5" />
+              수정
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <dl className="grid gap-4 md:grid-cols-3">
@@ -101,10 +102,16 @@ export default function MyCompanyPage() {
       {/* 3. 벤치마크 진단용 */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            벤치마크 진단용
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              벤치마크 진단용
+            </CardTitle>
+            <Button variant="ghost" size="sm" onClick={() => setEditSection("benchmark")}>
+              <Pencil className="h-3.5 w-3.5" />
+              수정
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <dl className="grid gap-4 md:grid-cols-2">
@@ -126,11 +133,14 @@ export default function MyCompanyPage() {
         </CardContent>
       </Card>
 
-      <CompanyEditModal
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        company={c}
-      />
+      {editSection !== null && (
+        <CompanyEditModal
+          open
+          onClose={() => setEditSection(null)}
+          company={c}
+          section={editSection}
+        />
+      )}
     </div>
   );
 }

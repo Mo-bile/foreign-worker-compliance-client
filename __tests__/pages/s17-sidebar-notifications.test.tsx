@@ -239,7 +239,7 @@ describe("CompanyEditModal", () => {
 
   it("open=true일 때 모달이 표시된다", () => {
     renderWithQuery(
-      <CompanyEditModal open={true} onClose={vi.fn()} company={mockCompany} />,
+      <CompanyEditModal open={true} onClose={vi.fn()} company={mockCompany} section="info" />,
     );
     expect(screen.getByText("사업장 정보 수정")).toBeInTheDocument();
     expect(screen.getByDisplayValue("테스트 회사")).toBeInTheDocument();
@@ -247,9 +247,24 @@ describe("CompanyEditModal", () => {
 
   it("open=false일 때 모달이 표시되지 않는다", () => {
     renderWithQuery(
-      <CompanyEditModal open={false} onClose={vi.fn()} company={mockCompany} />,
+      <CompanyEditModal open={false} onClose={vi.fn()} company={mockCompany} section="info" />,
     );
     expect(screen.queryByText("사업장 정보 수정")).not.toBeInTheDocument();
+  });
+
+  it("section=workers일 때 인원 정보 수정 모달이 표시된다", () => {
+    renderWithQuery(
+      <CompanyEditModal open={true} onClose={vi.fn()} company={mockCompany} section="workers" />,
+    );
+    expect(screen.getByText("인원 정보 수정")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("50")).toBeInTheDocument();
+  });
+
+  it("section=benchmark일 때 벤치마크 정보 수정 모달이 표시된다", () => {
+    renderWithQuery(
+      <CompanyEditModal open={true} onClose={vi.fn()} company={mockCompany} section="benchmark" />,
+    );
+    expect(screen.getByText("벤치마크 정보 수정")).toBeInTheDocument();
   });
 });
 
@@ -261,9 +276,10 @@ describe("MyCompanyPage — 내 사업장 정보", () => {
     expect(screen.getByText("3명")).toBeInTheDocument();
   });
 
-  it("정보 수정 버튼이 있다", () => {
+  it("각 카드에 수정 버튼이 있다", () => {
     renderWithQuery(<MyCompanyPage />);
-    expect(screen.getByRole("button", { name: /정보 수정/ })).toBeInTheDocument();
+    const editButtons = screen.getAllByRole("button", { name: /수정/ });
+    expect(editButtons.length).toBe(3);
   });
 
   it("근로자 관리 링크가 있다", () => {
