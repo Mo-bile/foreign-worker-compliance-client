@@ -36,9 +36,22 @@ export function useCreateCompany() {
 export function useUpdateCompany() {
   const queryClient = useQueryClient();
 
-  return useMutation<CompanyResponse, Error, { id: number; data: Partial<UpdateCompanyRequest> }>({
+  return useMutation<CompanyResponse, Error, { id: number; data: UpdateCompanyRequest }>({
     mutationFn: ({ id, data }) =>
       mutateApi<CompanyResponse>(`/api/companies/${id}`, "PUT", data, "사업장 수정에 실패했습니다"),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["companies", variables.id] });
+    },
+  });
+}
+
+export function usePatchCompany() {
+  const queryClient = useQueryClient();
+
+  return useMutation<CompanyResponse, Error, { id: number; data: Partial<UpdateCompanyRequest> }>({
+    mutationFn: ({ id, data }) =>
+      mutateApi<CompanyResponse>(`/api/companies/${id}`, "PATCH", data, "사업장 수정에 실패했습니다"),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
       queryClient.invalidateQueries({ queryKey: ["companies", variables.id] });

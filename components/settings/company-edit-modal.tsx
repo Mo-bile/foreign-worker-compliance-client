@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUpdateCompany } from "@/lib/queries/use-companies";
+import { usePatchCompany } from "@/lib/queries/use-companies";
 import { useMetadata } from "@/lib/queries/use-metadata";
 import {
   REGIONS,
@@ -106,7 +106,7 @@ function InfoForm({
   readonly company: CompanyResponse;
   readonly onClose: () => void;
 }) {
-  const updateMutation = useUpdateCompany();
+  const patchMutation = usePatchCompany();
   const { data: metadata } = useMetadata();
 
   const regionOptions = metadata
@@ -137,7 +137,7 @@ function InfoForm({
   });
 
   function onSubmit(data: z.infer<typeof infoSchema>) {
-    updateMutation.mutate(
+    patchMutation.mutate(
       { id: company.id, data },
       {
         onSuccess: () => {
@@ -246,8 +246,8 @@ function InfoForm({
         <Button type="button" variant="outline" onClick={onClose}>
           취소
         </Button>
-        <Button type="submit" disabled={updateMutation.isPending}>
-          {updateMutation.isPending ? "저장 중..." : "저장"}
+        <Button type="submit" disabled={patchMutation.isPending}>
+          {patchMutation.isPending ? "저장 중..." : "저장"}
         </Button>
       </AlertDialogFooter>
     </form>
@@ -263,7 +263,7 @@ function WorkersForm({
   readonly company: CompanyResponse;
   readonly onClose: () => void;
 }) {
-  const updateMutation = useUpdateCompany();
+  const patchMutation = usePatchCompany();
 
   const {
     register,
@@ -279,7 +279,7 @@ function WorkersForm({
   });
 
   function onSubmit(data: z.infer<typeof workersSchema>) {
-    updateMutation.mutate(
+    patchMutation.mutate(
       { id: company.id, data },
       {
         onSuccess: () => {
@@ -342,8 +342,8 @@ function WorkersForm({
         <Button type="button" variant="outline" onClick={onClose}>
           취소
         </Button>
-        <Button type="submit" disabled={updateMutation.isPending}>
-          {updateMutation.isPending ? "저장 중..." : "저장"}
+        <Button type="submit" disabled={patchMutation.isPending}>
+          {patchMutation.isPending ? "저장 중..." : "저장"}
         </Button>
       </AlertDialogFooter>
     </form>
@@ -359,7 +359,7 @@ function BenchmarkForm({
   readonly company: CompanyResponse;
   readonly onClose: () => void;
 }) {
-  const updateMutation = useUpdateCompany();
+  const patchMutation = usePatchCompany();
 
   const {
     register,
@@ -374,7 +374,7 @@ function BenchmarkForm({
   });
 
   function onSubmit(data: z.infer<typeof benchmarkSchema>) {
-    updateMutation.mutate(
+    patchMutation.mutate(
       { id: company.id, data },
       {
         onSuccess: () => {
@@ -426,8 +426,8 @@ function BenchmarkForm({
         <Button type="button" variant="outline" onClick={onClose}>
           취소
         </Button>
-        <Button type="submit" disabled={updateMutation.isPending}>
-          {updateMutation.isPending ? "저장 중..." : "저장"}
+        <Button type="submit" disabled={patchMutation.isPending}>
+          {patchMutation.isPending ? "저장 중..." : "저장"}
         </Button>
       </AlertDialogFooter>
     </form>

@@ -57,6 +57,10 @@ vi.mock("@/lib/queries/use-companies", () => ({
     mutate: vi.fn(),
     isPending: false,
   }),
+  usePatchCompany: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+  }),
   useCompanies: () => ({ data: [], isLoading: false, isError: false }),
 }));
 

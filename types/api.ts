@@ -239,7 +239,7 @@ export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 // ─── Company Schemas ─────────────────────────────────────
-const companyBaseFields = z.object({
+export const companyBaseFields = z.object({
   name: z.string().min(1, "회사명을 입력해주세요"),
   region: z.enum(REGIONS, { error: "지역을 선택해주세요" }),
   subRegion: z.string().optional(),
