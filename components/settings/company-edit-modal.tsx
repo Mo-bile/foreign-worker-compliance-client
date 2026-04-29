@@ -37,6 +37,7 @@ export function CompanyEditModal({ open, onClose, company }: CompanyEditModalPro
             foreignWorkerCount: company.foreignWorkerCount,
             address: company.address,
             contactPhone: company.contactPhone,
+            contactEmail: company.contactEmail ?? "",
             averageForeignWorkerWage: company.averageForeignWorkerWage ?? undefined,
             recentYearTerminationCount: company.recentYearTerminationCount ?? undefined,
           }}

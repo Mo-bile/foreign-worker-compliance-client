@@ -250,6 +250,7 @@ const companyBaseFields = z.object({
   foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
   address: z.string().min(1, "주소를 입력해주세요"),
   contactPhone: z.string().min(1, "연락처를 입력해주세요"),
+  contactEmail: z.string().email("올바른 이메일 형식이 아닙니다").optional().or(z.literal("")),
   averageForeignWorkerWage: z.number().positive("양수를 입력해주세요").optional(),
   recentYearTerminationCount: z.number().int().min(0, "0 이상이어야 합니다").optional(),
 });
