@@ -35,7 +35,7 @@ function writePrefs(companyId: number, prefs: NotificationPrefs): void {
 const TOGGLE_ITEMS = [
   { key: "d30" as const, label: "D-30 (한 달 전)" },
   { key: "d7" as const, label: "D-7 (일주일 전)" },
-  { key: "overdue" as const, label: "OVERDUE (기한 초과)" },
+  { key: "overdue" as const, label: "기한 초과" },
 ];
 
 interface NotificationTimingTogglesProps {

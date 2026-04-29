@@ -209,7 +209,7 @@ export function WorkerForm(props: WorkerFormProps) {
                         aria-invalid={!!errors.companyId}
                         className="w-full"
                       >
-                        <SelectValue placeholder="사업장 선택" />
+                        <SelectValue placeholder="사업장 선택">{companies.find((c) => String(c.id) === (field.value != null ? String(field.value) : undefined))?.name}</SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {companies.map((c) => (

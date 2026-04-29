@@ -12,9 +12,9 @@ const items: VisaDistributionItem[] = [
 describe("VisaDistribution", () => {
   it("비자_유형_라벨을_렌더링한다", () => {
     render(<VisaDistribution items={items} />);
-    expect(screen.getByText("E-9")).toBeDefined();
-    expect(screen.getByText("H-2")).toBeDefined();
-    expect(screen.getByText("E-7")).toBeDefined();
+    expect(screen.getByText("고용허가제 일반외국인")).toBeDefined();
+    expect(screen.getByText("외국국적동포")).toBeDefined();
+    expect(screen.getByText("전문직")).toBeDefined();
   });
 
   it("인원수를_렌더링한다", () => {

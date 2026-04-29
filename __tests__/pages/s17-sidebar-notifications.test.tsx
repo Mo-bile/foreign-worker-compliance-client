@@ -180,7 +180,7 @@ describe("NotificationTimingToggles", () => {
     render(<NotificationTimingToggles companyId={1} />);
     expect(screen.getByLabelText("D-30 (한 달 전)")).not.toBeChecked();
     expect(screen.getByLabelText("D-7 (일주일 전)")).toBeChecked();
-    expect(screen.getByLabelText("OVERDUE (기한 초과)")).not.toBeChecked();
+    expect(screen.getByLabelText("기한 초과")).not.toBeChecked();
   });
 });
 

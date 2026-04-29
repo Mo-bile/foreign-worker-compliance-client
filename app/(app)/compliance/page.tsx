@@ -88,7 +88,7 @@ export default function CompliancePage() {
             }}
           >
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="데드라인 유형 전체" />
+              <SelectValue placeholder="데드라인 유형 전체">{deadlineTypeFilter === "ALL" ? "전체" : DEADLINE_TYPE_LABELS[deadlineTypeFilter as DeadlineType]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">전체</SelectItem>
@@ -107,7 +107,7 @@ export default function CompliancePage() {
             }}
           >
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="상태 전체" />
+              <SelectValue placeholder="상태 전체">{statusFilter === "ALL" ? "전체" : DEADLINE_STATUS_LABELS[statusFilter as DeadlineStatus]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">전체</SelectItem>
