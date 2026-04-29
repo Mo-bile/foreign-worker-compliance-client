@@ -133,7 +133,10 @@ function generateWorker(id: number): WorkerResponse {
     ],
     contractStartDate: `2025-${String((id % 12) + 1).padStart(2, "0")}-01`,
     contractEndDate: id % 3 === 0 ? null : `2026-${String((id % 12) + 1).padStart(2, "0")}-28`,
-    contactPhone: id % 2 === 0 ? `010-${String(1000 + id).padStart(4, "0")}-${String(5000 + id).padStart(4, "0")}` : null,
+    contactPhone:
+      id % 2 === 0
+        ? `010-${String(1000 + id).padStart(4, "0")}-${String(5000 + id).padStart(4, "0")}`
+        : null,
     contactEmail: id % 3 === 0 ? `worker${id}@example.com` : null,
     jobPosition: id % 4 === 0 ? "프레스 가공" : id % 4 === 1 ? "조립" : null,
     passportNumber: id % 2 === 0 ? `M${String(10000000 + id)}` : null,

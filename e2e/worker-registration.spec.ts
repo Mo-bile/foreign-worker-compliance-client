@@ -8,7 +8,7 @@ test.describe("근로자 등록 플로우", () => {
     await page.getByLabel("국적").click();
     await page.getByRole("option", { name: "베트남" }).click();
     await page.getByLabel("비자 유형").click();
-    await page.getByRole("option", { name: "고용허가제 일반외국인" }).click();
+    await page.getByRole("option", { name: "비전문취업" }).click();
     await page.getByLabel("비자 만료일").fill("2027-12-31");
     await page.getByLabel("입국일").fill("2025-01-15");
     await page.getByLabel("계약 시작일").fill("2025-02-01");

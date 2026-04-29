@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { VISA_TYPE_SHORT, type VisaType } from "@/types/api";
+import { VISA_TYPE_LABELS, type VisaType } from "@/types/api";
 import type { VisaDistributionItem } from "@/types/dashboard";
 
 const barColors: Partial<Record<VisaType, string>> = {
@@ -26,7 +26,7 @@ export function VisaDistribution({ items }: VisaDistributionProps) {
       <CardContent className="space-y-2.5">
         {items.map((item) => (
           <div key={item.type} className="flex items-center gap-2.5">
-            <span className="w-9 text-xs font-semibold">{VISA_TYPE_SHORT[item.type]}</span>
+            <span className="w-auto min-w-9 text-xs font-semibold">{VISA_TYPE_LABELS[item.type]}</span>
             <div className="relative h-6 flex-1 overflow-hidden rounded bg-secondary">
               <div
                 className={cn(

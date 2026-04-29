@@ -50,12 +50,7 @@ export default function CompliancePage() {
 
   const overdueAll = useOverdueDeadlines(selectedCompanyId);
   const overdue = usePaginatedOverdueDeadlines(selectedCompanyId, filters, overduePage);
-  const upcoming = usePaginatedUpcomingDeadlines(
-    30,
-    selectedCompanyId,
-    filters,
-    upcomingPage,
-  );
+  const upcoming = usePaginatedUpcomingDeadlines(30, selectedCompanyId, filters, upcomingPage);
   // useUpcomingDeadlines(30) is already called inside usePaginatedUpcomingDeadlines above,
   // so React Query deduplicates — no extra fetch for the chart.
   const upcomingAll = useUpcomingDeadlines(30, selectedCompanyId);
@@ -93,7 +88,7 @@ export default function CompliancePage() {
             }}
           >
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="데드라인 유형 전체" />
+              <SelectValue placeholder="데드라인 유형 전체">{deadlineTypeFilter === "ALL" ? "전체" : DEADLINE_TYPE_LABELS[deadlineTypeFilter as DeadlineType]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">전체</SelectItem>
@@ -112,7 +107,7 @@ export default function CompliancePage() {
             }}
           >
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="상태 전체" />
+              <SelectValue placeholder="상태 전체">{statusFilter === "ALL" ? "전체" : DEADLINE_STATUS_LABELS[statusFilter as DeadlineStatus]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">전체</SelectItem>

@@ -48,6 +48,14 @@ export function DeadlineTimeline({ items }: DeadlineTimelineProps) {
           ))
         )}
       </CardContent>
+      <div className="border-t px-6 py-3 text-right">
+        <Link
+          href="/settings/notifications"
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
+          알림 설정 →
+        </Link>
+      </div>
     </Card>
   );
 }

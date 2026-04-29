@@ -77,9 +77,7 @@ describe("usePaginatedWorkers", () => {
 
     expect(result.current.workers).toBeDefined();
     expect(result.current.workers!.items.length).toBeGreaterThan(0);
-    expect(result.current.workers!.items.every((w) => w.nationality === "VIETNAM")).toBe(
-      true,
-    );
+    expect(result.current.workers!.items.every((w) => w.nationality === "VIETNAM")).toBe(true);
   });
 
   it("비자_유형_필터가_적용된다", async () => {

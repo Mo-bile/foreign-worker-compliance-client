@@ -30,9 +30,8 @@ export function CompanySelector() {
     );
   }
 
-  const selectedName = selectedCompanyId != null
-    ? companies.find((c) => c.id === selectedCompanyId)?.name
-    : undefined;
+  const selectedName =
+    selectedCompanyId != null ? companies.find((c) => c.id === selectedCompanyId)?.name : undefined;
 
   return (
     <Select
@@ -41,7 +40,8 @@ export function CompanySelector() {
     >
       <SelectTrigger className="w-52" aria-label="사업장 선택">
         <SelectValue placeholder="사업장 선택">
-          {selectedName ?? (selectedCompanyId != null ? `사업장 #${selectedCompanyId}` : "사업장 선택")}
+          {selectedName ??
+            (selectedCompanyId != null ? `사업장 #${selectedCompanyId}` : "사업장 선택")}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>

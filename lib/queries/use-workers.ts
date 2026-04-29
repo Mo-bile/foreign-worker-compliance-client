@@ -55,12 +55,7 @@ export function useUpdateWorker(workerId: number) {
 
   return useMutation<void, Error, UpdateWorkerRequest>({
     mutationFn: (data) =>
-      mutateApiVoid(
-        `/api/workers/${workerId}`,
-        "PUT",
-        data,
-        "근로자 수정에 실패했습니다",
-      ),
+      mutateApiVoid(`/api/workers/${workerId}`, "PUT", data, "근로자 수정에 실패했습니다"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workers"] });
       queryClient.invalidateQueries({ queryKey: ["workers", workerId] });

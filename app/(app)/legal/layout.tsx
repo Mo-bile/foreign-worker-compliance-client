@@ -15,7 +15,18 @@ export default function LegalLayout({ children }: { readonly children: React.Rea
         {TABS.map(({ href, label }) => {
           const isActive = pathname.startsWith(href);
           return (
-            <Link key={href} href={href} className={cn("border-b-2 px-1 pb-2 text-sm font-medium transition-colors", isActive ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground")}>{label}</Link>
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "border-b-2 px-1 pb-2 text-sm font-medium transition-colors",
+                isActive
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {label}
+            </Link>
           );
         })}
       </nav>

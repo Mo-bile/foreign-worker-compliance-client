@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { VISA_TYPE_LABELS, type VisaType } from "@/types/api";
 import type { WageAnalysis } from "@/types/benchmark";
 import { DataSourceMeta } from "./data-source-meta";
 
@@ -22,7 +23,10 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
   const { distribution, companyBracket, companyAvgWage, visaType } = wageAnalysis;
 
   const total =
-    distribution.under100 + distribution.from100to200 + distribution.from200to300 + distribution.over300;
+    distribution.under100 +
+    distribution.from100to200 +
+    distribution.from200to300 +
+    distribution.over300;
 
   const data = [
     { bracket: "~100만", count: distribution.under100, key: "under100" },
@@ -52,7 +56,7 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold">💰 임금 구간 포지셔닝</h3>
           <span className="rounded-full bg-[oklch(0.95_0.03_255)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_255)]">
-            {visaType}
+            {VISA_TYPE_LABELS[visaType as VisaType]}
           </span>
         </div>
 

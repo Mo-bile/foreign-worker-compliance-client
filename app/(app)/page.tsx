@@ -1,6 +1,6 @@
 "use client";
 
-import { VISA_TYPE_SHORT } from "@/types/api";
+import { VISA_TYPE_LABELS } from "@/types/api";
 import Link from "next/link";
 import { Users, Shield, Clock, AlertTriangle } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -18,8 +18,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function DashboardPage() {
   const { selectedCompanyId } = useCompanyContext();
   const { data, isLoading, isError, error, refetch } = useDashboard(selectedCompanyId);
-  const { mutate: generateInsight, isPending: isInsightPending } =
-    useDashboardInsightMutation(selectedCompanyId ?? 0);
+  const { mutate: generateInsight, isPending: isInsightPending } = useDashboardInsightMutation(
+    selectedCompanyId ?? 0,
+  );
 
   if (selectedCompanyId == null) {
     return (
@@ -67,7 +68,7 @@ export default function DashboardPage() {
           isLoading={false}
           className="border-t-[color:var(--signal-blue)]"
           subtitle={stats.visaBreakdown
-            .map((v) => `${VISA_TYPE_SHORT[v.type]} ${v.count}명`)
+            .map((v) => `${VISA_TYPE_LABELS[v.type]} ${v.count}명`)
             .join(" · ")}
         />
         <StatCard

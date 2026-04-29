@@ -167,11 +167,15 @@ export default function ReportsPage() {
                 <div className="w-full md:w-56">
                   <Select value={selectedYearMonth} onValueChange={setYearMonth}>
                     <SelectTrigger className="w-full" aria-label="기준 월 선택">
-                      <SelectValue placeholder="기준 월 선택" />
+                      <SelectValue placeholder="기준 월 선택">{yearMonthOptions.find((o) => o.value === selectedYearMonth)?.label}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {yearMonthOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          disabled={option.disabled}
+                        >
                           {option.label}
                         </SelectItem>
                       ))}
@@ -223,7 +227,7 @@ export default function ReportsPage() {
             <div className="w-full md:w-56">
               <Select value={selectedYearMonth} onValueChange={setYearMonth}>
                 <SelectTrigger className="w-full" aria-label="기준 월 선택">
-                  <SelectValue placeholder="기준 월 선택" />
+                  <SelectValue placeholder="기준 월 선택">{yearMonthOptions.find((o) => o.value === selectedYearMonth)?.label}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {yearMonthOptions.map((option) => (

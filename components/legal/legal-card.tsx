@@ -6,7 +6,11 @@ import { ImpactBox } from "./impact-box";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { BADGE_COLORS, BADGE_FALLBACK } from "@/lib/constants/signal-colors";
-import { DISPLAY_STATUS_LABELS, DISPLAY_STATUS_COLORS, SOURCE_TYPE_LABELS } from "@/lib/constants/legal-change";
+import {
+  DISPLAY_STATUS_LABELS,
+  DISPLAY_STATUS_COLORS,
+  SOURCE_TYPE_LABELS,
+} from "@/lib/constants/legal-change";
 import type { LegalChange } from "@/types/legal";
 
 interface LegalCardProps {
@@ -34,14 +38,26 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
         시행일: {change.effectiveDate} · 감지일: {change.detectedDate} · {change.lawName}
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", DISPLAY_STATUS_COLORS[change.displayStatus]?.badge)}>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+            DISPLAY_STATUS_COLORS[change.displayStatus]?.badge,
+          )}
+        >
           {DISPLAY_STATUS_LABELS[change.displayStatus]}
-          {change.displayStatus === "UPCOMING" && change.dDay != null && ` (D${change.dDay > 0 ? `+${change.dDay}` : change.dDay === 0 ? "-Day" : change.dDay})`}
+          {change.displayStatus === "UPCOMING" &&
+            change.dDay != null &&
+            ` (D${change.dDay > 0 ? `+${change.dDay}` : change.dDay === 0 ? "-Day" : change.dDay})`}
         </span>
         <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
           {SOURCE_TYPE_LABELS[change.sourceType]}
         </span>
-        <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", BADGE_COLORS[change.badge.color] ?? BADGE_FALLBACK)}>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-xs font-medium",
+            BADGE_COLORS[change.badge.color] ?? BADGE_FALLBACK,
+          )}
+        >
           {change.badge.text}
         </span>
       </div>
@@ -84,11 +100,7 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
             </div>
           ) : data ? (
             <>
-              <ImpactBox
-                level={data.level}
-                description={data.description}
-                actions={data.actions}
-              />
+              <ImpactBox level={data.level} description={data.description} actions={data.actions} />
               {change.officialSourceUrl && (
                 <a
                   href={change.officialSourceUrl}

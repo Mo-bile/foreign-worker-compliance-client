@@ -17,9 +17,7 @@ function makeRequest(url: string) {
 describe("POST /api/dashboard/insight", () => {
   it("companyId가_있으면_201을_반환한다", async () => {
     server.use(
-      http.post(`${BACKEND}/api/dashboard/insight`, () =>
-        HttpResponse.json({}, { status: 201 }),
-      ),
+      http.post(`${BACKEND}/api/dashboard/insight`, () => HttpResponse.json({}, { status: 201 })),
     );
 
     const request = makeRequest("http://localhost:3000/api/dashboard/insight?companyId=1");

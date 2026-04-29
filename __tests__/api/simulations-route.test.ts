@@ -21,7 +21,6 @@ const validBody = {
   desiredTiming: "2026_Q2",
   domesticInsuredCount: 33,
   appliedScoringCodes: ["DEPOPULATION_AREA"],
-  deductionScore: 0,
 };
 
 describe("POST /api/simulations", () => {

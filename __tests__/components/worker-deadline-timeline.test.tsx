@@ -110,17 +110,13 @@ describe("WorkerDeadlineTimeline", () => {
   });
 
   it("로딩 중이면 스켈레톤을 표시한다", () => {
-    const { container } = render(
-      <WorkerDeadlineTimeline deadlines={undefined} isLoading={true} />,
-    );
+    const { container } = render(<WorkerDeadlineTimeline deadlines={undefined} isLoading={true} />);
     const skeletons = container.querySelectorAll("[data-slot='skeleton']");
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it("에러 상태이면 에러 메시지를 표시한다", () => {
-    render(
-      <WorkerDeadlineTimeline deadlines={undefined} isLoading={false} isError={true} />,
-    );
+    render(<WorkerDeadlineTimeline deadlines={undefined} isLoading={false} isError={true} />);
     expect(screen.getByText(/오류가 발생했습니다/)).toBeInTheDocument();
   });
 

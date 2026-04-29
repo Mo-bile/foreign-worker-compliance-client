@@ -91,6 +91,22 @@ export const MOCK_SCORING_POLICIES: readonly ScoringPolicyItem[] = [
     applicableIndustry: null,
     mutualExclusionGroup: null,
   },
+  {
+    code: "LABOR_VIOLATION_SERIOUS",
+    displayName: "노동관계법 중대위반(성폭행·성희롱)",
+    points: 10,
+    type: "DEDUCTION",
+    applicableIndustry: null,
+    mutualExclusionGroup: "LABOR_VIOLATION",
+  },
+  {
+    code: "LABOR_VIOLATION_GENERAL",
+    displayName: "노동관계법 위반(폭행폭언·임금체불)",
+    points: 6,
+    type: "DEDUCTION",
+    applicableIndustry: null,
+    mutualExclusionGroup: "LABOR_VIOLATION",
+  },
 ];
 
 export const mockMetadata: MetadataResponse = {
@@ -112,4 +128,8 @@ export const mockMetadata: MetadataResponse = {
     description: VISA_TYPE_LABELS[code],
   })),
   scoringPolicies: MOCK_SCORING_POLICIES,
+  scoringPolicyGroups: [
+    { code: "LONG_TENURE", displayName: "장기근속 가산점" },
+    { code: "LABOR_VIOLATION", displayName: "노동관계법 위반 감점" },
+  ],
 };

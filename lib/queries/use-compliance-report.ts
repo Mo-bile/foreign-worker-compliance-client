@@ -4,10 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "./query-utils";
 import type { ComplianceReport } from "@/types/compliance-report";
 
-export function useComplianceReport(
-  companyId: number | null | undefined,
-  yearMonth?: string,
-) {
+export function useComplianceReport(companyId: number | null | undefined, yearMonth?: string) {
   return useQuery<ComplianceReport>({
     queryKey: ["compliance-report", companyId, yearMonth],
     queryFn: () => {

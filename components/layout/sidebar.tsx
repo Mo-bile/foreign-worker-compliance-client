@@ -6,10 +6,12 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   Users,
-  Building2,
+  Building,
   Lightbulb,
   BarChart3,
   FileText,
+  Bell,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,21 +30,30 @@ const NAV_SECTIONS: readonly NavSection[] = [
   { label: "메인", items: [{ href: "/", label: "대시보드", icon: LayoutDashboard }] },
   {
     label: "고용 전",
-    items: [{ href: "/simulator", label: "고용허가 시뮬레이터", icon: Lightbulb }],
+    items: [{ href: "/simulator", label: "E-9 고용허가 시뮬레이터", icon: Lightbulb }],
   },
   {
     label: "고용 후",
     items: [
       { href: "/benchmark", label: "사업장 건강검진", icon: BarChart3 },
-      { href: "/companies", label: "사업장 관리", icon: Building2 },
       { href: "/workers", label: "근로자 관리", icon: Users },
     ],
   },
   {
     label: "지속 관리",
+    items: [{ href: "/legal", label: "법령·리포트", icon: FileText }],
+  },
+  {
+    label: "설정",
     items: [
-      { href: "/legal", label: "법령·리포트", icon: FileText },
+      { href: "/settings/company", label: "내 사업장 정보", icon: Building },
+      { href: "/settings/notifications", label: "알림 설정", icon: Bell },
     ],
+  },
+  {
+    // TODO: P1 인증 도입 시 role=OPERATOR 가드 추가
+    label: "관리자",
+    items: [{ href: "/companies", label: "사업장 관리", icon: ShieldCheck }],
   },
 ];
 

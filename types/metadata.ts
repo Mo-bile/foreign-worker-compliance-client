@@ -28,10 +28,16 @@ export interface ScoringPolicyItem {
   readonly mutualExclusionGroup: string | null;
 }
 
+export interface ScoringPolicyGroup {
+  readonly code: string;
+  readonly displayName: string;
+}
+
 export interface MetadataResponse {
   readonly nationalities: readonly NationalityItem[];
   readonly regions: readonly RegionItem[];
   readonly industryCategories: readonly IndustryCategoryItem[];
   readonly visaTypes: readonly VisaTypeItem[];
   readonly scoringPolicies: readonly ScoringPolicyItem[];
+  readonly scoringPolicyGroups: readonly ScoringPolicyGroup[];
 }

@@ -30,9 +30,7 @@ describe("Legal types mock data shape", () => {
   });
 
   it("acknowledged items have no impact data", () => {
-    const acknowledgedIds = mockLegalChangesResponse
-      .filter((c) => c.acknowledged)
-      .map((c) => c.id);
+    const acknowledgedIds = mockLegalChangesResponse.filter((c) => c.acknowledged).map((c) => c.id);
     for (const id of acknowledgedIds) {
       expect(mockImpacts[id]).toBeUndefined();
     }

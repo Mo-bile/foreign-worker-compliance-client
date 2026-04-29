@@ -16,17 +16,13 @@ describe("DashboardAiInsight", () => {
 
   describe("빈 상태 (aiInsight === null)", () => {
     it("안내_문구와_AI_분석_버튼을_렌더링한다", () => {
-      render(
-        <DashboardAiInsight aiInsight={null} isPending={false} onGenerate={mockOnGenerate} />,
-      );
+      render(<DashboardAiInsight aiInsight={null} isPending={false} onGenerate={mockOnGenerate} />);
       expect(screen.getByText("아직 AI 분석 결과가 없습니다.")).toBeDefined();
       expect(screen.getByRole("button", { name: /AI 분석/ })).toBeDefined();
     });
 
     it("AI_분석_버튼_클릭_시_onGenerate를_호출한다", () => {
-      render(
-        <DashboardAiInsight aiInsight={null} isPending={false} onGenerate={mockOnGenerate} />,
-      );
+      render(<DashboardAiInsight aiInsight={null} isPending={false} onGenerate={mockOnGenerate} />);
       fireEvent.click(screen.getByRole("button", { name: /AI 분석/ }));
       expect(mockOnGenerate).toHaveBeenCalledTimes(1);
     });
@@ -40,7 +36,11 @@ describe("DashboardAiInsight", () => {
 
     it("마크다운_콘텐츠를_렌더링한다", () => {
       render(
-        <DashboardAiInsight aiInsight={mockInsight} isPending={false} onGenerate={mockOnGenerate} />,
+        <DashboardAiInsight
+          aiInsight={mockInsight}
+          isPending={false}
+          onGenerate={mockOnGenerate}
+        />,
       );
       expect(screen.getByText("테스트")).toBeDefined();
       expect(screen.getByText(/인사이트 내용/)).toBeDefined();
@@ -48,21 +48,33 @@ describe("DashboardAiInsight", () => {
 
     it("상대시간을_표시한다", () => {
       render(
-        <DashboardAiInsight aiInsight={mockInsight} isPending={false} onGenerate={mockOnGenerate} />,
+        <DashboardAiInsight
+          aiInsight={mockInsight}
+          isPending={false}
+          onGenerate={mockOnGenerate}
+        />,
       );
       expect(screen.getByText(/3시간 전 분석됨/)).toBeDefined();
     });
 
     it("다시_분석_버튼을_렌더링한다", () => {
       render(
-        <DashboardAiInsight aiInsight={mockInsight} isPending={false} onGenerate={mockOnGenerate} />,
+        <DashboardAiInsight
+          aiInsight={mockInsight}
+          isPending={false}
+          onGenerate={mockOnGenerate}
+        />,
       );
       expect(screen.getByRole("button", { name: /다시 분석/ })).toBeDefined();
     });
 
     it("다시_분석_버튼_클릭_시_onGenerate를_호출한다", () => {
       render(
-        <DashboardAiInsight aiInsight={mockInsight} isPending={false} onGenerate={mockOnGenerate} />,
+        <DashboardAiInsight
+          aiInsight={mockInsight}
+          isPending={false}
+          onGenerate={mockOnGenerate}
+        />,
       );
       fireEvent.click(screen.getByRole("button", { name: /다시 분석/ }));
       expect(mockOnGenerate).toHaveBeenCalledTimes(1);
@@ -71,16 +83,12 @@ describe("DashboardAiInsight", () => {
 
   describe("로딩 상태 (isPending === true)", () => {
     it("프로그레스_컴포넌트를_렌더링한다", () => {
-      render(
-        <DashboardAiInsight aiInsight={null} isPending={true} onGenerate={mockOnGenerate} />,
-      );
+      render(<DashboardAiInsight aiInsight={null} isPending={true} onGenerate={mockOnGenerate} />);
       expect(screen.getByText("근로자 현황을 조회하고 있습니다...")).toBeDefined();
     });
 
     it("버튼을_렌더링하지_않는다", () => {
-      render(
-        <DashboardAiInsight aiInsight={null} isPending={true} onGenerate={mockOnGenerate} />,
-      );
+      render(<DashboardAiInsight aiInsight={null} isPending={true} onGenerate={mockOnGenerate} />);
       expect(screen.queryByRole("button", { name: /AI 분석/ })).toBeNull();
       expect(screen.queryByRole("button", { name: /다시 분석/ })).toBeNull();
     });
@@ -93,7 +101,11 @@ describe("DashboardAiInsight", () => {
         generatedAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2분 전
       };
       render(
-        <DashboardAiInsight aiInsight={recentInsight} isPending={false} onGenerate={mockOnGenerate} />,
+        <DashboardAiInsight
+          aiInsight={recentInsight}
+          isPending={false}
+          onGenerate={mockOnGenerate}
+        />,
       );
       const button = screen.getByRole("button", { name: /다시 분석/ });
       expect(button).toHaveProperty("disabled", true);
@@ -105,7 +117,11 @@ describe("DashboardAiInsight", () => {
         generatedAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2분 전
       };
       render(
-        <DashboardAiInsight aiInsight={recentInsight} isPending={false} onGenerate={mockOnGenerate} />,
+        <DashboardAiInsight
+          aiInsight={recentInsight}
+          isPending={false}
+          onGenerate={mockOnGenerate}
+        />,
       );
       expect(screen.getByText(/분 후 다시 분석할 수 있습니다/)).toBeDefined();
     });

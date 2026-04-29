@@ -102,9 +102,7 @@ export function WorkerDeadlineTimeline({
                       >
                         {DEADLINE_STATUS_LABELS[deadline.status]}
                       </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {deadline.dueDate}
-                      </span>
+                      <span className="text-[11px] text-muted-foreground">{deadline.dueDate}</span>
                     </div>
                     <p className="mt-0.5 text-[13px] text-foreground">{deadline.description}</p>
                   </div>
