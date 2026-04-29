@@ -22,7 +22,10 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
   const { distribution, companyBracket, companyAvgWage, visaType } = wageAnalysis;
 
   const total =
-    distribution.under100 + distribution.from100to200 + distribution.from200to300 + distribution.over300;
+    distribution.under100 +
+    distribution.from100to200 +
+    distribution.from200to300 +
+    distribution.over300;
 
   const data = [
     { bracket: "~100만", count: distribution.under100, key: "under100" },

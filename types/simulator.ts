@@ -37,7 +37,6 @@ export const simulationRequestSchema = z.object({
   desiredTiming: z.enum(DESIRED_TIMINGS),
   domesticInsuredCount: z.number().int().min(1),
   appliedScoringCodes: z.array(z.string()),
-  deductionScore: z.number().int().min(0),
 });
 
 export type SimulationRequest = z.infer<typeof simulationRequestSchema>;

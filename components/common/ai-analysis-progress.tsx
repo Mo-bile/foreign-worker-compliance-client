@@ -3,7 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Database, Brain, FileCheck } from "lucide-react";
 import type { AiProgressVariant, ProgressStep } from "@/lib/constants/ai-progress-steps";
-import { AI_PROGRESS_PRESETS, PHASE_RATIO, TOTAL_DURATION } from "@/lib/constants/ai-progress-steps";
+import {
+  AI_PROGRESS_PRESETS,
+  PHASE_RATIO,
+  TOTAL_DURATION,
+} from "@/lib/constants/ai-progress-steps";
 
 interface TimedStep extends ProgressStep {
   readonly duration: number;
@@ -110,12 +114,8 @@ export function AiAnalysisProgress({ variant, isPending }: AiAnalysisProgressPro
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[oklch(0.6_0.15_255)]/10">
           <StepIcon className="h-5 w-5 animate-pulse text-[oklch(0.5_0.12_260)]" />
         </div>
-        <div
-          style={{ opacity: fadeIn ? 1 : 0, transition: "opacity 150ms ease-in-out" }}
-        >
-          <p className="text-sm font-medium">
-            {done ? "분석 완료!" : currentStep.label}
-          </p>
+        <div style={{ opacity: fadeIn ? 1 : 0, transition: "opacity 150ms ease-in-out" }}>
+          <p className="text-sm font-medium">{done ? "분석 완료!" : currentStep.label}</p>
           <p className="text-xs text-muted-foreground">
             {done ? "결과를 표시합니다" : currentStep.sub}
           </p>
@@ -134,7 +134,9 @@ export function AiAnalysisProgress({ variant, isPending }: AiAnalysisProgressPro
           {Math.floor(elapsed / 1000)}초 경과
         </span>
         <span className="text-[10px] text-muted-foreground">
-          {done ? `${steps.length} / ${steps.length} 단계` : `${stepIndex + 1} / ${steps.length} 단계`}
+          {done
+            ? `${steps.length} / ${steps.length} 단계`
+            : `${stepIndex + 1} / ${steps.length} 단계`}
         </span>
       </div>
     </div>

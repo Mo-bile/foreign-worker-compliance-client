@@ -10,10 +10,7 @@ export async function GET(request: NextRequest) {
   const rawDays = searchParams.get("days") ?? "30";
   const days = Number(rawDays);
   if (!Number.isInteger(days) || days <= 0 || days > 365) {
-    return NextResponse.json(
-      { message: "days는 1~365 사이의 정수여야 합니다" },
-      { status: 400 },
-    );
+    return NextResponse.json({ message: "days는 1~365 사이의 정수여야 합니다" }, { status: 400 });
   }
 
   const rawCompanyId = searchParams.get("companyId");

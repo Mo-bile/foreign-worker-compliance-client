@@ -171,7 +171,11 @@ export default function ReportsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {yearMonthOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          disabled={option.disabled}
+                        >
                           {option.label}
                         </SelectItem>
                       ))}

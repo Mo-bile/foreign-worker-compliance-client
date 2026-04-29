@@ -31,12 +31,8 @@ export function ImpactBox({ level, description, actions }: ImpactBoxProps) {
           </span>
         )}
       </div>
-      {!hasContent && (
-        <p className="text-sm text-muted-foreground">AI 분석 데이터가 없습니다</p>
-      )}
-      {description && (
-        <p className="mb-2 text-sm text-muted-foreground">{description}</p>
-      )}
+      {!hasContent && <p className="text-sm text-muted-foreground">AI 분석 데이터가 없습니다</p>}
+      {description && <p className="mb-2 text-sm text-muted-foreground">{description}</p>}
       {actions && actions.length > 0 && (
         <ul className="space-y-1">
           {actions.map((action) => (

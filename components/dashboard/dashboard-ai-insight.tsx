@@ -75,9 +75,7 @@ function EmptyState({ onGenerate }: { readonly onGenerate: () => void }) {
       <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[oklch(0.6_0.15_255)]/10">
         <Sparkles className="h-5 w-5 text-[oklch(0.5_0.12_260)]" />
       </div>
-      <p className="text-[13px] text-[oklch(0.45_0.02_260)]">
-        아직 AI 분석 결과가 없습니다.
-      </p>
+      <p className="text-[13px] text-[oklch(0.45_0.02_260)]">아직 AI 분석 결과가 없습니다.</p>
       <p className="mb-4 text-[12px] text-muted-foreground">
         버튼을 눌러 현재 사업장 상태를 AI로 분석해 보세요.
       </p>

@@ -50,12 +50,7 @@ export default function CompliancePage() {
 
   const overdueAll = useOverdueDeadlines(selectedCompanyId);
   const overdue = usePaginatedOverdueDeadlines(selectedCompanyId, filters, overduePage);
-  const upcoming = usePaginatedUpcomingDeadlines(
-    30,
-    selectedCompanyId,
-    filters,
-    upcomingPage,
-  );
+  const upcoming = usePaginatedUpcomingDeadlines(30, selectedCompanyId, filters, upcomingPage);
   // useUpcomingDeadlines(30) is already called inside usePaginatedUpcomingDeadlines above,
   // so React Query deduplicates — no extra fetch for the chart.
   const upcomingAll = useUpcomingDeadlines(30, selectedCompanyId);

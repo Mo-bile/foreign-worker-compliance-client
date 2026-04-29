@@ -13,7 +13,8 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     acknowledged: false,
     displayStatus: "RECENTLY_EFFECTIVE",
     sourceType: "ENFORCEMENT_RULE",
-    officialSourceUrl: "https://www.law.go.kr/lsSc.do?menuId=1&subMenuId=15&tabMenuId=81&query=고용허가제",
+    officialSourceUrl:
+      "https://www.law.go.kr/lsSc.do?menuId=1&subMenuId=15&tabMenuId=81&query=고용허가제",
   },
   {
     id: 2,
@@ -172,10 +173,7 @@ export const mockImpacts: Record<number, LegalImpact> = {
     level: "MEDIUM",
     description:
       "2026년 하반기 최저임금이 시간급 10,360원으로 변경됩니다. 현재 임금이 신규 최저임금에 미달하는 근로자가 있는지 확인이 필요합니다.",
-    actions: [
-      "E-9 근로자 현재 시급 대비 신규 최저임금 비교",
-      "미달 근로자 근로계약서 갱신 준비",
-    ],
+    actions: ["E-9 근로자 현재 시급 대비 신규 최저임금 비교", "미달 근로자 근로계약서 갱신 준비"],
   },
   4: {
     level: "HIGH",
@@ -191,18 +189,12 @@ export const mockImpacts: Record<number, LegalImpact> = {
     level: "HIGH",
     description:
       "체류자격 변경 시 고용주의 출입국관리사무소 신고 의무가 강화됩니다. 기한 내 미신고 시 과태료 부과 가능합니다.",
-    actions: [
-      "체류자격 변경 대상 근로자 파악",
-      "신고 절차 및 기한 확인",
-    ],
+    actions: ["체류자격 변경 대상 근로자 파악", "신고 절차 및 기한 확인"],
   },
   9: {
     level: "HIGH",
     description:
       "상시 5인 미만 사업장에도 근로기준법 일부 조항이 확대 적용됩니다. 해당 사업장은 준비가 필요합니다.",
-    actions: [
-      "사업장 적용 대상 여부 확인",
-      "확대 적용 조항 검토 및 준비",
-    ],
+    actions: ["사업장 적용 대상 여부 확인", "확대 적용 조항 검토 및 준비"],
   },
 };

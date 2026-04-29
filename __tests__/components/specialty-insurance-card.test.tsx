@@ -46,7 +46,9 @@ describe("SpecialtyInsuranceCard", () => {
   });
 
   it("사업주_의무에_데드라인이_있으면_상태를_표시한다", () => {
-    const deadlines = [createDeadline({ deadlineType: "EXIT_GUARANTEE_INSURANCE", status: "URGENT" })];
+    const deadlines = [
+      createDeadline({ deadlineType: "EXIT_GUARANTEE_INSURANCE", status: "URGENT" }),
+    ];
     render(<SpecialtyInsuranceCard visaType="E9" deadlines={deadlines} />);
     expect(screen.getByText("긴급")).toBeInTheDocument();
   });

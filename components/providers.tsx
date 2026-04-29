@@ -1,12 +1,7 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
-import {
-  MutationCache,
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { ErrorDialog } from "@/components/common/error-dialog";
@@ -44,10 +39,7 @@ export function Providers({ children }: { readonly children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         {children}
         <Toaster position="top-right" />
-        <ErrorDialog
-          message={globalError}
-          onClose={() => setGlobalError(null)}
-        />
+        <ErrorDialog message={globalError} onClose={() => setGlobalError(null)} />
       </QueryClientProvider>
     </ThemeProvider>
   );

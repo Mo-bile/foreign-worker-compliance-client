@@ -305,11 +305,7 @@ export const updateWorkerRequestSchema = z
     name: z.string().min(1, "이름을 입력해주세요"),
     dateOfBirth: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
     contactPhone: z.string().optional().or(z.literal("")),
-    contactEmail: z
-      .string()
-      .email("올바른 이메일 형식이 아닙니다")
-      .optional()
-      .or(z.literal("")),
+    contactEmail: z.string().email("올바른 이메일 형식이 아닙니다").optional().or(z.literal("")),
     nationality: z.enum(NATIONALITIES, { error: "국적을 선택해주세요" }),
     visaType: z.enum(VISA_TYPES, { error: "비자 유형을 선택해주세요" }),
     visaExpiryDate: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
@@ -321,13 +317,10 @@ export const updateWorkerRequestSchema = z
       .or(z.literal("")),
     jobPosition: z.string().optional().or(z.literal("")),
   })
-  .refine(
-    (d) => !d.contractEndDate || d.contractEndDate >= d.contractStartDate,
-    {
-      message: "계약 종료일은 시작일 이후여야 합니다",
-      path: ["contractEndDate"],
-    },
-  );
+  .refine((d) => !d.contractEndDate || d.contractEndDate >= d.contractStartDate, {
+    message: "계약 종료일은 시작일 이후여야 합니다",
+    path: ["contractEndDate"],
+  });
 
 export type UpdateWorkerRequest = z.infer<typeof updateWorkerRequestSchema>;
 

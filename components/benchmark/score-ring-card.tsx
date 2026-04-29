@@ -2,7 +2,11 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ScoreRing } from "./score-ring";
-import { MANAGEMENT_GRADE_COLORS, MANAGEMENT_GRADE_LABELS, type ManagementGrade } from "@/lib/constants/benchmark";
+import {
+  MANAGEMENT_GRADE_COLORS,
+  MANAGEMENT_GRADE_LABELS,
+  type ManagementGrade,
+} from "@/lib/constants/benchmark";
 import { cn } from "@/lib/utils";
 
 interface ScoreRingCardProps {

@@ -74,8 +74,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
     setPage(1);
   };
 
-  const sortIndicator = (key: string) =>
-    sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "";
+  const sortIndicator = (key: string) => (sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "");
   const [page, setPage] = useState(1);
 
   const handleSearchChange = (value: string) => {
@@ -128,7 +127,10 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
         cmp = a.name.localeCompare(b.name, "ko");
         break;
       case "nationality":
-        cmp = (NATIONALITY_LABELS[a.nationality] ?? a.nationality).localeCompare(NATIONALITY_LABELS[b.nationality] ?? b.nationality, "ko");
+        cmp = (NATIONALITY_LABELS[a.nationality] ?? a.nationality).localeCompare(
+          NATIONALITY_LABELS[b.nationality] ?? b.nationality,
+          "ko",
+        );
         break;
       case "visaType":
         cmp = a.visaType.localeCompare(b.visaType);
@@ -203,17 +205,43 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("name")}>이름{sortIndicator("name")}</TableHead>
-                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("nationality")}>국적{sortIndicator("nationality")}</TableHead>
-                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("visaType")}>비자 유형{sortIndicator("visaType")}</TableHead>
-                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("visaExpiry")}>비자 만료일{sortIndicator("visaExpiry")}</TableHead>
-                <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("status")}>상태{sortIndicator("status")}</TableHead>
+                <TableHead
+                  className="cursor-pointer select-none"
+                  onClick={() => toggleSort("name")}
+                >
+                  이름{sortIndicator("name")}
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none"
+                  onClick={() => toggleSort("nationality")}
+                >
+                  국적{sortIndicator("nationality")}
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none"
+                  onClick={() => toggleSort("visaType")}
+                >
+                  비자 유형{sortIndicator("visaType")}
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none"
+                  onClick={() => toggleSort("visaExpiry")}
+                >
+                  비자 만료일{sortIndicator("visaExpiry")}
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none"
+                  onClick={() => toggleSort("status")}
+                >
+                  상태{sortIndicator("status")}
+                </TableHead>
                 <TableHead>보험</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginated.items.map((worker) => {
-                const nationalityLabel = NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
+                const nationalityLabel =
+                  NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
                 const statusClass = WORKER_STATUS_COLORS[worker.status];
 
                 return (
@@ -226,7 +254,9 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     <TableCell>{nationalityLabel}</TableCell>
                     <TableCell>
                       <span className="font-mono text-xs">{worker.visaType}</span>
-                      <span className="ml-1.5 text-muted-foreground">{VISA_TYPE_LABELS[worker.visaType]}</span>
+                      <span className="ml-1.5 text-muted-foreground">
+                        {VISA_TYPE_LABELS[worker.visaType]}
+                      </span>
                       <H2Badge visaType={worker.visaType} />
                     </TableCell>
                     <TableCell>{worker.visaExpiryDate}</TableCell>
