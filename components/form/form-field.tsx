@@ -13,6 +13,7 @@ interface FormFieldProps<T extends FieldValues> {
   readonly className?: string;
   readonly registerOptions?: Parameters<UseFormRegister<T>>[1];
   readonly children?: React.ReactNode;
+  readonly description?: string;
 }
 
 export function FormField<T extends FieldValues>({
@@ -26,6 +27,7 @@ export function FormField<T extends FieldValues>({
   className,
   registerOptions,
   children,
+  description,
 }: FormFieldProps<T>) {
   const error = errors[name] as FieldError | undefined;
   return (
@@ -41,6 +43,7 @@ export function FormField<T extends FieldValues>({
           disabled={disabled}
         />
       )}
+      {description && <p className="text-sm text-muted-foreground">{description}</p>}
       {error && <p className="text-sm text-destructive">{error.message}</p>}
     </div>
   );

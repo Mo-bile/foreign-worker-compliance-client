@@ -239,6 +239,7 @@ export function CompanyForm(props: CompanyFormProps) {
         type="number"
         placeholder="50"
         registerOptions={{ valueAsNumber: true }}
+        description="내·외국인 포함 상시근로자 수"
       />
 
       <FormField
@@ -249,6 +250,7 @@ export function CompanyForm(props: CompanyFormProps) {
         type="number"
         placeholder="40"
         registerOptions={{ setValueAs: (v: string) => (v === "" ? undefined : Number(v)) }}
+        description="고용허가제 고용 한도 산정 기준"
       />
 
       <FormField
@@ -259,6 +261,7 @@ export function CompanyForm(props: CompanyFormProps) {
         type="number"
         placeholder="10"
         registerOptions={{ valueAsNumber: true }}
+        description="현재 고용 중인 외국인 근로자 수"
       />
 
       <FormField
