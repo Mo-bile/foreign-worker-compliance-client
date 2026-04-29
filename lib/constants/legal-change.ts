@@ -36,10 +36,7 @@ export const DISPLAY_STATUS_LABELS: Record<DisplayStatus, string> = {
   UNVERIFIED: "미검증",
 };
 
-export const DISPLAY_STATUS_COLORS: Record<
-  DisplayStatus,
-  { badge: string; dot: string }
-> = {
+export const DISPLAY_STATUS_COLORS: Record<DisplayStatus, { badge: string; dot: string }> = {
   UPCOMING: { badge: "bg-signal-blue-bg text-signal-blue", dot: "bg-signal-blue" },
   RECENTLY_EFFECTIVE: {
     badge: "bg-signal-green-bg text-signal-green",

@@ -26,10 +26,7 @@ interface SpecialtyInsuranceCardProps {
   readonly deadlines: readonly ComplianceDeadlineResponse[];
 }
 
-export function SpecialtyInsuranceCard({
-  visaType,
-  deadlines,
-}: SpecialtyInsuranceCardProps) {
+export function SpecialtyInsuranceCard({ visaType, deadlines }: SpecialtyInsuranceCardProps) {
   if (visaType !== "E9" && visaType !== "H2") return null;
 
   return (
@@ -42,15 +39,14 @@ export function SpecialtyInsuranceCard({
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <p className="mb-2 text-xs font-semibold text-muted-foreground">사업주 의무 — 자동 추적</p>
+          <p className="mb-2 text-xs font-semibold text-muted-foreground">
+            사업주 의무 — 자동 추적
+          </p>
           <div className="space-y-2">
             {EMPLOYER_TYPES.map((type) => {
               const deadline = deadlines.find((d) => d.deadlineType === type);
               return (
-                <div
-                  key={type}
-                  className="flex items-center justify-between rounded-lg border p-3"
-                >
+                <div key={type} className="flex items-center justify-between rounded-lg border p-3">
                   <div>
                     <p className="text-sm font-medium">{DEADLINE_TYPE_LABELS[type]}</p>
                     <p className="text-xs text-muted-foreground">사업주 가입 필수</p>

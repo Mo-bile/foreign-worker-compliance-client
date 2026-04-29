@@ -68,14 +68,15 @@ export function WorkerForm(props: WorkerFormProps) {
     : NATIONALITIES.map((n) => ({ value: n, label: NATIONALITY_LABELS[n] }));
 
   const visaTypeOptions = metadata
-    ? metadata.visaTypes.map((v) => ({ value: v.code, label: `${VISA_TYPE_SHORT[v.code as keyof typeof VISA_TYPE_SHORT] ?? v.code} ${v.description}` }))
+    ? metadata.visaTypes.map((v) => ({
+        value: v.code,
+        label: `${VISA_TYPE_SHORT[v.code as keyof typeof VISA_TYPE_SHORT] ?? v.code} ${v.description}`,
+      }))
     : VISA_TYPES.map((v) => ({ value: v, label: `${VISA_TYPE_SHORT[v]} ${VISA_TYPE_LABELS[v]}` }));
 
-  const resolver = (
-    isEdit
-      ? standardSchemaResolver(updateWorkerRequestSchema)
-      : standardSchemaResolver(registerWorkerRequestSchema)
-  ) as unknown as Resolver<WorkerFormValues>;
+  const resolver = (isEdit
+    ? standardSchemaResolver(updateWorkerRequestSchema)
+    : standardSchemaResolver(registerWorkerRequestSchema)) as unknown as Resolver<WorkerFormValues>;
 
   const {
     register,
@@ -242,7 +243,8 @@ export function WorkerForm(props: WorkerFormProps) {
                     className="w-full"
                   >
                     <SelectValue placeholder="국적 선택">
-                      {nationalityOptions.find((o) => o.value === field.value)?.label ?? field.value}
+                      {nationalityOptions.find((o) => o.value === field.value)?.label ??
+                        field.value}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>

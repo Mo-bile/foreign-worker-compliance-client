@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Info } from "lucide-react";
 import { SimulationForm } from "@/components/simulator/simulation-form";
 import { InputGuide } from "@/components/simulator/input-guide";
 import { ResultSummarySidebar } from "@/components/simulator/result-summary-sidebar";
@@ -32,6 +33,20 @@ export default function SimulatorPage() {
     );
   }
 
+  const infoBox = (
+    <div className="mb-6 flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
+      <Info className="mt-0.5 h-4 w-4 shrink-0" />
+      <div className="space-y-1">
+        <p>본 시뮬레이터는 고용허가제 E-9 (일반 외국인) 비자 기준입니다.</p>
+        <p>
+          H-2 (방문취업) 비자는 2026-02-12부터 신규 발급이 중단되어 본 시뮬레이션은 E-9 한정으로
+          작동합니다.
+        </p>
+        <p>E-7-4 (숙련기능인력) 전환은 별도 추천서 발급 절차이며 본 도구 범위 외입니다.</p>
+      </div>
+    </div>
+  );
+
   const result = mutation.data;
   const isExceeded = result?.verdict.verdict === "EXCEEDED";
 
@@ -48,101 +63,111 @@ export default function SimulatorPage() {
   // ─── Input mode ───
   if (!result && !mutation.isPending && !mutation.isError) {
     return (
-      <div className="grid grid-cols-[380px_1fr] gap-6">
-        <div className="sticky top-6 self-start">
-          <SimulationForm
-            company={selectedCompany}
-            onSubmit={handleSubmit}
-            isPending={mutation.isPending}
-          />
+      <>
+        {infoBox}
+        <div className="grid grid-cols-[380px_1fr] gap-6">
+          <div className="sticky top-6 self-start">
+            <SimulationForm
+              company={selectedCompany}
+              onSubmit={handleSubmit}
+              isPending={mutation.isPending}
+            />
+          </div>
+          <InputGuide />
         </div>
-        <InputGuide />
-      </div>
+      </>
     );
   }
 
   // ─── Loading / Error / Result mode ───
   return (
-    <div className="grid grid-cols-[380px_1fr] gap-6">
-      {/* Left sidebar */}
-      <div className="sticky top-6 max-h-[calc(100vh-3rem)] self-start space-y-4 overflow-y-auto">
-        {result && lastRequest ? (
-          <ResultSummarySidebar
-            request={lastRequest}
-            company={selectedCompany}
-            estimatedScore={result.scoring.estimatedScore}
-            isExceeded={isExceeded ?? false}
-            onEdit={handleEdit}
-          />
-        ) : (
-          <SimulationForm
-            company={selectedCompany}
-            onSubmit={handleSubmit}
-            isPending={mutation.isPending}
-          />
-        )}
-        {result && lastRequest && <AiSummarySection sanitizedHtml={result.aiSummary} />}
-      </div>
+    <>
+      {infoBox}
+      <div className="grid grid-cols-[380px_1fr] gap-6">
+        {/* Left sidebar */}
+        <div className="sticky top-6 max-h-[calc(100vh-3rem)] self-start space-y-4 overflow-y-auto">
+          {result && lastRequest ? (
+            <ResultSummarySidebar
+              request={lastRequest}
+              company={selectedCompany}
+              estimatedScore={result.scoring.estimatedScore}
+              isExceeded={isExceeded ?? false}
+              onEdit={handleEdit}
+            />
+          ) : (
+            <SimulationForm
+              company={selectedCompany}
+              onSubmit={handleSubmit}
+              isPending={mutation.isPending}
+            />
+          )}
+          {result && lastRequest && <AiSummarySection sanitizedHtml={result.aiSummary} />}
+        </div>
 
-      {/* Right content */}
-      <div className="space-y-4">
-        <AiAnalysisProgress variant="simulation" isPending={mutation.isPending} />
+        {/* Right content */}
+        <div className="space-y-4">
+          <AiAnalysisProgress variant="simulation" isPending={mutation.isPending} />
 
-        {mutation.isError && (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-            <p className="text-sm font-medium text-destructive">시뮬레이션 분석에 실패했습니다</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              잠시 후 다시 시도해주세요. 문제가 지속되면 관리자에게 문의하세요.
-            </p>
-            {lastRequest && (
-              <button
-                type="button"
-                onClick={() => mutation.mutate(lastRequest)}
-                disabled={mutation.isPending}
-                className="mt-3 rounded-md bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                다시 시도
-              </button>
-            )}
-          </div>
-        )}
-
-        {result && (
-          <>
-            {/* ① Verdict Card */}
-            <VerdictCard data={result.verdict} />
-
-            {/* Exceeded info banner */}
-            {isExceeded && (
-              <div className="rounded-lg border-l-[3px] border-signal-orange bg-secondary p-4">
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  한도 초과로 현재 신청이 불가하지만, 참고용 정보를 확인할 수 있습니다
-                </p>
-              </div>
-            )}
-
-            {/* ② Scoring */}
-            <ScoringSection data={result.scoring} defaultOpen={!isExceeded} muted={isExceeded} />
-
-            {/* ③ Quota */}
-            <QuotaSection data={result.quota} defaultOpen={!isExceeded} muted={isExceeded} />
-
-            {/* ④ Timeline */}
-            <TimelineSection data={result.timeline} defaultOpen={!isExceeded} muted={isExceeded} />
-
-            {/* ⑥ What-if (exceeded only) */}
-            {result.whatIf && <WhatIfSection data={result.whatIf} />}
-
-            {/* Recommendation */}
-            <RecommendationBox data={result.recommendation} />
-
-            {/* Disclaimer */}
-            <div className="border-t border-border pt-3 text-center text-[10px] text-muted-foreground">
-              ⚖ {result.disclaimer}
+          {mutation.isError && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
+              <p className="text-sm font-medium text-destructive">시뮬레이션 분석에 실패했습니다</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                잠시 후 다시 시도해주세요. 문제가 지속되면 관리자에게 문의하세요.
+              </p>
+              {lastRequest && (
+                <button
+                  type="button"
+                  onClick={() => mutation.mutate(lastRequest)}
+                  disabled={mutation.isPending}
+                  className="mt-3 rounded-md bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  다시 시도
+                </button>
+              )}
             </div>
-          </>
-        )}
+          )}
+
+          {result && (
+            <>
+              {/* ① Verdict Card */}
+              <VerdictCard data={result.verdict} />
+
+              {/* Exceeded info banner */}
+              {isExceeded && (
+                <div className="rounded-lg border-l-[3px] border-signal-orange bg-secondary p-4">
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    한도 초과로 현재 신청이 불가하지만, 참고용 정보를 확인할 수 있습니다
+                  </p>
+                </div>
+              )}
+
+              {/* ② Scoring */}
+              <ScoringSection data={result.scoring} defaultOpen={!isExceeded} muted={isExceeded} />
+
+              {/* ③ Quota */}
+              <QuotaSection data={result.quota} defaultOpen={!isExceeded} muted={isExceeded} />
+
+              {/* ④ Timeline */}
+              <TimelineSection
+                data={result.timeline}
+                defaultOpen={!isExceeded}
+                muted={isExceeded}
+              />
+
+              {/* ⑥ What-if (exceeded only) */}
+              {result.whatIf && <WhatIfSection data={result.whatIf} />}
+
+              {/* Recommendation */}
+              <RecommendationBox data={result.recommendation} />
+
+              {/* Disclaimer */}
+              <div className="border-t border-border pt-3 text-center text-[10px] text-muted-foreground">
+                ⚖ {result.disclaimer}
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

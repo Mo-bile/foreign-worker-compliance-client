@@ -192,8 +192,7 @@ export function transformDashboardResponse(raw: DashboardRawResponse): Dashboard
     insuranceSummary: raw.insuranceSummary.map(transformInsuranceSummary),
     complianceScore: {
       score: toFiniteNumber(
-        raw.complianceScore.score
-          ?? (raw.complianceScore as Record<string, unknown>).total,
+        raw.complianceScore.score ?? (raw.complianceScore as Record<string, unknown>).total,
         0,
       ),
       breakdown: raw.complianceScore.breakdown.map(transformComplianceBreakdown),

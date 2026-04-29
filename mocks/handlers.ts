@@ -9,6 +9,7 @@ import { mockBenchmarkResponse, mockBenchmarkList } from "@/mocks/benchmark-data
 import { mockLegalChangesResponse, mockImpacts } from "./legal-data";
 import { mockComplianceReport } from "./report-data";
 import { mockMetadata, MOCK_SCORING_POLICIES } from "./metadata-data";
+import { mockNotificationLogs, mockTriggerResponse } from "./notification-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
@@ -189,6 +190,18 @@ const postAcknowledge: Parameters<typeof http.post>[1] = () =>
 
 const getReport: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockComplianceReport);
 
+// ─── Notifications ──────────────────────────────────────
+
+const getNotificationLogs: Parameters<typeof http.get>[1] = ({ request }) => {
+  const url = new URL(request.url);
+  const limit = Number(url.searchParams.get("limit") ?? "10");
+  return HttpResponse.json(mockNotificationLogs.slice(0, limit));
+};
+
+const postNotificationTrigger: Parameters<typeof http.post>[1] = () => {
+  return HttpResponse.json(mockTriggerResponse);
+};
+
 // ─── Handler registration (BACKEND + jsdom paths) ───────
 
 export const handlers = [
@@ -282,4 +295,10 @@ export const handlers = [
       { status: 500 },
     ),
   ),
+
+  // Notifications
+  http.get(`${BACKEND}/api/notifications/logs`, getNotificationLogs),
+  http.post(`${BACKEND}/api/notifications/trigger`, postNotificationTrigger),
+  http.get("*/api/notifications/logs", getNotificationLogs),
+  http.post("*/api/notifications/trigger", postNotificationTrigger),
 ];

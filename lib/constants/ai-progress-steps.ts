@@ -31,8 +31,16 @@ const COMMON_MIDDLE: readonly ProgressStep[] = [
 const DASHBOARD_PRESET: ProgressPreset = {
   front: [
     { label: "근로자 현황을 조회하고 있습니다...", sub: "비자 유형별 분포 확인", icon: "database" },
-    { label: "보험 가입 현황을 확인하고 있습니다...", sub: "4대보험 가입률 계산", icon: "database" },
-    { label: "컴플라이언스 데드라인을 점검하고 있습니다...", sub: "비자 만료, 보험 가입 기한", icon: "database" },
+    {
+      label: "보험 가입 현황을 확인하고 있습니다...",
+      sub: "4대보험 가입률 계산",
+      icon: "database",
+    },
+    {
+      label: "컴플라이언스 데드라인을 점검하고 있습니다...",
+      sub: "비자 만료, 보험 가입 기한",
+      icon: "database",
+    },
     { label: "긴급 조치 항목을 집계하고 있습니다...", sub: "초과/임박 건 분류", icon: "database" },
   ],
   middle: COMMON_MIDDLE,
@@ -45,14 +53,34 @@ const DASHBOARD_PRESET: ProgressPreset = {
 
 const BENCHMARK_PRESET: ProgressPreset = {
   front: [
-    { label: "사업장 임금 데이터를 수집하고 있습니다...", sub: "월 평균임금, 지급 현황", icon: "database" },
-    { label: "동종업계 통계를 조회하고 있습니다...", sub: "지역×업종 기준 비교군 선정", icon: "database" },
-    { label: "이직률 데이터를 분석하고 있습니다...", sub: "E-9 퇴사사유 분포 조회", icon: "database" },
-    { label: "관리 실태 항목을 점검하고 있습니다...", sub: "체크리스트 기반 점수 산정", icon: "database" },
+    {
+      label: "사업장 임금 데이터를 수집하고 있습니다...",
+      sub: "월 평균임금, 지급 현황",
+      icon: "database",
+    },
+    {
+      label: "동종업계 통계를 조회하고 있습니다...",
+      sub: "지역×업종 기준 비교군 선정",
+      icon: "database",
+    },
+    {
+      label: "이직률 데이터를 분석하고 있습니다...",
+      sub: "E-9 퇴사사유 분포 조회",
+      icon: "database",
+    },
+    {
+      label: "관리 실태 항목을 점검하고 있습니다...",
+      sub: "체크리스트 기반 점수 산정",
+      icon: "database",
+    },
   ],
   middle: COMMON_MIDDLE,
   back: [
-    { label: "4축 진단 결과를 종합하고 있습니다...", sub: "임금/안정성/관리/포지셔닝", icon: "file" },
+    {
+      label: "4축 진단 결과를 종합하고 있습니다...",
+      sub: "임금/안정성/관리/포지셔닝",
+      icon: "file",
+    },
     { label: "개선 방향을 도출하고 있습니다...", sub: "우선순위별 권장 사항", icon: "file" },
     { label: "진단 리포트를 작성하고 있습니다...", sub: "전문가 진단 형식 정리", icon: "file" },
     { label: "마무리 중입니다...", sub: "최종 검토", icon: "file" },
@@ -63,8 +91,16 @@ const SIMULATION_PRESET: ProgressPreset = {
   front: [
     { label: "고용 한도를 계산하고 있습니다...", sub: "내국인 피보험자 수 기반", icon: "database" },
     { label: "점수제 항목을 시뮬레이션하고 있습니다...", sub: "가점/감점 합산", icon: "database" },
-    { label: "분기별 쿼터 현황을 조회하고 있습니다...", sub: "업종별 배정 규모 확인", icon: "database" },
-    { label: "예상 소요기간을 추정하고 있습니다...", sub: "국적별 행정 소요일 계산", icon: "database" },
+    {
+      label: "분기별 쿼터 현황을 조회하고 있습니다...",
+      sub: "업종별 배정 규모 확인",
+      icon: "database",
+    },
+    {
+      label: "예상 소요기간을 추정하고 있습니다...",
+      sub: "국적별 행정 소요일 계산",
+      icon: "database",
+    },
   ],
   middle: COMMON_MIDDLE,
   back: [

@@ -28,7 +28,6 @@ describe("simulationRequestSchema", () => {
     desiredTiming: "2026_Q2" as const,
     domesticInsuredCount: 10,
     appliedScoringCodes: ["CODE_A"],
-    deductionScore: 0,
   };
 
   describe("valid parse", () => {
@@ -40,7 +39,6 @@ describe("simulationRequestSchema", () => {
         expect(result.data.desiredTiming).toBe("2026_Q2");
         expect(result.data.domesticInsuredCount).toBe(10);
         expect(result.data.appliedScoringCodes).toEqual(["CODE_A"]);
-        expect(result.data.deductionScore).toBe(0);
         expect(result.data.preferredNationality).toBeUndefined();
       }
     });
@@ -109,12 +107,6 @@ describe("simulationRequestSchema", () => {
       const result = simulationRequestSchema.safeParse(rest);
       expect(result.success).toBe(false);
     });
-
-    it("fails when deductionScore is missing", () => {
-      const { deductionScore: _, ...rest } = validBase;
-      const result = simulationRequestSchema.safeParse(rest);
-      expect(result.success).toBe(false);
-    });
   });
 
   describe("boundary values — desiredWorkers (int, 1..50)", () => {
@@ -168,33 +160,6 @@ describe("simulationRequestSchema", () => {
       ).toBe(false);
     });
   });
-
-  describe("boundary values — deductionScore (int, min 0)", () => {
-    it("accepts zero (minimum boundary)", () => {
-      expect(simulationRequestSchema.safeParse({ ...validBase, deductionScore: 0 }).success).toBe(
-        true,
-      );
-    });
-
-    it("accepts positive values", () => {
-      expect(simulationRequestSchema.safeParse({ ...validBase, deductionScore: 100 }).success).toBe(
-        true,
-      );
-    });
-
-    it("rejects negative values: -1", () => {
-      expect(simulationRequestSchema.safeParse({ ...validBase, deductionScore: -1 }).success).toBe(
-        false,
-      );
-    });
-
-    it("rejects float values: 1.5", () => {
-      expect(simulationRequestSchema.safeParse({ ...validBase, deductionScore: 1.5 }).success).toBe(
-        false,
-      );
-    });
-  });
-
   describe("field type validation", () => {
     it("rejects a string for desiredWorkers", () => {
       expect(simulationRequestSchema.safeParse({ ...validBase, desiredWorkers: "5" }).success).toBe(

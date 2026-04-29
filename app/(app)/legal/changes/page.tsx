@@ -148,8 +148,8 @@ export default function LegalChangesPage() {
         <p className="font-semibold text-signal-green">✅ 공식 출처 기반 법령 변경 데이터</p>
         <p className="mt-1 text-muted-foreground">
           본 데이터는 법제처·고용노동부·법무부·국민연금공단 등 공식 출처를 2026-04-25 기준으로
-          검증하여 수록한 실제 시행/예정 법령 변경입니다. 각 항목의 공식 출처 링크에서
-          원문 확인 가능합니다.
+          검증하여 수록한 실제 시행/예정 법령 변경입니다. 각 항목의 공식 출처 링크에서 원문 확인
+          가능합니다.
         </p>
         <p className="mt-1 text-xs text-muted-foreground/70">
           ✦ 영향 분석은 AI가 사업장 정보를 기반으로 생성한 관리 보조 도구입니다.

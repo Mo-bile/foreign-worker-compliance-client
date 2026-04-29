@@ -17,10 +17,6 @@ interface SimulationFormProps {
   readonly isPending: boolean;
 }
 
-const GROUP_LABELS: Record<string, string> = {
-  LONG_TENURE: "장기근속",
-};
-
 export function SimulationForm({ company, onSubmit, isPending }: SimulationFormProps) {
   const [desiredWorkers, setDesiredWorkers] = useState<number>(1);
   const [preferredNationality, setPreferredNationality] = useState<string>("");
@@ -37,6 +33,13 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
     : (NATIONALITY_LABELS as Record<string, string>);
 
   const scoringPolicies = metadata?.scoringPolicies ?? [];
+  const groupLabelMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const group of metadata?.scoringPolicyGroups ?? []) {
+      map.set(group.code, group.displayName);
+    }
+    return map;
+  }, [metadata?.scoringPolicyGroups]);
   const independentPolicies = useMemo(
     () => scoringPolicies.filter((policy) => policy.mutualExclusionGroup === null),
     [scoringPolicies],
@@ -91,16 +94,6 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [company?.industryCategory]);
 
-  const deductionScore = useMemo(() => {
-    let total = 0;
-    for (const policy of scoringPolicies) {
-      if (policy.type === "DEDUCTION" && allSelectedCodes.has(policy.code)) {
-        total += policy.points;
-      }
-    }
-    return total;
-  }, [allSelectedCodes, scoringPolicies]);
-
   const isSubmitDisabled =
     isPending ||
     !Number.isFinite(desiredWorkers) ||
@@ -141,7 +134,6 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
       desiredTiming,
       domesticInsuredCount,
       appliedScoringCodes: [...allSelectedCodes],
-      deductionScore,
     };
 
     onSubmit(request);
@@ -168,8 +160,8 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
               </div>
               <p className="text-xs text-muted-foreground">
                 {REGION_LABELS[company.region] ?? company.region} ·{" "}
-                {INDUSTRY_CATEGORY_LABELS[company.industryCategory] ?? company.industryCategory} · 상시근로자{" "}
-                {company.employeeCount}명
+                {INDUSTRY_CATEGORY_LABELS[company.industryCategory] ?? company.industryCategory} ·
+                상시근로자 {company.employeeCount}명
               </p>
             </div>
           )}
@@ -348,62 +340,73 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
                   </label>
                 );
               })}
-              {[...policyGroups.entries()].map(([group, policies]) => (
-                <div key={group} className="rounded-md border border-border bg-background/70 p-3">
-                  <p className="mb-2 text-xs font-semibold text-foreground">
-                    {(GROUP_LABELS[group] ?? group) + " 가산점 (택1)"}
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    {policies.map((policy) => {
-                      const isApplicable = isPolicyApplicable(policy);
-                      const applicableIndustry =
-                        policy.applicableIndustry as IndustryCategory | null;
+              {[...policyGroups.entries()].map(([group, policies]) => {
+                const groupLabel = groupLabelMap.get(group) ?? group;
 
-                      return (
-                        <label
-                          key={policy.code}
-                          className={cn(
-                            "flex items-center gap-2 text-[13px]",
-                            isApplicable ? "cursor-pointer" : "cursor-not-allowed opacity-70",
-                          )}
-                        >
-                          <input
-                            type="radio"
-                            name={`policy-group-${group}`}
-                            checked={selectedGroupChoices[group] === policy.code}
-                            disabled={!isApplicable}
-                            onClick={() => {
-                              if (selectedGroupChoices[group] === policy.code) {
-                                handleGroupChange(group, policy.code);
-                              }
-                            }}
-                            onChange={() => {
-                              if (selectedGroupChoices[group] !== policy.code) {
-                                handleGroupChange(group, policy.code);
-                              }
-                            }}
+                return (
+                  <div key={group} className="rounded-md border border-border bg-background/70 p-3">
+                    <p className="mb-2 text-xs font-semibold text-foreground">
+                      {groupLabel} (택1)
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {policies.map((policy) => {
+                        const isDeduction = policy.type === "DEDUCTION";
+                        const isApplicable = isPolicyApplicable(policy);
+                        const applicableIndustry =
+                          policy.applicableIndustry as IndustryCategory | null;
+
+                        return (
+                          <label
+                            key={policy.code}
                             className={cn(
-                              "h-4 w-4",
-                              isApplicable ? "cursor-pointer" : "cursor-not-allowed",
+                              "flex items-center gap-2 text-[13px]",
+                              isApplicable ? "cursor-pointer" : "cursor-not-allowed opacity-70",
                             )}
-                          />
-                          <span>
-                            {policy.displayName}{" "}
-                            <span className="font-semibold text-signal-green">
-                              (+{policy.points}점)
-                            </span>
-                            {!isApplicable && applicableIndustry !== null && (
-                              <span className="ml-1 text-[11px] text-muted-foreground">
-                                ({INDUSTRY_CATEGORY_LABELS[applicableIndustry]} 사업장만 해당)
+                          >
+                            <input
+                              type="radio"
+                              name={`policy-group-${group}`}
+                              checked={selectedGroupChoices[group] === policy.code}
+                              disabled={!isApplicable}
+                              onClick={() => {
+                                if (selectedGroupChoices[group] === policy.code) {
+                                  handleGroupChange(group, policy.code);
+                                }
+                              }}
+                              onChange={() => {
+                                if (selectedGroupChoices[group] !== policy.code) {
+                                  handleGroupChange(group, policy.code);
+                                }
+                              }}
+                              className={cn(
+                                "h-4 w-4",
+                                isApplicable ? "cursor-pointer" : "cursor-not-allowed",
+                              )}
+                            />
+                            <span className={isDeduction ? "text-signal-red" : undefined}>
+                              {policy.displayName}{" "}
+                              <span
+                                className={
+                                  isDeduction
+                                    ? "font-semibold text-signal-red"
+                                    : "font-semibold text-signal-green"
+                                }
+                              >
+                                ({isDeduction ? `-${policy.points}점` : `+${policy.points}점`})
                               </span>
-                            )}
-                          </span>
-                        </label>
-                      );
-                    })}
+                              {!isApplicable && applicableIndustry !== null && (
+                                <span className="ml-1 text-[11px] text-muted-foreground">
+                                  ({INDUSTRY_CATEGORY_LABELS[applicableIndustry]} 사업장만 해당)
+                                </span>
+                              )}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

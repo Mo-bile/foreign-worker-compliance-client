@@ -72,16 +72,15 @@ export type ManagementCheck = z.infer<typeof managementCheckSchema>;
 
 // ─── Positioning Analysis ───────────────────────────────────
 
-export const positioningAnalysisSchema = z
-  .object({
-    region: z.string(),
-    industryCategory: z.string(),
-    regionalTotal: z.number(),
-    industryTotal: z.number(),
-    companyForeignWorkerCount: z.number(),
-    companyShare: z.number(),
-    sizeCategory: z.enum(["소규모", "중소규모", "중규모", "대규모"]),
-  });
+export const positioningAnalysisSchema = z.object({
+  region: z.string(),
+  industryCategory: z.string(),
+  regionalTotal: z.number(),
+  industryTotal: z.number(),
+  companyForeignWorkerCount: z.number(),
+  companyShare: z.number(),
+  sizeCategory: z.enum(["소규모", "중소규모", "중규모", "대규모"]),
+});
 export type PositioningAnalysis = z.infer<typeof positioningAnalysisSchema>;
 
 // ─── Benchmark Response ─────────────────────────────────────

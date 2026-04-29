@@ -2,7 +2,9 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { formatRelativeTime } from "@/lib/utils/format-relative-time";
 
 describe("formatRelativeTime", () => {
-  afterEach(() => { vi.useRealTimers(); });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it("초_단위_차이를_반환한다", () => {
     vi.useFakeTimers();

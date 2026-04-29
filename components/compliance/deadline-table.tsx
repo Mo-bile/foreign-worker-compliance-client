@@ -77,7 +77,9 @@ function groupByWorker(
 
   const groups = Array.from(grouped.values()).map((group) => ({
     ...group,
-    deadlines: [...group.deadlines].sort((left, right) => left.dueDate.localeCompare(right.dueDate)),
+    deadlines: [...group.deadlines].sort((left, right) =>
+      left.dueDate.localeCompare(right.dueDate),
+    ),
   }));
 
   if (!shouldSortByDueDate) {

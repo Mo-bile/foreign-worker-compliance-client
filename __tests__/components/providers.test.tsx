@@ -9,9 +9,7 @@ function MutationTestComponent({ error }: { error: Error }) {
   const mutation = useMutation({
     mutationFn: () => Promise.reject(error),
   });
-  return (
-    <button onClick={() => mutation.mutate()}>trigger</button>
-  );
+  return <button onClick={() => mutation.mutate()}>trigger</button>;
 }
 
 function QueryTestComponent({ error }: { error: Error }) {
@@ -58,7 +56,9 @@ describe("Providers 글로벌 에러 핸들링", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("alertdialog")).toBeInTheDocument();
-      expect(screen.getByText("서버와의 통신 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.")).toBeInTheDocument();
+      expect(
+        screen.getByText("서버와의 통신 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요."),
+      ).toBeInTheDocument();
     });
   });
 

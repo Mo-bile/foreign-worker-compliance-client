@@ -18,8 +18,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function DashboardPage() {
   const { selectedCompanyId } = useCompanyContext();
   const { data, isLoading, isError, error, refetch } = useDashboard(selectedCompanyId);
-  const { mutate: generateInsight, isPending: isInsightPending } =
-    useDashboardInsightMutation(selectedCompanyId ?? 0);
+  const { mutate: generateInsight, isPending: isInsightPending } = useDashboardInsightMutation(
+    selectedCompanyId ?? 0,
+  );
 
   if (selectedCompanyId == null) {
     return (

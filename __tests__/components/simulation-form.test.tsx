@@ -42,10 +42,57 @@ const mockMetadata: MetadataResponse = {
   industryCategories: [{ code: "MANUFACTURING", koreanName: "제조업" }],
   visaTypes: [{ code: "E9", description: "비전문취업" }],
   scoringPolicies: [
-    { code: "BONUS_1", displayName: "신규 사업장", points: 5, type: "BONUS", applicableIndustry: null, mutualExclusionGroup: null },
-    { code: "BONUS_2", displayName: "성실납부", points: 3, type: "BONUS", applicableIndustry: null, mutualExclusionGroup: null },
-    { code: "DEDUCT_1", displayName: "임금체불", points: 10, type: "DEDUCTION", applicableIndustry: null, mutualExclusionGroup: null },
-    { code: "DEDUCT_2", displayName: "산재사고", points: 7, type: "DEDUCTION", applicableIndustry: null, mutualExclusionGroup: null },
+    {
+      code: "BONUS_1",
+      displayName: "신규 사업장",
+      points: 5,
+      type: "BONUS",
+      applicableIndustry: null,
+      mutualExclusionGroup: null,
+    },
+    {
+      code: "BONUS_2",
+      displayName: "성실납부",
+      points: 3,
+      type: "BONUS",
+      applicableIndustry: null,
+      mutualExclusionGroup: null,
+    },
+    {
+      code: "DEDUCT_1",
+      displayName: "임금체불",
+      points: 10,
+      type: "DEDUCTION",
+      applicableIndustry: null,
+      mutualExclusionGroup: null,
+    },
+    {
+      code: "DEDUCT_2",
+      displayName: "산재사고",
+      points: 7,
+      type: "DEDUCTION",
+      applicableIndustry: null,
+      mutualExclusionGroup: null,
+    },
+    {
+      code: "LV_SERIOUS",
+      displayName: "노동관계법 중대위반",
+      points: 10,
+      type: "DEDUCTION",
+      applicableIndustry: null,
+      mutualExclusionGroup: "LABOR_VIOLATION",
+    },
+    {
+      code: "LV_GENERAL",
+      displayName: "노동관계법 일반위반",
+      points: 6,
+      type: "DEDUCTION",
+      applicableIndustry: null,
+      mutualExclusionGroup: "LABOR_VIOLATION",
+    },
+  ],
+  scoringPolicyGroups: [
+    { code: "LABOR_VIOLATION", displayName: "노동관계법 위반 감점" },
   ],
 };
 
@@ -158,7 +205,7 @@ describe("SimulationForm", () => {
 
     it("감점 항목은 -점수로 표시한다", () => {
       renderForm();
-      expect(screen.getByText(/-10점/)).toBeDefined();
+      expect(screen.getAllByText(/-10점/).length).toBeGreaterThan(0);
       expect(screen.getByText(/-7점/)).toBeDefined();
     });
 
@@ -185,10 +232,10 @@ describe("SimulationForm", () => {
     });
   });
 
-  // ── deductionScore calculation ─────────────────────────────────
+  // ── Deduction item selection ───────────────────────────────────
 
-  describe("감점 점수 계산", () => {
-    it("감점 체크박스를 선택하면 deductionScore에 반영된다", async () => {
+  describe("감점 항목 선택", () => {
+    it("감점 체크박스를 선택하면 appliedScoringCodes에 반영된다", async () => {
       const onSubmit = vi.fn();
       const user = userEvent.setup();
       renderForm({ onSubmit });
@@ -208,11 +255,10 @@ describe("SimulationForm", () => {
 
       expect(onSubmit).toHaveBeenCalledTimes(1);
       const request = onSubmit.mock.calls[0][0];
-      expect(request.deductionScore).toBe(10);
       expect(request.appliedScoringCodes).toContain("DEDUCT_1");
     });
 
-    it("여러 감점 체크박스를 선택하면 합산된다", async () => {
+    it("여러 감점 체크박스를 선택하면 모두 반영된다", async () => {
       const onSubmit = vi.fn();
       const user = userEvent.setup();
       renderForm({ onSubmit });
@@ -229,10 +275,11 @@ describe("SimulationForm", () => {
 
       expect(onSubmit).toHaveBeenCalledTimes(1);
       const request = onSubmit.mock.calls[0][0];
-      expect(request.deductionScore).toBe(17);
+      expect(request.appliedScoringCodes).toContain("DEDUCT_1");
+      expect(request.appliedScoringCodes).toContain("DEDUCT_2");
     });
 
-    it("가산 항목은 deductionScore에 포함되지 않는다", async () => {
+    it("가산 항목도 appliedScoringCodes에 반영된다", async () => {
       const onSubmit = vi.fn();
       const user = userEvent.setup();
       renderForm({ onSubmit });
@@ -248,8 +295,55 @@ describe("SimulationForm", () => {
 
       expect(onSubmit).toHaveBeenCalledTimes(1);
       const request = onSubmit.mock.calls[0][0];
-      expect(request.deductionScore).toBe(0);
       expect(request.appliedScoringCodes).toContain("BONUS_1");
+    });
+  });
+
+  describe("그룹 감점 렌더링", () => {
+    it("그룹 라벨이 metadata의 displayName으로 렌더링된다", () => {
+      renderForm();
+      expect(screen.getByText(/노동관계법 위반 감점/)).toBeDefined();
+    });
+
+    it("그룹 감점 항목이 라디오 버튼으로 렌더링된다", () => {
+      renderForm();
+      const radioButtons = screen.getAllByRole("radio");
+
+      expect(radioButtons.length).toBe(2);
+      expect(screen.getByText(/노동관계법 중대위반/)).toBeDefined();
+      expect(screen.getByText(/노동관계법 일반위반/)).toBeDefined();
+    });
+
+    it("그룹 감점 항목이 빨간색 스타일로 표시된다", () => {
+      renderForm();
+      const deductionLabel = screen.getByText(/노동관계법 중대위반/);
+
+      expect(deductionLabel.className).toContain("text-signal-red");
+    });
+
+    it("그룹 감점 항목의 점수가 -N점 형식으로 표시된다", () => {
+      renderForm();
+      expect(screen.getAllByText(/-10점/).length).toBeGreaterThan(0);
+      expect(screen.getByText(/-6점/)).toBeDefined();
+    });
+
+    it("그룹 라디오 버튼 선택이 appliedScoringCodes에 반영된다", async () => {
+      const onSubmit = vi.fn();
+      const user = userEvent.setup();
+      renderForm({ onSubmit });
+
+      const radioButtons = screen.getAllByRole("radio");
+      await user.click(radioButtons[0]); // LV_SERIOUS
+
+      const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
+      await user.selectOptions(timingSelect, "2026_Q2");
+
+      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      await user.click(submitButton);
+
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+      const request = onSubmit.mock.calls[0][0];
+      expect(request.appliedScoringCodes).toContain("LV_SERIOUS");
     });
   });
 
@@ -319,7 +413,6 @@ describe("SimulationForm", () => {
         desiredTiming: "2026_Q3",
         domesticInsuredCount: 30,
         appliedScoringCodes: [],
-        deductionScore: 0,
       });
     });
 

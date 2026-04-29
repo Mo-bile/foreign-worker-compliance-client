@@ -33,7 +33,12 @@ const singleWorkerDeadlines: DeadlineWithWorkerName[] = Array.from({ length: 25 
 describe("DeadlineTable", () => {
   it("limit이_있으면_해당_건수만_표시하고_페이지네이션_미표시", () => {
     render(
-      <DeadlineTable title="테스트" deadlines={singleWorkerDeadlines} isLoading={false} limit={5} />,
+      <DeadlineTable
+        title="테스트"
+        deadlines={singleWorkerDeadlines}
+        isLoading={false}
+        limit={5}
+      />,
     );
     expect(screen.getAllByText(/테스트 데드라인/)).toHaveLength(5);
     expect(screen.queryByLabelText("다음 페이지")).toBeNull();
@@ -220,14 +225,16 @@ describe("DeadlineTable", () => {
         }),
       ];
 
-      render(<DeadlineTable title="임박 데드라인" deadlines={upcomingDeadlines} isLoading={false} />);
+      render(
+        <DeadlineTable title="임박 데드라인" deadlines={upcomingDeadlines} isLoading={false} />,
+      );
 
       const soonHeader = screen.getByRole("button", { name: /Worker-Soon — 임박 1건/ });
       const lateHeader = screen.getByRole("button", { name: /Worker-Late — 임박 2건/ });
 
-      expect(soonHeader.compareDocumentPosition(lateHeader) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-        Node.DOCUMENT_POSITION_FOLLOWING,
-      );
+      expect(
+        soonHeader.compareDocumentPosition(lateHeader) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it("아코디언_내부_완료_버튼이_올바른_ID로_onComplete를_호출한다", async () => {
@@ -302,7 +309,11 @@ describe("DeadlineTable", () => {
       ];
 
       render(
-        <DeadlineTable title="기한초과 데드라인" deadlines={multiWorkerDeadlines} isLoading={false} />,
+        <DeadlineTable
+          title="기한초과 데드라인"
+          deadlines={multiWorkerDeadlines}
+          isLoading={false}
+        />,
       );
 
       expect(screen.getByText("Worker-A deadline 1")).toBeDefined();
@@ -333,7 +344,11 @@ describe("DeadlineTable", () => {
       ];
 
       render(
-        <DeadlineTable title="임박 데드라인 (30일)" deadlines={upcomingDeadlines} isLoading={false} />,
+        <DeadlineTable
+          title="임박 데드라인 (30일)"
+          deadlines={upcomingDeadlines}
+          isLoading={false}
+        />,
       );
 
       expect(screen.getByRole("button", { name: /Worker-A — 임박 1건/ })).toBeDefined();

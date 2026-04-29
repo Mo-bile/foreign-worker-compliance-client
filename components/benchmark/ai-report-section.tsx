@@ -23,9 +23,7 @@ export function AiReportSection({ aiReport }: AiReportSectionProps) {
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[oklch(0.6_0.15_255)] to-[oklch(0.55_0.18_300)] text-xs font-bold text-white">
           AI
         </div>
-        <span className="text-sm font-bold text-[oklch(0.3_0.03_260)]">
-          AI 종합 분석
-        </span>
+        <span className="text-sm font-bold text-[oklch(0.3_0.03_260)]">AI 종합 분석</span>
         <span className="rounded-full bg-[oklch(0.6_0.15_255)]/12 px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_260)]">
           AI 분석
         </span>

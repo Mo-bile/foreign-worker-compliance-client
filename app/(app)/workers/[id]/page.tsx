@@ -17,7 +17,12 @@ import { InsuranceBadge } from "@/components/workers/insurance-badge";
 import { H2Badge } from "@/components/workers/h2-badge";
 import { SpecialtyInsuranceCard } from "@/components/workers/specialty-insurance-card";
 import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-timeline";
-import { NATIONALITY_LABELS, VISA_TYPE_LABELS, WORKER_STATUS_LABELS, INSURANCE_TYPE_LABELS } from "@/types/api";
+import {
+  NATIONALITY_LABELS,
+  VISA_TYPE_LABELS,
+  WORKER_STATUS_LABELS,
+  INSURANCE_TYPE_LABELS,
+} from "@/types/api";
 import { useWorker } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
 
@@ -52,7 +57,10 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{w.name}</h1>
-        <Link href={`/workers/${workerId}/edit`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+        <Link
+          href={`/workers/${workerId}/edit`}
+          className={buttonVariants({ variant: "outline", size: "sm" })}
+        >
           수정
         </Link>
       </div>

@@ -27,11 +27,7 @@ export function FilterSelect<T extends string>({
     <Select value={value as string} onValueChange={(v) => onValueChange(v as T | "ALL")}>
       <SelectTrigger className={className} aria-label={placeholder}>
         <SelectValue placeholder={placeholder}>
-          {value === "ALL"
-            ? placeholder
-            : labelMap
-              ? (labelMap[value as T] ?? value)
-              : value}
+          {value === "ALL" ? placeholder : labelMap ? (labelMap[value as T] ?? value) : value}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
