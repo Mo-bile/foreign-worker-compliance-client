@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Pencil, Users } from "lucide-react";
+import { Pencil, Users, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,6 +44,7 @@ export default function MyCompanyPage() {
   }
 
   const workerCount = workers.data?.length ?? 0;
+  const c = company.data;
 
   return (
     <div className="space-y-6">
@@ -55,29 +56,80 @@ export default function MyCompanyPage() {
         </Button>
       </div>
 
-      <CompanyDetailCard company={company.data} />
+      {/* 1. 사업장 기본 정보 */}
+      <CompanyDetailCard company={c} />
 
+      {/* 2. 근로자·인원 정보 */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <Users className="h-4 w-4 text-muted-foreground" />
-            근로자 요약
+            근로자·인원 정보
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-between">
-          <p className="text-sm">
-            소속 근로자 <span className="font-semibold">{workerCount}명</span>
-          </p>
-          <Link href="/workers" className="text-sm text-primary hover:underline">
-            근로자 관리 →
-          </Link>
+        <CardContent className="space-y-4">
+          <dl className="grid gap-4 md:grid-cols-3">
+            <div>
+              <dt className="text-sm text-muted-foreground">총 직원 수</dt>
+              <dd className="font-medium">{c.employeeCount}명</dd>
+              <p className="text-xs text-muted-foreground">내·외국인 포함 상시근로자</p>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">내국인 피보험자 수</dt>
+              <dd className="font-medium">
+                {c.domesticInsuredCount != null ? `${c.domesticInsuredCount}명` : "—"}
+              </dd>
+              <p className="text-xs text-muted-foreground">고용 한도 산정 기준</p>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">외국인 근로자 수</dt>
+              <dd className="font-medium">{c.foreignWorkerCount}명</dd>
+              <p className="text-xs text-muted-foreground">등록된 외국인 근로자 수</p>
+            </div>
+          </dl>
+          <div className="flex items-center justify-between border-t pt-3">
+            <p className="text-sm">
+              소속 근로자 <span className="font-semibold">{workerCount}명</span>
+            </p>
+            <Link href="/workers" className="text-sm text-primary hover:underline">
+              근로자 관리 →
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 3. 벤치마크 진단용 */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            벤치마크 진단용
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <dl className="grid gap-4 md:grid-cols-2">
+            <div>
+              <dt className="text-sm text-muted-foreground">외국인 근로자 평균 월임금</dt>
+              <dd className="font-medium">
+                {c.averageForeignWorkerWage != null ? `${c.averageForeignWorkerWage}만원` : "—"}
+              </dd>
+              <p className="text-xs text-muted-foreground">미입력 시 임금 포지셔닝 진단이 생략됩니다</p>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">최근 1년 퇴사 외국인 수</dt>
+              <dd className="font-medium">
+                {c.recentYearTerminationCount != null ? `${c.recentYearTerminationCount}명` : "—"}
+              </dd>
+              <p className="text-xs text-muted-foreground">미입력 시 고용 안정성 진단이 생략됩니다</p>
+            </div>
+          </dl>
         </CardContent>
       </Card>
 
       <CompanyEditModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        company={company.data}
+        company={c}
       />
     </div>
   );
