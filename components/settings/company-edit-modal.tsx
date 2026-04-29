@@ -71,27 +71,6 @@ const benchmarkSchema = z.object({
   recentYearTerminationCount: z.number().int().min(0, "0 이상이어야 합니다").optional(),
 });
 
-// ─── Merge Helper ───────────────────────────────────────
-
-function buildFullUpdateBody(company: CompanyResponse, sectionData: Record<string, unknown>) {
-  return {
-    name: company.name,
-    region: company.region,
-    subRegion: company.subRegion ?? "",
-    industryCategory: company.industryCategory,
-    industrySubCategory: company.industrySubCategory ?? "",
-    employeeCount: company.employeeCount,
-    domesticInsuredCount: company.domesticInsuredCount ?? undefined,
-    foreignWorkerCount: company.foreignWorkerCount,
-    address: company.address,
-    contactPhone: company.contactPhone,
-    contactEmail: company.contactEmail ?? "",
-    averageForeignWorkerWage: company.averageForeignWorkerWage ?? undefined,
-    recentYearTerminationCount: company.recentYearTerminationCount ?? undefined,
-    ...sectionData,
-  };
-}
-
 // ─── Props ──────────────────────────────────────────────
 
 interface CompanyEditModalProps {
@@ -159,7 +138,7 @@ function InfoForm({
 
   function onSubmit(data: z.infer<typeof infoSchema>) {
     updateMutation.mutate(
-      { id: company.id, data: buildFullUpdateBody(company, data) },
+      { id: company.id, data },
       {
         onSuccess: () => {
           toast.success("사업장 정보가 수정되었습니다");
@@ -301,7 +280,7 @@ function WorkersForm({
 
   function onSubmit(data: z.infer<typeof workersSchema>) {
     updateMutation.mutate(
-      { id: company.id, data: buildFullUpdateBody(company, data) },
+      { id: company.id, data },
       {
         onSuccess: () => {
           toast.success("인원 정보가 수정되었습니다");
@@ -396,7 +375,7 @@ function BenchmarkForm({
 
   function onSubmit(data: z.infer<typeof benchmarkSchema>) {
     updateMutation.mutate(
-      { id: company.id, data: buildFullUpdateBody(company, data) },
+      { id: company.id, data },
       {
         onSuccess: () => {
           toast.success("벤치마크 정보가 수정되었습니다");
