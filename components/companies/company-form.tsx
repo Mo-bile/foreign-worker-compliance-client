@@ -295,7 +295,7 @@ export function CompanyForm(props: CompanyFormProps) {
             type="number"
             placeholder="10"
             registerOptions={{ valueAsNumber: true }}
-            description="현재 고용 중인 외국인"
+            description="등록된 외국인 근로자 수"
           />
         </div>
       </div>
