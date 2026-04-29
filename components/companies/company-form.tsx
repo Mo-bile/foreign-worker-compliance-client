@@ -231,6 +231,33 @@ export function CompanyForm(props: CompanyFormProps) {
         placeholder="전자부품"
       />
 
+      <FormField
+        label="주소"
+        name="address"
+        register={register}
+        errors={errors}
+        placeholder="서울시 강남구 테헤란로 123"
+        className="flex flex-col gap-1.5 md:col-span-2"
+      />
+
+      <FormField
+        label="연락처"
+        name="contactPhone"
+        register={register}
+        errors={errors}
+        type="tel"
+        placeholder="02-1234-5678"
+      />
+
+      <FormField
+        label="이메일 (선택)"
+        name="contactEmail"
+        register={register}
+        errors={errors}
+        type="email"
+        placeholder="contact@company.com"
+      />
+
       {/* 인원 정보 */}
       <div className="space-y-4 rounded-lg border border-dashed p-4 md:col-span-2">
         <p className="text-sm font-medium text-muted-foreground">
@@ -272,33 +299,6 @@ export function CompanyForm(props: CompanyFormProps) {
           />
         </div>
       </div>
-
-      <FormField
-        label="주소"
-        name="address"
-        register={register}
-        errors={errors}
-        placeholder="서울시 강남구 테헤란로 123"
-        className="flex flex-col gap-1.5 md:col-span-2"
-      />
-
-      <FormField
-        label="연락처"
-        name="contactPhone"
-        register={register}
-        errors={errors}
-        type="tel"
-        placeholder="02-1234-5678"
-      />
-
-      <FormField
-        label="이메일 (선택)"
-        name="contactEmail"
-        register={register}
-        errors={errors}
-        type="email"
-        placeholder="contact@company.com"
-      />
 
       {/* 벤치마크 진단용 (선택) */}
       <div className="space-y-4 rounded-lg border border-dashed p-4 md:col-span-2">
