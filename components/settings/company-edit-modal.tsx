@@ -18,7 +18,7 @@ interface CompanyEditModalProps {
 export function CompanyEditModal({ open, onClose, company }: CompanyEditModalProps) {
   return (
     <AlertDialog open={open}>
-      <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <AlertDialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <AlertDialogHeader>
           <AlertDialogTitle>사업장 정보 수정</AlertDialogTitle>
         </AlertDialogHeader>

@@ -166,7 +166,9 @@ export function CompanyForm(props: CompanyFormProps) {
                 aria-invalid={!!errors.region}
                 className="w-full"
               >
-                <SelectValue placeholder="지역 선택" />
+                <SelectValue placeholder="지역 선택">
+                  {regionOptions.find((o) => o.value === field.value)?.label}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {regionOptions.map((opt) => (
@@ -202,7 +204,9 @@ export function CompanyForm(props: CompanyFormProps) {
                 aria-invalid={!!errors.industryCategory}
                 className="w-full"
               >
-                <SelectValue placeholder="업종 선택" />
+                <SelectValue placeholder="업종 선택">
+                  {industryCategoryOptions.find((o) => o.value === field.value)?.label}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {industryCategoryOptions.map((opt) => (
