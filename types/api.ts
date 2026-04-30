@@ -388,5 +388,6 @@ export interface ErrorResponse {
   readonly status: number;
   readonly error: string;
   readonly message: string;
+  readonly alertMessage?: string;
   readonly timestamp: string;
 }

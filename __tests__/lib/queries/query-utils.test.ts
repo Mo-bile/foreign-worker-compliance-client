@@ -9,6 +9,20 @@ afterEach(() => {
 });
 
 describe("throwResponseError", () => {
+  it("JSON_응답의_alertMessage를_message보다_우선한다", async () => {
+    const res = new Response(
+      JSON.stringify({
+        message: "서버 메시지",
+        alertMessage: "사용자 안내 메시지",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+    await expect(throwResponseError(res, "fallback")).rejects.toThrow("사용자 안내 메시지");
+  });
+
   it("JSON_응답의_message를_사용한다", async () => {
     const res = new Response(JSON.stringify({ message: "서버 에러" }), {
       status: 500,

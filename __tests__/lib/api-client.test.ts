@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
+import { http, HttpResponse } from "msw";
 import { server } from "@/mocks/server";
 import { apiClient, ApiError } from "@/lib/api-client";
 
@@ -25,5 +26,31 @@ describe("apiClient", () => {
   it("5xx_응답시_ApiError를_throw한다", async () => {
     await expect(apiClient.get("/test/500")).rejects.toThrow(ApiError);
     await expect(apiClient.get("/test/500")).rejects.toMatchObject({ status: 500 });
+  });
+
+  it("에러_응답의_alertMessage를_message보다_우선한다", async () => {
+    server.use(
+      http.get("http://localhost:8080/test/alert-message", () =>
+        HttpResponse.json(
+          {
+            status: 500,
+            error: "Internal Server Error",
+            message: "서버 내부 오류",
+            alertMessage: "사용자에게 보여줄 안내 문구",
+            timestamp: new Date().toISOString(),
+          },
+          { status: 500 },
+        ),
+      ),
+    );
+
+    await expect(apiClient.get("/test/alert-message")).rejects.toThrow(
+      "사용자에게 보여줄 안내 문구",
+    );
+    await expect(apiClient.get("/test/alert-message")).rejects.toMatchObject({
+      status: 500,
+      alertMessage: "사용자에게 보여줄 안내 문구",
+      serverMessage: "서버 내부 오류",
+    });
   });
 });

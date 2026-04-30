@@ -6,11 +6,17 @@ import { ERROR_MESSAGES } from "@/lib/constants/error-messages";
 export function handleRouteError(error: unknown, context: string): NextResponse {
   if (error instanceof ApiError) {
     if (error.status >= 500) {
-      console.error(`[${context}] Backend error: ${error.status} ${error.message}`);
+      console.error(`[${context}] Backend error: ${error.status} ${error.serverMessage}`);
     } else {
-      console.warn(`[${context}] Backend returned ${error.status}: ${error.message}`);
+      console.warn(`[${context}] Backend returned ${error.status}: ${error.serverMessage}`);
     }
-    return NextResponse.json({ message: error.message }, { status: error.status });
+    return NextResponse.json(
+      {
+        message: error.serverMessage,
+        ...(error.alertMessage ? { alertMessage: error.alertMessage } : {}),
+      },
+      { status: error.status },
+    );
   }
   console.error(`[${context}] Unexpected error:`, error);
   return NextResponse.json({ message: ERROR_MESSAGES.SERVER_ERROR }, { status: 500 });

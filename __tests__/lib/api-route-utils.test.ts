@@ -16,6 +16,25 @@ describe("handleRouteError", () => {
     warnSpy.mockRestore();
   });
 
+  it("ApiError의_alertMessage를_응답에_포함한다", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const error = new ApiError(
+      500,
+      "Internal Server Error",
+      "사용자 안내 메시지",
+      "사용자 안내 메시지",
+      "서버 내부 오류",
+    );
+    const res = handleRouteError(error, "GET /api/test");
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json).toMatchObject({
+      message: "서버 내부 오류",
+      alertMessage: "사용자 안내 메시지",
+    });
+    errorSpy.mockRestore();
+  });
+
   it("ApiError_5xx이면_console.error로_로깅한다", () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const error = new ApiError(502, "Bad Gateway", "백엔드 에러");

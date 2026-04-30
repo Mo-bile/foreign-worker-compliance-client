@@ -1,11 +1,17 @@
 /**
- * Throws an error with the HTTP status attached, using the server's error message if available.
+ * Throws an error with the HTTP status attached, using the user-facing alert message if available.
  */
+function getStringField(body: unknown, field: "alertMessage" | "message"): string | undefined {
+  if (typeof body !== "object" || body === null) return undefined;
+  const value = (body as Record<string, unknown>)[field];
+  return typeof value === "string" ? value : undefined;
+}
+
 export async function throwResponseError(res: Response, fallbackMessage: string): Promise<never> {
   let message = fallbackMessage;
   try {
     const body = await res.json();
-    if (body.message) message = body.message;
+    message = getStringField(body, "alertMessage") || getStringField(body, "message") || message;
   } catch {
     console.warn(
       `[throwResponseError] Non-JSON error response: status=${res.status}, ` +

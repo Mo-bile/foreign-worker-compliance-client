@@ -3,10 +3,18 @@ export class ApiError extends Error {
     public readonly status: number,
     public readonly statusText: string,
     message: string,
+    public readonly alertMessage?: string,
+    public readonly serverMessage: string = message,
   ) {
     super(message);
     this.name = "ApiError";
   }
+}
+
+function getStringField(body: unknown, field: "alertMessage" | "message"): string | undefined {
+  if (typeof body !== "object" || body === null) return undefined;
+  const value = (body as Record<string, unknown>)[field];
+  return typeof value === "string" ? value : undefined;
 }
 
 function getBaseUrl(): string {
@@ -20,13 +28,17 @@ function getBaseUrl(): string {
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let message = response.statusText;
+    let alertMessage: string | undefined;
+    let serverMessage = response.statusText;
     try {
       const body = await response.json();
-      message = body.message ?? message;
+      alertMessage = getStringField(body, "alertMessage");
+      serverMessage = getStringField(body, "message") || serverMessage;
+      message = alertMessage || serverMessage;
     } catch {
       // body가 JSON이 아닌 경우 statusText 사용
     }
-    throw new ApiError(response.status, response.statusText, message);
+    throw new ApiError(response.status, response.statusText, message, alertMessage, serverMessage);
   }
   return response.json() as Promise<T>;
 }
