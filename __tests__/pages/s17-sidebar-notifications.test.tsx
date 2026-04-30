@@ -177,6 +177,18 @@ describe("DeadlineTimeline — 알림 설정 딥링크", () => {
   });
 });
 
+describe("NotificationSettingsPage — 알림 안내 박스", () => {
+  it("상단 안내 문구와 쉬운 발송 표현을 표시한다", () => {
+    renderWithQuery(<NotificationSettingsPage />);
+
+    expect(screen.getByText(/주요 기한을 놓치지 않도록 이메일로 알려주는 기능/)).toBeInTheDocument();
+    expect(screen.getByText(/받을 이메일을 확인하고, 알림을 받을 시점/)).toBeInTheDocument();
+    expect(screen.getByText(/자동 발송은 준비 중/)).toBeInTheDocument();
+    expect(screen.getByText("직접 보내기")).toBeInTheDocument();
+    expect(screen.queryByText(/P2 단계/)).not.toBeInTheDocument();
+  });
+});
+
 describe("NotificationTimingToggles", () => {
   const STORAGE_KEY = "fwc:notification-prefs:1";
 
@@ -321,7 +333,7 @@ describe("NotificationSettingsPage — 알림 설정", () => {
     expect(screen.getByText("알림 설정")).toBeInTheDocument();
     expect(screen.getByText("수신 이메일")).toBeInTheDocument();
     expect(screen.getByText("알림 시점")).toBeInTheDocument();
-    expect(screen.getByText("수동 발송")).toBeInTheDocument();
+    expect(screen.getByText("직접 보내기")).toBeInTheDocument();
     expect(screen.getByText("최근 발송 기록")).toBeInTheDocument();
   });
 
@@ -335,10 +347,8 @@ describe("NotificationSettingsPage — 알림 설정", () => {
     expect(screen.getByRole("button", { name: /지금 알림 보내기/ })).toBeInTheDocument();
   });
 
-  it("P2 스케줄러 안내가 표시된다", () => {
+  it("자동 발송 준비 중 안내가 표시된다", () => {
     renderWithQuery(<NotificationSettingsPage />);
-    expect(
-      screen.getAllByText(/자동 스케줄러는 P2 단계에서 구현 예정/).length,
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/자동 발송은 .*준비 중/).length).toBeGreaterThanOrEqual(1);
   });
 });

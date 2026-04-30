@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, Bell, Send, Clock, AlertTriangle } from "lucide-react";
+import { Mail, Bell, Send, Clock, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,6 +45,15 @@ export default function NotificationSettingsPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">알림 설정</h1>
 
+      <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
+        <Info className="mt-0.5 h-4 w-4 shrink-0" />
+        <div className="space-y-1">
+          <p>알림은 주요 기한을 놓치지 않도록 이메일로 알려주는 기능입니다.</p>
+          <p>받을 이메일을 확인하고, 알림을 받을 시점을 선택할 수 있습니다.</p>
+          <p>지금은 버튼을 눌러 직접 알림을 보낼 수 있으며, 자동 발송은 준비 중입니다.</p>
+        </div>
+      </div>
+
       {/* 수신 이메일 */}
       <Card>
         <CardHeader className="pb-2">
@@ -85,7 +94,7 @@ export default function NotificationSettingsPage() {
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <Send className="h-4 w-4 text-muted-foreground" />
-            수동 발송
+            직접 보내기
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -112,15 +121,6 @@ export default function NotificationSettingsPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* P2 스케줄러 안내 */}
-      <div className="flex gap-3 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800 dark:border-orange-900 dark:bg-orange-950/30 dark:text-orange-200">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-        <div>
-          <p>자동 스케줄러는 P2 단계에서 구현 예정입니다.</p>
-          <p>현재는 위 "지금 알림 보내기" 버튼으로 수동 발송이 가능합니다.</p>
-        </div>
-      </div>
     </div>
   );
 }

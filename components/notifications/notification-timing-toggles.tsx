@@ -68,7 +68,7 @@ export function NotificationTimingToggles({ companyId }: NotificationTimingToggl
         </label>
       ))}
       <p className="text-xs text-muted-foreground">
-        ※ 자동 스케줄러는 P2 단계에서 구현 예정입니다.
+        ※ 자동 발송은 아직 준비 중입니다.
       </p>
     </div>
   );
