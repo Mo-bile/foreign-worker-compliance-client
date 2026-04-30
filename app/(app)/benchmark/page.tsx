@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Info } from "lucide-react";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import { useBenchmarkList, useCreateBenchmark } from "@/lib/queries/use-benchmark";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,6 +47,23 @@ export default function BenchmarkPage() {
     );
   }
 
+  const infoBox = (
+    <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
+      <Info className="mt-0.5 h-4 w-4 shrink-0" />
+      <div className="space-y-1">
+        <p>사업장 진단 리포트는 회사 및 근로자 데이터와 외부 기준 데이터를 함께 분석합니다.</p>
+        <p>
+          임금 구간, E-9 퇴사 사유, 관리 체크리스트, 지역/업종 포지셔닝 기준을 바탕으로
+          현재 사업장의 관리 상태를 진단합니다.
+        </p>
+        <p>
+          일부 항목은 현재 등록된 사업장 정보와 근로자 정보의 입력 완성도에 따라 결과가 제한될 수
+          있습니다.
+        </p>
+      </div>
+    </div>
+  );
+
   if (isLoading) return <BenchmarkSkeleton />;
 
   if (isError) {
@@ -60,6 +78,7 @@ export default function BenchmarkPage() {
   if (!benchmarks || benchmarks.length === 0) {
     return (
       <div className="space-y-4">
+        {infoBox}
         <BenchmarkEmptyState
           onCreateBenchmark={handleCreateBenchmark}
           isLoading={createBenchmark.isPending}
@@ -73,6 +92,7 @@ export default function BenchmarkPage() {
 
   return (
     <div className="space-y-5">
+      {infoBox}
       <BenchmarkHeader
         analyzedAt={latest.analyzedAt}
         onCreateBenchmark={handleCreateBenchmark}

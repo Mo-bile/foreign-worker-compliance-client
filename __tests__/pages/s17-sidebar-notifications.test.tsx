@@ -82,6 +82,19 @@ vi.mock("@/lib/queries/use-simulation", () => ({
   }),
 }));
 
+vi.mock("@/lib/queries/use-benchmark", () => ({
+  useBenchmarkList: () => ({
+    data: [],
+    isLoading: false,
+    isError: false,
+    error: null,
+  }),
+  useCreateBenchmark: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+  }),
+}));
+
 // ─── MSW Setup ──────────────────────────────────────────
 
 beforeAll(() => server.listen());
@@ -105,6 +118,7 @@ import { NotificationTimingToggles } from "@/components/notifications/notificati
 import { NotificationLogTable } from "@/components/notifications/notification-log-table";
 import { CompanyEditModal } from "@/components/settings/company-edit-modal";
 import SimulatorPage from "@/app/(app)/simulator/page";
+import BenchmarkPage from "@/app/(app)/benchmark/page";
 import MyCompanyPage from "@/app/(app)/settings/company/page";
 import NotificationSettingsPage from "@/app/(app)/settings/notifications/page";
 import type { NotificationLog } from "@/types/notification";
@@ -144,6 +158,14 @@ describe("SimulatorPage — E-9 안내 박스", () => {
     renderWithQuery(<SimulatorPage />);
     expect(screen.getByText(/E-9 \(일반 외국인\) 비자 기준/)).toBeInTheDocument();
     expect(screen.getByText(/H-2 \(방문취업\)/)).toBeInTheDocument();
+  });
+});
+
+describe("BenchmarkPage — 진단 안내 박스", () => {
+  it("사업장 진단에 사용하는 데이터 기준 안내 문구가 표시된다", () => {
+    renderWithQuery(<BenchmarkPage />);
+    expect(screen.getByText(/회사 및 근로자 데이터와 외부 기준 데이터/)).toBeInTheDocument();
+    expect(screen.getByText(/임금 구간, E-9 퇴사 사유, 관리 체크리스트/)).toBeInTheDocument();
   });
 });
 
