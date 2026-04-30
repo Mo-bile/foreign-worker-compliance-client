@@ -22,7 +22,7 @@ export function useWorkers(companyId?: number | null) {
       const params = companyId ? `?companyId=${companyId}` : "";
       return fetchApi<readonly WorkerResponse[]>(
         `/api/workers${params}`,
-        "근로자 목록을 불러올 수 없습니다",
+        "외국인 근로자 목록을 불러올 수 없습니다",
       );
     },
     enabled: companyId != null && companyId > 0,

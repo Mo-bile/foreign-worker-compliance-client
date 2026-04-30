@@ -36,7 +36,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
     label: "고용 후",
     items: [
       { href: "/benchmark", label: "사업장 건강검진", icon: BarChart3 },
-      { href: "/workers", label: "근로자 관리", icon: Users },
+      { href: "/workers", label: "외국인 근로자 관리", icon: Users },
     ],
   },
   {

@@ -14,7 +14,7 @@ import { CompanySelector } from "@/components/companies/company-selector";
 const NAV_ITEMS = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
   { href: "/companies", label: "사업장 관리", icon: Building2 },
-  { href: "/workers", label: "근로자 관리", icon: Users },
+  { href: "/workers", label: "외국인 근로자 관리", icon: Users },
   { href: "/compliance", label: "컴플라이언스", icon: AlertTriangle },
 ] as const;
 
