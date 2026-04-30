@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Info } from "lucide-react";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import { CATEGORY_ICONS } from "@/lib/constants/legal-change";
 import { useLegalChanges } from "@/lib/queries/use-legal-changes";
@@ -74,8 +75,8 @@ function applyFilter(
     case "resolved":
       return changes.filter((change) => change.acknowledged);
     default: {
-      const _exhaustive: never = filter;
-      return changes;
+      const exhaustive: never = filter;
+      throw new Error(`Unsupported legal change filter: ${exhaustive}`);
     }
   }
 }
@@ -144,16 +145,16 @@ export default function LegalChangesPage() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-[var(--signal-green)]/20 bg-signal-green-bg p-4 text-sm">
-        <p className="font-semibold text-signal-green">✅ 공식 출처 기반 법령 변경 데이터</p>
-        <p className="mt-1 text-muted-foreground">
-          본 데이터는 법제처·고용노동부·법무부·국민연금공단 등 공식 출처를 2026-04-25 기준으로
-          검증하여 수록한 실제 시행/예정 법령 변경입니다. 각 항목의 공식 출처 링크에서 원문 확인
-          가능합니다.
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground/70">
-          ✦ 영향 분석은 AI가 사업장 정보를 기반으로 생성한 관리 보조 도구입니다.
-        </p>
+      <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
+        <Info className="mt-0.5 h-4 w-4 shrink-0" />
+        <div className="space-y-1">
+          <p>공식 기관에서 확인한 법령 변경 정보입니다.</p>
+          <p>
+            법제처, 고용노동부, 법무부, 국민연금공단 등 공식 출처를 기준으로 정리했으며,
+            각 항목에서 원문을 확인할 수 있습니다.
+          </p>
+          <p>사업장별 안내는 등록된 사업장 정보를 바탕으로 제공되는 참고용 안내입니다.</p>
+        </div>
       </div>
       <div className="flex items-center justify-between">
         <FilterBar activeFilter={filter} counts={filterCounts} onFilterChange={setFilter} />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Info } from "lucide-react";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import { useComplianceReport } from "@/lib/queries/use-compliance-report";
 import { ExportButtons } from "@/components/report/export-buttons";
@@ -141,6 +142,18 @@ export default function ReportsPage() {
   );
   const selectedYearMonth = yearMonth ?? data?.yearMonth;
   const yearMonthOptions = buildYearMonthOptions();
+  const reportNotice = (
+    <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
+      <Info className="mt-0.5 h-4 w-4 shrink-0" />
+      <div className="space-y-1">
+        <p>선택한 달의 보험 가입과 주요 기한 준수 현황을 100점 기준으로 정리한 리포트입니다.</p>
+        <p>
+          점수는 사업장 관리 상태를 빠르게 확인하기 위한 참고 지표이며, 조회한 이후 바뀐 정보는
+          다음 리포트에 반영될 수 있습니다.
+        </p>
+      </div>
+    </div>
+  );
 
   if (selectedCompanyId == null) {
     return (
@@ -160,6 +173,7 @@ export default function ReportsPage() {
     if (is404) {
       return (
         <div className="space-y-6">
+          {reportNotice}
           <Card>
             <CardHeader className="border-b">
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -215,6 +229,7 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
+      {reportNotice}
       <Card className="overflow-visible">
         <CardHeader className="border-b">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">

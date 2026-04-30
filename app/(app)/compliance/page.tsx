@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import { Info } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -75,7 +76,22 @@ export default function CompliancePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">컴플라이언스 현황</h1>
+      <h1 className="text-2xl font-bold">주요 기한 관리</h1>
+
+      <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
+        <Info className="mt-0.5 h-4 w-4 shrink-0" />
+        <div className="space-y-1">
+          <p>
+            이 화면에서는 근로자별로 놓쳤거나 곧 다가오는 신고·갱신·보험 관련 기한을 확인할 수
+            있습니다.
+          </p>
+          <p>기한이 지난 항목은 먼저 처리하고, 30일 안에 다가오는 항목은 미리 준비하세요.</p>
+          <p>
+            항목 종류와 처리 상태를 선택해 필요한 내용만 볼 수 있으며, 처리한 항목은 완료로 표시할
+            수 있습니다.
+          </p>
+        </div>
+      </div>
 
       <Card>
         <CardContent className="flex flex-wrap items-center gap-3 pt-6">

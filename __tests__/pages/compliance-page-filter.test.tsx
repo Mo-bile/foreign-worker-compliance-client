@@ -39,6 +39,15 @@ describe("CompliancePage 쿼리파라미터 필터", () => {
     mockUseCompanyContext.mockReturnValue({ selectedCompanyId: 1, companies: [] });
   });
 
+  it("상단에 주요 기한 관리 안내 문구가 표시된다", () => {
+    render(<CompliancePage />, { wrapper: createWrapper() });
+
+    expect(screen.getByRole("heading", { name: "주요 기한 관리" })).toBeInTheDocument();
+    expect(screen.getByText(/놓쳤거나 곧 다가오는 신고·갱신·보험 관련 기한/)).toBeInTheDocument();
+    expect(screen.getByText(/기한이 지난 항목은 먼저 처리/)).toBeInTheDocument();
+    expect(screen.getByText(/처리한 항목은 완료로 표시/)).toBeInTheDocument();
+  });
+
   it("type_파라미터_없이_진입하면_전체_필터가_기본값이다", async () => {
     render(<CompliancePage />, { wrapper: createWrapper() });
     await waitFor(() => {
