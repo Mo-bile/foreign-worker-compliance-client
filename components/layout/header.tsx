@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, LayoutDashboard, Users, AlertTriangle, Building2 } from "lucide-react";
+import { Menu, LayoutDashboard, Users, CalendarClock, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
   { href: "/companies", label: "사업장 관리", icon: Building2 },
   { href: "/workers", label: "외국인 근로자 관리", icon: Users },
-  { href: "/compliance", label: "컴플라이언스", icon: AlertTriangle },
+  { href: "/deadlines", label: "기한 관리", icon: CalendarClock },
 ] as const;
 
 export function Header() {

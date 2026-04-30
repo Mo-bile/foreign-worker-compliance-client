@@ -34,10 +34,10 @@ describe("DeadlineTimeline", () => {
     expect(screen.getByText("30일 타임라인")).toBeDefined();
   });
 
-  it("전체_보기_링크가_/compliance를_가리킨다", () => {
+  it("전체_주요_기한_보기_링크가_/deadlines를_가리킨다", () => {
     render(<DeadlineTimeline items={mockItems} />);
-    const link = screen.getByText("전체 보기 →");
-    expect(link.closest("a")?.getAttribute("href")).toBe("/compliance");
+    const link = screen.getByText("전체 주요 기한 보기 →");
+    expect(link.closest("a")?.getAttribute("href")).toBe("/deadlines");
   });
 
   it("overdue_urgency에_signal-red_색상_바가_있다", () => {

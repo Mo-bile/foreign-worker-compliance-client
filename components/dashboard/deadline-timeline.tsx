@@ -24,8 +24,8 @@ export function DeadlineTimeline({ items }: DeadlineTimelineProps) {
             <Calendar className="h-4 w-4 text-muted-foreground" />
             30일 타임라인
           </CardTitle>
-          <Link href="/compliance" className="text-xs text-primary hover:underline">
-            전체 보기 →
+          <Link href="/deadlines" className="text-xs text-primary hover:underline">
+            전체 주요 기한 보기 →
           </Link>
         </div>
       </CardHeader>

@@ -125,7 +125,7 @@ function transformAlertGroups(alerts: readonly DashboardRawAlert[]): readonly Al
       label: ALERT_TITLE_MAP[type as DeadlineType] ?? type,
       count: groupAlerts.length,
       urgency: maxUrgency,
-      href: `/compliance?type=${type}`,
+      href: `/deadlines?type=${type}`,
     }))
     .sort((a, b) => URGENCY_PRIORITY[a.urgency] - URGENCY_PRIORITY[b.urgency]);
 }

@@ -30,8 +30,9 @@ describe("Sidebar", () => {
     expect(link).toHaveClass("bg-secondary");
   });
 
-  it("데드라인 관리 항목이 더 이상 존재하지 않는다", () => {
+  it("기한 관리 항목이 고용 후 섹션에 렌더링된다", () => {
     render(<Sidebar />);
-    expect(screen.queryByText("데드라인 관리")).not.toBeInTheDocument();
+    const link = screen.getByText("기한 관리").closest("a");
+    expect(link).toHaveAttribute("href", "/deadlines");
   });
 });

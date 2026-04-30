@@ -12,6 +12,7 @@ import {
   FileText,
   Bell,
   ShieldCheck,
+  CalendarClock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
     items: [
       { href: "/benchmark", label: "사업장 건강검진", icon: BarChart3 },
       { href: "/workers", label: "외국인 근로자 관리", icon: Users },
+      { href: "/deadlines", label: "기한 관리", icon: CalendarClock },
     ],
   },
   {

@@ -53,6 +53,11 @@ describe("DashboardPage", () => {
     expect(screen.getByText(/현재 상태 요약/)).toBeDefined();
     expect(screen.getByText("통합 컴플라이언스 점수")).toBeDefined();
     expect(screen.getByText("30일 타임라인")).toBeDefined();
+    const deadlineLinks = screen.getAllByRole("link", { name: "전체 주요 기한 보기 →" });
+    expect(deadlineLinks).toHaveLength(2);
+    deadlineLinks.forEach((link) => {
+      expect(link).toHaveAttribute("href", "/deadlines");
+    });
   });
 
   it("사업장_미선택_시_선택_안내를_렌더링한다", () => {

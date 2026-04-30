@@ -97,10 +97,10 @@ export default function DashboardPage() {
             subtitle={`D-7 이내 ${stats.deadlineBreakdown.d7}건 · D-30 이내 ${stats.deadlineBreakdown.d30}건`}
           />
           <Link
-            href="/compliance"
+            href="/deadlines"
             className="mt-1.5 block text-center text-xs text-primary hover:underline"
           >
-            전체 데드라인 보기 →
+            전체 주요 기한 보기 →
           </Link>
         </div>
         <StatCard

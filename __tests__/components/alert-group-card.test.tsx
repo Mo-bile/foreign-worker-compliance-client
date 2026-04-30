@@ -9,21 +9,21 @@ const mockGroups: readonly AlertGroup[] = [
     label: "비자 만료 임박",
     count: 2,
     urgency: "critical",
-    href: "/compliance?type=VISA_EXPIRY",
+    href: "/deadlines?type=VISA_EXPIRY",
   },
   {
     deadlineType: "HEALTH_INSURANCE_ENROLLMENT",
     label: "건강보험 취득신고",
     count: 3,
     urgency: "warning",
-    href: "/compliance?type=HEALTH_INSURANCE_ENROLLMENT",
+    href: "/deadlines?type=HEALTH_INSURANCE_ENROLLMENT",
   },
   {
     deadlineType: "CONTRACT_RENEWAL",
     label: "근로계약 갱신",
     count: 1,
     urgency: "caution",
-    href: "/compliance?type=CONTRACT_RENEWAL",
+    href: "/deadlines?type=CONTRACT_RENEWAL",
   },
 ];
 
@@ -40,7 +40,7 @@ describe("AlertGroupCard", () => {
     render(<AlertGroupCard alertGroups={mockGroups} />);
     const links = screen.getAllByText("전체 보기 →");
     expect(links.length).toBe(3);
-    expect(links[0].closest("a")?.getAttribute("href")).toBe("/compliance?type=VISA_EXPIRY");
+    expect(links[0].closest("a")?.getAttribute("href")).toBe("/deadlines?type=VISA_EXPIRY");
   });
 
   it("critical_urgency에_signal-red_배경이다", () => {

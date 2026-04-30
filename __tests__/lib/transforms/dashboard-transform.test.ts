@@ -236,10 +236,10 @@ describe("transformDashboardResponse", () => {
       expect(insuranceGroup?.label).toBe("임금체불보증보험");
     });
 
-    it("href가 /compliance?type={deadlineType} 형태이다", () => {
+    it("href가 /deadlines?type={deadlineType} 형태이다", () => {
       const result = transformDashboardResponse(baseRaw);
       const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
-      expect(visaGroup?.href).toBe("/compliance?type=VISA_EXPIRY");
+      expect(visaGroup?.href).toBe("/deadlines?type=VISA_EXPIRY");
     });
 
     it("alerts가 빈 배열이면 빈 배열을 반환한다", () => {
