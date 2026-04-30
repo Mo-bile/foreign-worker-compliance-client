@@ -19,6 +19,12 @@ describe("WorkerTable", () => {
     expect(screen.getByText(/총 25건 중 1-20/)).toBeDefined();
   });
 
+  it("전화번호_컬럼을_표시한다", () => {
+    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+    expect(screen.getByRole("columnheader", { name: "전화번호" })).toBeDefined();
+    expect(screen.getByText("010-1234-5678")).toBeDefined();
+  });
+
   it("기본_정렬은_상태_오름차순이다_재직중이_먼저_나온다", () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     const rows = screen.getAllByRole("row");
@@ -43,7 +49,7 @@ describe("WorkerTable", () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     const statusTrigger = screen.getByRole("combobox", { name: "상태 전체" });
     await userEvent.click(statusTrigger);
-    const option = screen.getByRole("option", { name: "재직중" });
+    const option = await screen.findByRole("option", { name: "재직중" });
     await userEvent.click(option);
     const activeCount = mockWorkers.filter((w) => w.status === "ACTIVE").length;
     expect(screen.getByText(new RegExp(`총 ${activeCount}건`))).toBeDefined();
@@ -91,8 +97,48 @@ describe("WorkerTable", () => {
 
   it("필터_결과가_빈_경우_조건에_맞는_근로자가_없습니다_메시지를_표시한다", async () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
-    const searchInput = screen.getByPlaceholderText("이름으로 검색...");
+    const searchInput = screen.getByPlaceholderText("검색어 입력...");
     await userEvent.type(searchInput, "베트남");
     expect(screen.getByText("조건에 맞는 근로자가 없습니다")).toBeDefined();
+  });
+
+  it.each([
+    ["이름", "Nguyen", "Nguyen Van A"],
+    ["전화번호", "01012345678", "Nguyen Van A"],
+    ["외국인등록번호", "9503155123456", "Nguyen Van A"],
+    ["여권번호", "M12345678", "Nguyen Van A"],
+  ])("%s로_검색하면_해당_근로자를_표시한다", async (_label, query, expectedName) => {
+    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+    const searchInput = screen.getByRole("textbox");
+    await userEvent.type(searchInput, query);
+    expect(screen.getByText(expectedName)).toBeDefined();
+    expect(screen.queryByText("Zhang Wei")).toBeNull();
+  });
+
+  it("검색_대상을_이름으로_선택하면_전화번호는_검색하지_않는다", async () => {
+    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+    const searchTypeTrigger = screen.getByRole("combobox", { name: "전체 검색" });
+    await userEvent.click(searchTypeTrigger);
+    const nameOption = await screen.findByRole("option", { name: "이름" });
+    await userEvent.click(nameOption);
+
+    const searchInput = screen.getByRole("textbox");
+    await userEvent.type(searchInput, "01012345678");
+
+    expect(screen.getByText("조건에 맞는 근로자가 없습니다")).toBeDefined();
+  });
+
+  it("검색_대상을_전화번호로_선택하면_전화번호로만_검색한다", async () => {
+    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+    const searchTypeTrigger = screen.getByRole("combobox", { name: "전체 검색" });
+    await userEvent.click(searchTypeTrigger);
+    const phoneOption = await screen.findByRole("option", { name: "전화번호" });
+    await userEvent.click(phoneOption);
+
+    const searchInput = screen.getByRole("textbox");
+    await userEvent.type(searchInput, "01012345678");
+
+    expect(screen.getByText("Nguyen Van A")).toBeDefined();
+    expect(screen.queryByText("Zhang Wei")).toBeNull();
   });
 });

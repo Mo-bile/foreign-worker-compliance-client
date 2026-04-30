@@ -54,9 +54,64 @@ interface WorkerTableProps {
   readonly isLoading: boolean;
 }
 
+const SEARCH_TYPES = ["NAME", "PHONE", "REGISTRATION_NUMBER", "PASSPORT_NUMBER"] as const;
+type SearchType = (typeof SEARCH_TYPES)[number];
+type SearchTypeFilter = SearchType | "ALL";
+
+const SEARCH_TYPE_LABELS: Record<SearchType, string> = {
+  NAME: "이름",
+  PHONE: "전화번호",
+  REGISTRATION_NUMBER: "외국인등록번호",
+  PASSPORT_NUMBER: "여권번호",
+};
+
+const normalizeTextSearch = (value: string) => value.trim().toLowerCase();
+
+const normalizeIdentifierSearch = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+const matchesIdentifierSearch = (field: string | null, search: string) =>
+  field == null ? false : normalizeIdentifierSearch(field).includes(search);
+
+const matchesWorkerSearch = (
+  worker: WorkerResponse,
+  search: string,
+  searchType: SearchTypeFilter,
+) => {
+  const textSearch = normalizeTextSearch(search);
+  if (textSearch === "") return true;
+
+  const identifierSearch = normalizeIdentifierSearch(search);
+  const matchesName = worker.name.toLowerCase().includes(textSearch);
+  const matchesPhone =
+    identifierSearch !== "" && matchesIdentifierSearch(worker.contactPhone, identifierSearch);
+  const matchesRegistrationNumber =
+    identifierSearch !== "" &&
+    matchesIdentifierSearch(worker.registrationNumber, identifierSearch);
+  const matchesPassportNumber =
+    identifierSearch !== "" && matchesIdentifierSearch(worker.passportNumber, identifierSearch);
+
+  switch (searchType) {
+    case "NAME":
+      return matchesName;
+    case "PHONE":
+      return matchesPhone;
+    case "REGISTRATION_NUMBER":
+      return matchesRegistrationNumber;
+    case "PASSPORT_NUMBER":
+      return matchesPassportNumber;
+    case "ALL":
+      return matchesName || matchesPhone || matchesRegistrationNumber || matchesPassportNumber;
+  }
+};
+
 export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [searchTypeFilter, setSearchTypeFilter] = useState<SearchTypeFilter>("ALL");
   const [nationalityFilter, setNationalityFilter] = useState<Nationality | "ALL">("ALL");
   const [visaFilter, setVisaFilter] = useState<VisaType | "ALL">("ALL");
   const [statusFilter, setStatusFilter] = useState<WorkerStatus | "ALL">("ALL");
@@ -79,6 +134,12 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
+    setPage(1);
+  };
+
+  const handleSearchTypeChange = (value: string | null) => {
+    if (!value) return;
+    setSearchTypeFilter(value as SearchTypeFilter);
     setPage(1);
   };
 
@@ -107,8 +168,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   };
 
   const filteredWorkers = workers.filter((worker) => {
-    const matchesSearch =
-      search.trim() === "" || worker.name.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = matchesWorkerSearch(worker, search, searchTypeFilter);
     if (nationalityFilter !== "ALL" && worker.nationality !== nationalityFilter) return false;
     const matchesVisa = visaFilter === "ALL" || worker.visaType === visaFilter;
 
@@ -156,9 +216,17 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
+        <FilterSelect
+          value={searchTypeFilter}
+          onValueChange={handleSearchTypeChange}
+          placeholder="전체 검색"
+          options={[...SEARCH_TYPES]}
+          labelMap={SEARCH_TYPE_LABELS}
+          className="w-36"
+        />
         <Input
           type="text"
-          placeholder="이름으로 검색..."
+          placeholder="검색어 입력..."
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           className="sm:max-w-xs"
@@ -211,6 +279,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                 >
                   이름{sortIndicator("name")}
                 </TableHead>
+                <TableHead>전화번호</TableHead>
                 <TableHead
                   className="cursor-pointer select-none"
                   onClick={() => toggleSort("nationality")}
@@ -251,6 +320,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     onClick={() => router.push(`/workers/${worker.id}`)}
                   >
                     <TableCell className="font-medium">{worker.name}</TableCell>
+                    <TableCell>{worker.contactPhone ?? "—"}</TableCell>
                     <TableCell>{nationalityLabel}</TableCell>
                     <TableCell>
                       <span className="font-mono text-xs">{worker.visaType}</span>
