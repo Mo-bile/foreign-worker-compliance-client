@@ -100,10 +100,11 @@ async function patch<T>(path: string, body: unknown): Promise<T> {
   return handleResponse<T>(response);
 }
 
-async function patchVoid(path: string): Promise<void> {
+async function patchVoid(path: string, body?: unknown): Promise<void> {
   const response = await fetch(`${getBaseUrl()}${path}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
+    ...(body !== undefined && { body: JSON.stringify(body) }),
   });
   if (!response.ok) {
     await handleResponse(response);

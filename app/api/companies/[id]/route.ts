@@ -63,11 +63,8 @@ export async function PATCH(
   if (validated instanceof NextResponse) return validated;
 
   try {
-    const company = await apiClient.patch<CompanyResponse>(
-      `/api/companies/${companyId}`,
-      validated.data,
-    );
-    return NextResponse.json(company);
+    await apiClient.patchVoid(`/api/companies/${companyId}`, validated.data);
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
     return handleRouteError(error, `PATCH /api/companies/${companyId}`);
   }

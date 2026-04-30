@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CompanyResponse, CreateCompanyRequest, UpdateCompanyRequest } from "@/types/api";
-import { fetchApi, mutateApi } from "./query-utils";
+import { fetchApi, mutateApi, mutateApiVoid } from "./query-utils";
 
 export function useCompanies() {
   return useQuery<readonly CompanyResponse[]>({
@@ -49,9 +49,9 @@ export function useUpdateCompany() {
 export function usePatchCompany() {
   const queryClient = useQueryClient();
 
-  return useMutation<CompanyResponse, Error, { id: number; data: Partial<UpdateCompanyRequest> }>({
+  return useMutation<void, Error, { id: number; data: Partial<UpdateCompanyRequest> }>({
     mutationFn: ({ id, data }) =>
-      mutateApi<CompanyResponse>(`/api/companies/${id}`, "PATCH", data, "사업장 수정에 실패했습니다"),
+      mutateApiVoid(`/api/companies/${id}`, "PATCH", data, "사업장 수정에 실패했습니다"),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
       queryClient.invalidateQueries({ queryKey: ["companies", variables.id] });
