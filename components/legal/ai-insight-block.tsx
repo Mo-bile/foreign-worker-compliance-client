@@ -17,7 +17,7 @@ export function AiInsightBlock({ html }: AiInsightBlockProps) {
   return (
     <div className="rounded-lg bg-secondary p-4">
       <span className="mb-3 inline-block rounded-full bg-background px-3 py-1 text-xs font-medium">
-        ✦ AI 영향 분석
+        ✦ AI가 정리한 사업장 영향
       </span>
       {/* Sanitized HTML rendered via DOMPurify — see PURIFY_CONFIG above */}
       <div

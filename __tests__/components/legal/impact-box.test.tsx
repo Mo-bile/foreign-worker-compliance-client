@@ -12,7 +12,7 @@ describe("ImpactBox", () => {
       />,
     );
 
-    expect(screen.getByText("✦ AI 분석 — 공식 출처 + 사업장 컨텍스트 기반")).toBeInTheDocument();
+    expect(screen.getByText("✦ AI 안내 — 공식 출처 + 사업장 정보 기반")).toBeInTheDocument();
     expect(screen.getByText("영향도: 높음")).toBeInTheDocument();
     expect(screen.getByText("사업장 내 영향도가 높은 법령 변경입니다.")).toBeInTheDocument();
     expect(screen.getByText("→ 서류를 검토하세요")).toBeInTheDocument();
@@ -31,14 +31,14 @@ describe("ImpactBox", () => {
   it("renders only the title when optional props are empty or missing", () => {
     render(<ImpactBox actions={[]} />);
 
-    expect(screen.getByText("✦ AI 분석 — 공식 출처 + 사업장 컨텍스트 기반")).toBeInTheDocument();
-    expect(screen.getByText("AI 분석 데이터가 없습니다")).toBeInTheDocument();
+    expect(screen.getByText("✦ AI 안내 — 공식 출처 + 사업장 정보 기반")).toBeInTheDocument();
+    expect(screen.getByText("AI 안내를 표시할 내용이 없습니다")).toBeInTheDocument();
     expect(screen.queryByText(/영향도:/)).not.toBeInTheDocument();
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
   it("renders title", () => {
     render(<ImpactBox />);
-    expect(screen.getByText("✦ AI 분석 — 공식 출처 + 사업장 컨텍스트 기반")).toBeInTheDocument();
+    expect(screen.getByText("✦ AI 안내 — 공식 출처 + 사업장 정보 기반")).toBeInTheDocument();
   });
 });

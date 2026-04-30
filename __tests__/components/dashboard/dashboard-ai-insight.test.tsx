@@ -26,15 +26,16 @@ describe("DashboardAiInsight", () => {
       expect(panel.className).toContain("dark:to-[oklch(0.16_0.03_260)]");
     });
 
-    it("안내_문구와_AI_분석_버튼을_렌더링한다", () => {
+    it("안내_문구와_AI_안내_버튼을_렌더링한다", () => {
       render(<DashboardAiInsight aiInsight={null} isPending={false} onGenerate={mockOnGenerate} />);
-      expect(screen.getByText("아직 AI 분석 결과가 없습니다.")).toBeDefined();
-      expect(screen.getByRole("button", { name: /AI 분석/ })).toBeDefined();
+      expect(screen.getByText("아직 AI 안내가 없습니다.")).toBeDefined();
+      expect(screen.getByText("버튼을 눌러 현재 사업장 상태에 맞는 AI 안내를 받아보세요.")).toBeDefined();
+      expect(screen.getByRole("button", { name: /AI 안내 받기/ })).toBeDefined();
     });
 
-    it("AI_분석_버튼_클릭_시_onGenerate를_호출한다", () => {
+    it("AI_안내_버튼_클릭_시_onGenerate를_호출한다", () => {
       render(<DashboardAiInsight aiInsight={null} isPending={false} onGenerate={mockOnGenerate} />);
-      fireEvent.click(screen.getByRole("button", { name: /AI 분석/ }));
+      fireEvent.click(screen.getByRole("button", { name: /AI 안내 받기/ }));
       expect(mockOnGenerate).toHaveBeenCalledTimes(1);
     });
   });
@@ -65,10 +66,10 @@ describe("DashboardAiInsight", () => {
           onGenerate={mockOnGenerate}
         />,
       );
-      expect(screen.getByText(/3시간 전 분석됨/)).toBeDefined();
+      expect(screen.getByText(/3시간 전 생성됨/)).toBeDefined();
     });
 
-    it("다시_분석_버튼을_렌더링한다", () => {
+    it("다시_안내_받기_버튼을_렌더링한다", () => {
       render(
         <DashboardAiInsight
           aiInsight={mockInsight}
@@ -76,10 +77,10 @@ describe("DashboardAiInsight", () => {
           onGenerate={mockOnGenerate}
         />,
       );
-      expect(screen.getByRole("button", { name: /다시 분석/ })).toBeDefined();
+      expect(screen.getByRole("button", { name: /다시 안내 받기/ })).toBeDefined();
     });
 
-    it("다시_분석_버튼_클릭_시_onGenerate를_호출한다", () => {
+    it("다시_안내_받기_버튼_클릭_시_onGenerate를_호출한다", () => {
       render(
         <DashboardAiInsight
           aiInsight={mockInsight}
@@ -87,7 +88,7 @@ describe("DashboardAiInsight", () => {
           onGenerate={mockOnGenerate}
         />,
       );
-      fireEvent.click(screen.getByRole("button", { name: /다시 분석/ }));
+      fireEvent.click(screen.getByRole("button", { name: /다시 안내 받기/ }));
       expect(mockOnGenerate).toHaveBeenCalledTimes(1);
     });
   });
@@ -100,13 +101,13 @@ describe("DashboardAiInsight", () => {
 
     it("버튼을_렌더링하지_않는다", () => {
       render(<DashboardAiInsight aiInsight={null} isPending={true} onGenerate={mockOnGenerate} />);
-      expect(screen.queryByRole("button", { name: /AI 분석/ })).toBeNull();
-      expect(screen.queryByRole("button", { name: /다시 분석/ })).toBeNull();
+      expect(screen.queryByRole("button", { name: /AI 안내 받기/ })).toBeNull();
+      expect(screen.queryByRole("button", { name: /다시 안내 받기/ })).toBeNull();
     });
   });
 
   describe("쿨다운 (5분)", () => {
-    it("생성_후_5분_이내면_다시_분석_버튼이_비활성화된다", () => {
+    it("생성_후_5분_이내면_다시_안내_받기_버튼이_비활성화된다", () => {
       const recentInsight: AiInsight = {
         content: "테스트",
         generatedAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2분 전
@@ -118,7 +119,7 @@ describe("DashboardAiInsight", () => {
           onGenerate={mockOnGenerate}
         />,
       );
-      const button = screen.getByRole("button", { name: /다시 분석/ });
+      const button = screen.getByRole("button", { name: /다시 안내 받기/ });
       expect(button).toHaveProperty("disabled", true);
     });
 
@@ -134,10 +135,10 @@ describe("DashboardAiInsight", () => {
           onGenerate={mockOnGenerate}
         />,
       );
-      expect(screen.getByText(/분 후 다시 분석할 수 있습니다/)).toBeDefined();
+      expect(screen.getByText(/분 후 다시 안내를 받을 수 있습니다/)).toBeDefined();
     });
 
-    it("5분_경과_후에는_다시_분석_버튼이_활성화된다", () => {
+    it("5분_경과_후에는_다시_안내_받기_버튼이_활성화된다", () => {
       const oldInsight: AiInsight = {
         content: "테스트",
         generatedAt: new Date(Date.now() - 6 * 60 * 1000).toISOString(), // 6분 전
@@ -145,7 +146,7 @@ describe("DashboardAiInsight", () => {
       render(
         <DashboardAiInsight aiInsight={oldInsight} isPending={false} onGenerate={mockOnGenerate} />,
       );
-      const button = screen.getByRole("button", { name: /다시 분석/ });
+      const button = screen.getByRole("button", { name: /다시 안내 받기/ });
       expect(button).toHaveProperty("disabled", false);
     });
   });

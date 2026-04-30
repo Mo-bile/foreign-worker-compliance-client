@@ -57,6 +57,7 @@ describe("LegalCard", () => {
     render(<LegalCard change={mockChange} companyId={1} />, { wrapper: Wrapper });
     expect(screen.getByText("고용허가제 시행규칙 개정")).toBeInTheDocument();
     expect(screen.getByText("조치 필요")).toBeInTheDocument();
+    expect(screen.getByText("AI 안내")).toBeInTheDocument();
     expect(screen.getByText("시행 예정 (D-13)")).toBeInTheDocument();
     expect(screen.getByText("법률")).toBeInTheDocument();
   });

@@ -16,7 +16,7 @@ function isCooldownActive(generatedAt: string): boolean {
 function formatCooldownRemaining(generatedAt: string): string {
   const remaining = COOLDOWN_MS - (Date.now() - new Date(generatedAt).getTime());
   const minutes = Math.ceil(remaining / 60_000);
-  return `${minutes}분 후 다시 분석할 수 있습니다`;
+  return `${minutes}분 후 다시 안내를 받을 수 있습니다`;
 }
 
 interface DashboardAiInsightProps {
@@ -36,15 +36,15 @@ export function DashboardAiInsight({ aiInsight, isPending, onGenerate }: Dashboa
           AI
         </div>
         <span className="text-sm font-bold text-[oklch(0.3_0.03_260)] dark:text-card-foreground">
-          AI 인사이트
+          AI 관리 안내
         </span>
         {aiInsight && !isPending && (
           <>
             <span className="rounded-full bg-[oklch(0.6_0.15_255)]/12 px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_260)] dark:bg-primary/15 dark:text-primary">
-              AI 분석
+              AI 안내
             </span>
             <span className="ml-auto text-[11px] text-muted-foreground">
-              {formatRelativeTime(aiInsight.generatedAt)} 분석됨
+              {formatRelativeTime(aiInsight.generatedAt)} 생성됨
             </span>
           </>
         )}
@@ -78,10 +78,10 @@ function EmptyState({ onGenerate }: { readonly onGenerate: () => void }) {
         <Sparkles className="h-5 w-5 text-[oklch(0.5_0.12_260)]" />
       </div>
       <p className="text-[13px] text-[oklch(0.45_0.02_260)] dark:text-card-foreground">
-        아직 AI 분석 결과가 없습니다.
+        아직 AI 안내가 없습니다.
       </p>
       <p className="mb-4 text-[12px] text-muted-foreground">
-        버튼을 눌러 현재 사업장 상태를 AI로 분석해 보세요.
+        버튼을 눌러 현재 사업장 상태에 맞는 AI 안내를 받아보세요.
       </p>
       <button
         type="button"
@@ -89,7 +89,7 @@ function EmptyState({ onGenerate }: { readonly onGenerate: () => void }) {
         className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[oklch(0.6_0.15_255)] to-[oklch(0.55_0.18_300)] px-5 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
       >
         <Sparkles className="h-3.5 w-3.5" />
-        AI 분석
+        AI 안내 받기
       </button>
     </div>
   );
@@ -124,7 +124,7 @@ function InsightContent({
           className="inline-flex items-center gap-1 rounded-md border border-[oklch(0.8_0.03_260)] px-3 py-1.5 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-[oklch(0.95_0.01_260)] disabled:cursor-not-allowed disabled:opacity-50 dark:border-border dark:hover:bg-muted/50"
         >
           <RefreshCw className="h-3 w-3" />
-          다시 분석
+          다시 안내 받기
         </button>
       </div>
     </>

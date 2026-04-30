@@ -110,7 +110,7 @@ export default function BenchmarkPage() {
         <BenchmarkStatCards benchmark={latest} />
       </div>
 
-      {/* AI 종합 분석 */}
+      {/* AI 종합 안내 */}
       <AiReportSection aiReport={latest.aiReport} />
 
       <div className="space-y-7">

@@ -31,7 +31,7 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
         <span className="text-xl">{change.icon}</span>
         <span className="text-sm font-semibold">
           {change.title}
-          <span className="ml-1.5 text-[10px] text-signal-blue font-semibold">✦ AI</span>
+          <span className="ml-1.5 text-[10px] text-signal-blue font-semibold">AI 안내</span>
         </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">

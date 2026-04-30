@@ -22,6 +22,8 @@ describe("AiReportSection", () => {
   it("마크다운_콘텐츠를_렌더링한다", () => {
     render(<AiReportSection aiReport="**진단** 결과입니다." />);
 
+    expect(screen.getByText("AI 종합 안내")).toBeInTheDocument();
+    expect(screen.getByText("AI 안내")).toBeInTheDocument();
     expect(screen.getByText("진단")).toBeInTheDocument();
     expect(screen.getByText(/결과입니다/)).toBeInTheDocument();
   });

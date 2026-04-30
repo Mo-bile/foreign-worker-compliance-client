@@ -19,6 +19,6 @@ describe("AiInsightBlock", () => {
 
   it("renders AI label", () => {
     render(<AiInsightBlock html="<p>내용</p>" />);
-    expect(screen.getByText("✦ AI 영향 분석")).toBeInTheDocument();
+    expect(screen.getByText("✦ AI가 정리한 사업장 영향")).toBeInTheDocument();
   });
 });

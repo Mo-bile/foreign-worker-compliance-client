@@ -26,12 +26,11 @@ export function CollapsibleInsight({ content, defaultOpen = false }: Collapsible
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
       >
-        {isOpen ? "✦ AI 해석 닫기" : "✦ AI 해석 보기"}
+        {isOpen ? "✦ AI 안내 닫기" : "✦ AI 안내 보기"}
       </button>
       {isOpen && (
         <div
           className="rounded-md bg-secondary p-3 text-sm text-muted-foreground [&_strong]:text-foreground [&_strong]:font-semibold"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: sanitized }}
         />
       )}

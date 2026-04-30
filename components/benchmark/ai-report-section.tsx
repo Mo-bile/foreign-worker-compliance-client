@@ -24,10 +24,10 @@ export function AiReportSection({ aiReport }: AiReportSectionProps) {
           AI
         </div>
         <span className="text-sm font-bold text-[oklch(0.3_0.03_260)] dark:text-card-foreground">
-          AI 종합 분석
+          AI 종합 안내
         </span>
         <span className="rounded-full bg-[oklch(0.6_0.15_255)]/12 px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_260)] dark:bg-primary/15 dark:text-primary">
-          AI 분석
+          AI 안내
         </span>
       </div>
 

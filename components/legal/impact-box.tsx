@@ -19,7 +19,7 @@ export function ImpactBox({ level, description, actions }: ImpactBoxProps) {
   return (
     <div className="rounded-lg bg-secondary p-4">
       <div className="mb-2 flex items-center gap-2">
-        <h4 className="text-sm font-semibold">✦ AI 분석 — 공식 출처 + 사업장 컨텍스트 기반</h4>
+        <h4 className="text-sm font-semibold">✦ AI 안내 — 공식 출처 + 사업장 정보 기반</h4>
         {levelStyle && (
           <span
             className={cn(
@@ -31,7 +31,9 @@ export function ImpactBox({ level, description, actions }: ImpactBoxProps) {
           </span>
         )}
       </div>
-      {!hasContent && <p className="text-sm text-muted-foreground">AI 분석 데이터가 없습니다</p>}
+      {!hasContent && (
+        <p className="text-sm text-muted-foreground">AI 안내를 표시할 내용이 없습니다</p>
+      )}
       {description && <p className="mb-2 text-sm text-muted-foreground">{description}</p>}
       {actions && actions.length > 0 && (
         <ul className="space-y-1">

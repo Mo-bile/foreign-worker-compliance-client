@@ -3,18 +3,18 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { CollapsibleInsight } from "@/components/benchmark/collapsible-insight";
 
 describe("CollapsibleInsight", () => {
-  const content = "<p>테스트 AI 해석 내용</p>";
+  const content = "<p>테스트 AI 안내 내용</p>";
 
   it("defaultOpen이_true이면_내용이_보인다", () => {
     render(<CollapsibleInsight content={content} defaultOpen />);
-    expect(screen.getByText("테스트 AI 해석 내용")).toBeDefined();
-    expect(screen.getByText(/AI 해석 닫기/)).toBeDefined();
+    expect(screen.getByText("테스트 AI 안내 내용")).toBeDefined();
+    expect(screen.getByText(/AI 안내 닫기/)).toBeDefined();
   });
 
   it("defaultOpen이_false이면_내용이_안_보인다", () => {
     render(<CollapsibleInsight content={content} />);
-    expect(screen.queryByText("테스트 AI 해석 내용")).toBeNull();
-    expect(screen.getByText(/AI 해석 보기/)).toBeDefined();
+    expect(screen.queryByText("테스트 AI 안내 내용")).toBeNull();
+    expect(screen.getByText(/AI 안내 보기/)).toBeDefined();
   });
 
   it("토글_버튼을_클릭하면_열고_닫힌다", () => {
@@ -25,7 +25,7 @@ describe("CollapsibleInsight", () => {
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
-    expect(screen.getByText("테스트 AI 해석 내용")).toBeDefined();
+    expect(screen.getByText("테스트 AI 안내 내용")).toBeDefined();
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute("aria-expanded")).toBe("false");

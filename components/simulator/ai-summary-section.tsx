@@ -13,7 +13,7 @@ export function AiSummarySection({ sanitizedHtml }: AiSummarySectionProps) {
           <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
             AI
           </span>
-          <span className="text-primary">종합 분석</span>
+          <span className="text-primary">종합 안내</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
