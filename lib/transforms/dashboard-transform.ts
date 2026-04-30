@@ -59,7 +59,7 @@ const INSURANCE_LABEL_MAP: Record<string, string> = {
 
 const COMPLIANCE_CATEGORY_LABEL_MAP: Record<string, string> = {
   INSURANCE: "보험 가입",
-  DEADLINE: "데드라인 준수",
+  DEADLINE: "주요 기한 준수",
   WAGE: "임금 경쟁력",
 };
 

@@ -195,17 +195,19 @@ export function DeadlineChart({ deadlines, isLoading, isError }: DeadlineChartPr
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">임박 데드라인 분포 (30일)</CardTitle>
+        <CardTitle className="text-base">30일 안에 다가오는 주요 기한</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-64 w-full" />
         ) : isError ? (
           <p className="text-destructive text-sm py-8 text-center">
-            데이터를 불러오는 중 오류가 발생했습니다.
+            내용을 불러오지 못했습니다. 페이지를 새로고침해 주세요.
           </p>
         ) : chartData.length === 0 ? (
-          <p className="text-muted-foreground text-sm py-8 text-center">데이터가 없습니다</p>
+          <p className="text-muted-foreground text-sm py-8 text-center">
+            표시할 내용이 없습니다
+          </p>
         ) : (
           <>
             <ChartLegend />

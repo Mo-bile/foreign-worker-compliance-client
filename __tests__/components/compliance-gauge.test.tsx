@@ -7,7 +7,7 @@ const scoreData: ComplianceScoreData = {
   score: 73,
   breakdown: [
     { label: "보험 가입", score: 92 },
-    { label: "데드라인 준수", score: 65 },
+    { label: "주요 기한 준수", score: 65 },
     { label: "임금 경쟁력", score: 62 },
   ],
 };
@@ -15,6 +15,7 @@ const scoreData: ComplianceScoreData = {
 describe("ComplianceGauge", () => {
   it("총점을_표시한다", () => {
     render(<ComplianceGauge data={scoreData} />);
+    expect(screen.getByText("통합 준수 점수")).toBeDefined();
     expect(screen.getByText("73")).toBeDefined();
   });
 
@@ -27,7 +28,7 @@ describe("ComplianceGauge", () => {
     render(<ComplianceGauge data={scoreData} />);
     expect(screen.getByText("보험 가입")).toBeDefined();
     expect(screen.getByText("92")).toBeDefined();
-    expect(screen.getByText("데드라인 준수")).toBeDefined();
+    expect(screen.getByText("주요 기한 준수")).toBeDefined();
     expect(screen.getByText("65")).toBeDefined();
     expect(screen.getByText("임금 경쟁력")).toBeDefined();
     expect(screen.getByText("62")).toBeDefined();

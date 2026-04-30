@@ -23,7 +23,7 @@ export function useOverdueDeadlines(companyId?: number | null) {
     queryFn: () =>
       fetchApi<readonly ComplianceDeadlineResponse[]>(
         `/api/compliance/overdue${queryString ? `?${queryString}` : ""}`,
-        "기한초과 데이터를 불러올 수 없습니다",
+        "기한이 지난 항목을 불러올 수 없습니다",
       ),
     refetchInterval: 30_000,
     enabled: companyId != null && companyId > 0,
@@ -42,7 +42,7 @@ export function useUpcomingDeadlines(days: number = 30, companyId?: number | nul
     queryFn: () =>
       fetchApi<readonly ComplianceDeadlineResponse[]>(
         `/api/compliance/upcoming?${params.toString()}`,
-        "임박 데드라인을 불러올 수 없습니다",
+        "다가오는 주요 기한을 불러올 수 없습니다",
       ),
     refetchInterval: 30_000,
     enabled: companyId != null && companyId > 0 && Number.isFinite(days) && days > 0,
@@ -55,7 +55,7 @@ export function useWorkerDeadlines(workerId: number) {
     queryFn: () =>
       fetchApi<readonly ComplianceDeadlineResponse[]>(
         `/api/compliance/worker/${workerId}`,
-        "데드라인 정보를 불러올 수 없습니다",
+        "주요 기한 정보를 불러올 수 없습니다",
       ),
     enabled: workerId > 0,
   });
@@ -119,7 +119,7 @@ export function useCompleteDeadline() {
 
   return useMutation<void, Error, number>({
     mutationFn: (deadlineId) =>
-      patchApi(`/api/compliance/${deadlineId}/complete`, "데드라인 완료 처리에 실패했습니다"),
+      patchApi(`/api/compliance/${deadlineId}/complete`, "주요 기한 완료 처리에 실패했습니다"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["compliance"] });
     },

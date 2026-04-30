@@ -12,10 +12,10 @@ describe("Sidebar", () => {
     expect(screen.getByText("법령·리포트")).toBeInTheDocument();
   });
 
-  it("법령 변경 알림, 컴플라이언스 리포트 항목이 더 이상 존재하지 않는다", () => {
+  it("법령 변경 알림, 준수 현황 리포트 항목이 더 이상 존재하지 않는다", () => {
     render(<Sidebar />);
     expect(screen.queryByText("법령 변경 알림")).not.toBeInTheDocument();
-    expect(screen.queryByText("컴플라이언스 리포트")).not.toBeInTheDocument();
+    expect(screen.queryByText("준수 현황 리포트")).not.toBeInTheDocument();
   });
 
   it("법령·리포트의 href가 /legal이다", () => {

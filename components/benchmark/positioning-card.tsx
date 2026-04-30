@@ -40,7 +40,7 @@ export function PositioningCard({ positioningAnalysis }: PositioningCardProps) {
     <Card>
       <CardContent className="space-y-4 p-5">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold">📍 지역·업종 포지셔닝</h3>
+          <h3 className="text-sm font-bold">📍 지역·업종 내 위치</h3>
           <span className="rounded-full bg-[oklch(0.95_0.03_255)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_255)]">
             {regionLabel}
           </span>

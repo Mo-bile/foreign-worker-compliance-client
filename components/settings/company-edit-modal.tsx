@@ -39,7 +39,7 @@ export type EditSection = "info" | "workers" | "benchmark";
 const SECTION_TITLES: Record<EditSection, string> = {
   info: "사업장 정보 수정",
   workers: "인원 정보 수정",
-  benchmark: "벤치마크 정보 수정",
+  benchmark: "비교 진단 정보 수정",
 };
 
 // ─── Section Schemas ────────────────────────────────────
@@ -378,7 +378,7 @@ function BenchmarkForm({
       { id: company.id, data },
       {
         onSuccess: () => {
-          toast.success("벤치마크 정보가 수정되었습니다");
+          toast.success("비교 진단 정보가 수정되었습니다");
           onClose();
         },
         onError: (error) => toast.error(`수정 실패: ${error.message}`),
@@ -399,7 +399,7 @@ function BenchmarkForm({
               setValueAs: (v: string) => (v === "" ? undefined : Number(v)),
             })}
           />
-          <p className="text-xs text-muted-foreground">미입력 시 임금 포지셔닝 진단이 생략됩니다</p>
+          <p className="text-xs text-muted-foreground">미입력 시 임금 수준 비교가 생략됩니다</p>
           {errors.averageForeignWorkerWage && (
             <p className="text-sm text-destructive">{errors.averageForeignWorkerWage.message}</p>
           )}

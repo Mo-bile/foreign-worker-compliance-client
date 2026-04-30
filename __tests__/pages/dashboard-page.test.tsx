@@ -42,6 +42,7 @@ describe("DashboardPage", () => {
 
     expect(screen.getAllByText("12").length).toBeGreaterThan(0);
     expect(screen.getByText("보험 가입률")).toBeDefined();
+    expect(screen.getByText("다가오는 주요 기한")).toBeDefined();
     expect(screen.getByText("긴급 조치 필요")).toBeDefined();
 
     expect(screen.getByText(/비자 만료 임박/)).toBeDefined();
@@ -51,7 +52,7 @@ describe("DashboardPage", () => {
     expect(screen.getByText("4대보험 현황")).toBeDefined();
     expect(screen.getByText("AI 관리 안내")).toBeDefined();
     expect(screen.getByText(/현재 상태 요약/)).toBeDefined();
-    expect(screen.getByText("통합 컴플라이언스 점수")).toBeDefined();
+    expect(screen.getByText("통합 준수 점수")).toBeDefined();
     expect(screen.getByText("30일 타임라인")).toBeDefined();
     const deadlineLinks = screen.getAllByRole("link", { name: "전체 주요 기한 보기 →" });
     expect(deadlineLinks).toHaveLength(2);

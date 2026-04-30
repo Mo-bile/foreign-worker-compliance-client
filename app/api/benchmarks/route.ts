@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   } catch (transformError) {
     console.error("[GET /api/benchmarks] Transform failed:", transformError);
     return NextResponse.json(
-      { message: "벤치마크 데이터 처리 중 오류가 발생했습니다" },
+      { message: "비교 진단 정보 처리 중 오류가 발생했습니다" },
       { status: 500 },
     );
   }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
   } catch (transformError) {
     console.error("[POST /api/benchmarks] Transform failed:", transformError);
     return NextResponse.json(
-      { message: "벤치마크 결과 처리 중 오류가 발생했습니다" },
+      { message: "비교 진단 결과 처리 중 오류가 발생했습니다" },
       { status: 500 },
     );
   }

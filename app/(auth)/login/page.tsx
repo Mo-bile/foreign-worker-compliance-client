@@ -19,7 +19,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">FWC 로그인</CardTitle>
-          <CardDescription>외국인 근로자 컴플라이언스 관리 시스템</CardDescription>
+          <CardDescription>외국인 근로자 준수 관리 시스템</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">

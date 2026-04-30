@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
       transformError,
     );
     return NextResponse.json(
-      { message: "컴플라이언스 리포트 데이터 처리 중 오류가 발생했습니다" },
+      { message: "준수 현황 리포트 처리 중 오류가 발생했습니다" },
       { status: 502 },
     );
   }

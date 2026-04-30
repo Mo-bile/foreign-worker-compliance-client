@@ -18,7 +18,7 @@ export function WhatIfSection({ data }: WhatIfSectionProps) {
     <CollapsibleCard
       icon={<span>🔄</span>}
       iconColorClass="bg-signal-orange-bg text-signal-orange"
-      title="한도 확대 시뮬레이션"
+      title="한도 확대 예상 계산"
       badge={
         <span className="inline-flex items-center rounded-full bg-signal-orange-bg px-2 py-0.5 text-[11px] font-semibold text-signal-orange">
           What-if
@@ -27,7 +27,7 @@ export function WhatIfSection({ data }: WhatIfSectionProps) {
       defaultOpen
     >
       <p className="mb-4 text-[13px] text-muted-foreground">
-        내국인 피보험자 수를 늘리면 고용 한도가 증가합니다. 아래는 시뮬레이션 결과입니다.
+        내국인 피보험자 수를 늘리면 고용 한도가 증가합니다. 아래는 예상 계산 결과입니다.
       </p>
 
       <table className="w-full border-collapse text-[13px]">

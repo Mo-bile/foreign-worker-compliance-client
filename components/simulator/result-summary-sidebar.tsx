@@ -21,7 +21,7 @@ export function ResultSummarySidebar({
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="mb-3 text-[13px] font-semibold">시뮬레이션 조건</div>
+        <div className="mb-3 text-[13px] font-semibold">예상 계산 조건</div>
         <div className="space-y-2 text-xs leading-relaxed text-muted-foreground">
           <p>
             <strong className="text-foreground">내국인:</strong> {request.domesticInsuredCount}명

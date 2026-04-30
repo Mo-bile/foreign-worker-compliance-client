@@ -67,6 +67,9 @@ describe("ReportsPage notice", () => {
     render(<ReportsPage />);
 
     expect(screen.getByText(/보험 가입과 주요 기한 준수 현황/)).toBeInTheDocument();
+    expect(screen.getByText("통합 준수 점수")).toBeInTheDocument();
+    expect(screen.getByText(/확인한 시각:/)).toBeInTheDocument();
+    expect(screen.getByText("주요 기한")).toBeInTheDocument();
     expect(screen.getByText(/사업장 관리 상태를 빠르게 확인하기 위한 참고 지표/)).toBeInTheDocument();
     expect(screen.getByText(/다음 리포트에 반영될 수 있습니다/)).toBeInTheDocument();
   });

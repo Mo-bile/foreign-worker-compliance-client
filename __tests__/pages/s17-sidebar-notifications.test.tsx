@@ -139,8 +139,8 @@ describe("Sidebar — S17 카테고리 재구성", () => {
     expect(screen.getByText("관리자")).toBeInTheDocument();
   });
 
-  it("시뮬레이터 라벨이 E-9 접두사를 포함한다", () => {
-    expect(screen.getByText("E-9 고용허가 시뮬레이터")).toBeInTheDocument();
+  it("예상 계산 라벨이 E-9 고용허가 표현을 포함한다", () => {
+    expect(screen.getByText("E-9 고용허가 예상 계산")).toBeInTheDocument();
   });
 
   it("설정 카테고리에 내 사업장 정보, 알림 설정이 있다", () => {
@@ -164,8 +164,9 @@ describe("SimulatorPage — E-9 안내 박스", () => {
 describe("BenchmarkPage — 진단 안내 박스", () => {
   it("사업장 진단에 사용하는 데이터 기준 안내 문구가 표시된다", () => {
     renderWithQuery(<BenchmarkPage />);
-    expect(screen.getByText(/회사 및 근로자 데이터와 외부 기준 데이터/)).toBeInTheDocument();
+    expect(screen.getByText(/회사 및 근로자 정보와 외부 기준 정보/)).toBeInTheDocument();
     expect(screen.getByText(/임금 구간, E-9 퇴사 사유, 관리 체크리스트/)).toBeInTheDocument();
+    expect(screen.getByText(/지역\/업종 내 위치 기준/)).toBeInTheDocument();
   });
 });
 
@@ -298,11 +299,11 @@ describe("CompanyEditModal", () => {
     expect(screen.getByDisplayValue("50")).toBeInTheDocument();
   });
 
-  it("section=benchmark일 때 벤치마크 정보 수정 모달이 표시된다", () => {
+  it("section=benchmark일 때 비교 진단 정보 수정 모달이 표시된다", () => {
     renderWithQuery(
       <CompanyEditModal open={true} onClose={vi.fn()} company={mockCompany} section="benchmark" />,
     );
-    expect(screen.getByText("벤치마크 정보 수정")).toBeInTheDocument();
+    expect(screen.getByText("비교 진단 정보 수정")).toBeInTheDocument();
   });
 });
 

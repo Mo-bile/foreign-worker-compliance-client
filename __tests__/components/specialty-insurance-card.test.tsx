@@ -45,7 +45,7 @@ describe("SpecialtyInsuranceCard", () => {
     expect(screen.getByText("상해보험")).toBeInTheDocument();
   });
 
-  it("사업주_의무에_데드라인이_있으면_상태를_표시한다", () => {
+  it("사업주_의무에_주요_기한이_있으면_상태를_표시한다", () => {
     const deadlines = [
       createDeadline({ deadlineType: "EXIT_GUARANTEE_INSURANCE", status: "URGENT" }),
     ];
@@ -53,9 +53,9 @@ describe("SpecialtyInsuranceCard", () => {
     expect(screen.getByText("긴급")).toBeInTheDocument();
   });
 
-  it("데드라인이_없으면_미등록_표시", () => {
+  it("주요_기한이_없으면_미등록_표시", () => {
     render(<SpecialtyInsuranceCard visaType="E9" deadlines={[]} />);
-    expect(screen.getAllByText("데드라인 미등록")).toHaveLength(2);
+    expect(screen.getAllByText("기한 미등록")).toHaveLength(2);
   });
 
   it("면책_문구를_표시한다", () => {

@@ -13,14 +13,15 @@ function createDeadline(
     deadlineType: overrides.deadlineType ?? "VISA_EXPIRY",
     dueDate: overrides.dueDate ?? "2026-04-01",
     status: overrides.status ?? "PENDING",
-    description: overrides.description ?? "테스트 데드라인",
+    description: overrides.description ?? "테스트 주요 기한",
   };
 }
 
 describe("WorkerDeadlineTimeline", () => {
-  it("데드라인 항목의 description을 표시한다", () => {
+  it("주요 기한 항목의 description을 표시한다", () => {
     const deadlines = [createDeadline({ description: "비자 만료일 갱신" })];
     render(<WorkerDeadlineTimeline deadlines={deadlines} isLoading={false} />);
+    expect(screen.getByText("근로자별 주요 기한")).toBeInTheDocument();
     expect(screen.getByText("비자 만료일 갱신")).toBeInTheDocument();
   });
 
@@ -104,9 +105,9 @@ describe("WorkerDeadlineTimeline", () => {
     expect(item.className).toMatch(/opacity/);
   });
 
-  it("데드라인이 없으면 빈 상태 메시지를 표시한다", () => {
+  it("주요 기한이 없으면 빈 상태 메시지를 표시한다", () => {
     render(<WorkerDeadlineTimeline deadlines={[]} isLoading={false} />);
-    expect(screen.getByText("등록된 데드라인이 없습니다")).toBeInTheDocument();
+    expect(screen.getByText("등록된 주요 기한이 없습니다")).toBeInTheDocument();
   });
 
   it("로딩 중이면 스켈레톤을 표시한다", () => {
@@ -117,7 +118,7 @@ describe("WorkerDeadlineTimeline", () => {
 
   it("에러 상태이면 에러 메시지를 표시한다", () => {
     render(<WorkerDeadlineTimeline deadlines={undefined} isLoading={false} isError={true} />);
-    expect(screen.getByText(/오류가 발생했습니다/)).toBeInTheDocument();
+    expect(screen.getByText(/내용을 불러오지 못했습니다/)).toBeInTheDocument();
   });
 
   it("날짜를 YYYY-MM-DD 형식으로 표시한다", () => {

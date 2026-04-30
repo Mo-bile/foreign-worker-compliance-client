@@ -7,9 +7,9 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("Sidebar - Simulator Link", () => {
-  it("시뮬레이터_링크를_렌더링한다", () => {
+  it("E-9_고용허가_예상_계산_링크를_렌더링한다", () => {
     render(<Sidebar />);
-    const link = screen.getByText("E-9 고용허가 시뮬레이터");
+    const link = screen.getByText("E-9 고용허가 예상 계산");
     expect(link).toBeDefined();
     expect(link.closest("a")?.getAttribute("href")).toBe("/simulator");
   });

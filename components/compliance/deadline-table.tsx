@@ -209,7 +209,7 @@ export function DeadlineTable({
   const isSingleWorker = groups.length <= 1;
   const deadlinesRef = JSON.stringify(deadlines?.map((deadline) => deadline.id) ?? []);
   const hasData = hasUnfilteredData ?? (deadlines != null && deadlines.length > 0);
-  const emptyMessage = hasData ? "조건에 맞는 결과가 없습니다" : "데이터가 없습니다";
+  const emptyMessage = hasData ? "조건에 맞는 결과가 없습니다" : "표시할 내용이 없습니다";
 
   useEffect(() => {
     if (groups.length > 0 && !isSingleWorker) {
@@ -232,7 +232,7 @@ export function DeadlineTable({
           </div>
         ) : isError ? (
           <EmptyState
-            message="데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요."
+            message="내용을 불러오지 못했습니다. 페이지를 새로고침해 주세요."
             variant="error"
           />
         ) : !items?.length ? (

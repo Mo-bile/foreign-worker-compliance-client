@@ -89,7 +89,7 @@ export default function DashboardPage() {
         />
         <div>
           <StatCard
-            title="다가오는 데드라인"
+            title="다가오는 주요 기한"
             value={stats.upcomingDeadlines}
             icon={Clock}
             isLoading={false}

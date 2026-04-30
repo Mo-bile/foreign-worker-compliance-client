@@ -22,7 +22,7 @@ export function DataSourceMeta({ source, baseDate, population, caution }: DataSo
         className="flex w-full items-center gap-1.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
       >
         <span className="text-xs">ⓘ</span>
-        <span>데이터 정보</span>
+        <span>기준 정보</span>
         <ChevronDown
           className={`ml-auto h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`}
         />

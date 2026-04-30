@@ -21,7 +21,7 @@ export const TOTAL_DURATION: Record<AiProgressVariant, number> = {
 };
 
 const COMMON_MIDDLE: readonly ProgressStep[] = [
-  { label: "AI가 데이터 패턴을 분석하고 있습니다...", sub: "이상치 및 추세 탐지", icon: "brain" },
+  { label: "AI가 정보 흐름을 살펴보고 있습니다...", sub: "이상치 및 추세 탐지", icon: "brain" },
   { label: "리스크 요인을 평가하고 있습니다...", sub: "우선순위별 위험도 산정", icon: "brain" },
   { label: "관련 규정과 대조하고 있습니다...", sub: "고용허가제 기준 검토", icon: "brain" },
   { label: "유사 사업장 사례를 참고하고 있습니다...", sub: "동종업계 비교 분석", icon: "brain" },
@@ -37,7 +37,7 @@ const DASHBOARD_PRESET: ProgressPreset = {
       icon: "database",
     },
     {
-      label: "컴플라이언스 데드라인을 점검하고 있습니다...",
+      label: "주요 기한을 점검하고 있습니다...",
       sub: "비자 만료, 보험 가입 기한",
       icon: "database",
     },
@@ -54,7 +54,7 @@ const DASHBOARD_PRESET: ProgressPreset = {
 const BENCHMARK_PRESET: ProgressPreset = {
   front: [
     {
-      label: "사업장 임금 데이터를 수집하고 있습니다...",
+      label: "사업장 임금 정보를 확인하고 있습니다...",
       sub: "월 평균임금, 지급 현황",
       icon: "database",
     },
@@ -64,7 +64,7 @@ const BENCHMARK_PRESET: ProgressPreset = {
       icon: "database",
     },
     {
-      label: "이직률 데이터를 분석하고 있습니다...",
+      label: "이직률 정보를 확인하고 있습니다...",
       sub: "E-9 퇴사사유 분포 조회",
       icon: "database",
     },
@@ -78,7 +78,7 @@ const BENCHMARK_PRESET: ProgressPreset = {
   back: [
     {
       label: "4축 진단 결과를 종합하고 있습니다...",
-      sub: "임금/안정성/관리/포지셔닝",
+      sub: "임금/안정성/관리/위치 비교",
       icon: "file",
     },
     { label: "개선 방향을 도출하고 있습니다...", sub: "우선순위별 권장 사항", icon: "file" },
@@ -90,7 +90,7 @@ const BENCHMARK_PRESET: ProgressPreset = {
 const SIMULATION_PRESET: ProgressPreset = {
   front: [
     { label: "고용 한도를 계산하고 있습니다...", sub: "내국인 피보험자 수 기반", icon: "database" },
-    { label: "점수제 항목을 시뮬레이션하고 있습니다...", sub: "가점/감점 합산", icon: "database" },
+    { label: "점수제 항목을 미리 계산하고 있습니다...", sub: "가점/감점 합산", icon: "database" },
     {
       label: "분기별 쿼터 현황을 조회하고 있습니다...",
       sub: "업종별 배정 규모 확인",
@@ -104,7 +104,7 @@ const SIMULATION_PRESET: ProgressPreset = {
   ],
   middle: COMMON_MIDDLE,
   back: [
-    { label: "시뮬레이션 결과를 생성하고 있습니다...", sub: "고용 가능성 판정", icon: "file" },
+    { label: "예상 계산 결과를 생성하고 있습니다...", sub: "고용 가능성 판정", icon: "file" },
     { label: "대안 시나리오를 검토하고 있습니다...", sub: "조건 변경 시 결과 비교", icon: "file" },
     { label: "종합 분석을 작성하고 있습니다...", sub: "한도/점수/소요기간 정리", icon: "file" },
     { label: "마무리 중입니다...", sub: "최종 검토", icon: "file" },

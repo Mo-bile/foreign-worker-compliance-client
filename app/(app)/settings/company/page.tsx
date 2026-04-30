@@ -99,13 +99,13 @@ export default function MyCompanyPage() {
         </CardContent>
       </Card>
 
-      {/* 3. 벤치마크 진단용 */}
+      {/* 3. 비교 진단용 */}
       <Card>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-base">
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              벤치마크 진단용
+              비교 진단용
             </CardTitle>
             <Button variant="ghost" size="sm" onClick={() => setEditSection("benchmark")}>
               <Pencil className="h-3.5 w-3.5" />
@@ -120,7 +120,7 @@ export default function MyCompanyPage() {
               <dd className="font-medium">
                 {c.averageForeignWorkerWage != null ? `${c.averageForeignWorkerWage}만원` : "—"}
               </dd>
-              <p className="text-xs text-muted-foreground">미입력 시 임금 포지셔닝 진단이 생략됩니다</p>
+              <p className="text-xs text-muted-foreground">미입력 시 임금 수준 비교가 생략됩니다</p>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">최근 1년 퇴사 외국인 수</dt>

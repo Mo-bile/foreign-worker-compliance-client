@@ -7,6 +7,7 @@ describe("BenchmarkStatCards", () => {
   it("정상 데이터의 4축 요약을 표시한다", () => {
     render(<BenchmarkStatCards benchmark={mockBenchmarkResponse} />);
 
+    expect(screen.getByText("임금 수준 비교")).toBeInTheDocument();
     expect(screen.getByText(/260만원/)).toBeInTheDocument();
     expect(screen.getByText(/12\.5%/)).toBeInTheDocument();
     expect(screen.getByText(/8 \/ 10/)).toBeInTheDocument();

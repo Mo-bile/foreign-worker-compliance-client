@@ -13,7 +13,7 @@ export function ScoringSection({ data, defaultOpen = true, muted = false }: Scor
     <CollapsibleCard
       icon={<span>🎯</span>}
       iconColorClass="bg-signal-orange-bg text-signal-orange"
-      title="점수제 시뮬레이션"
+      title="점수제 예상 계산"
       defaultOpen={defaultOpen}
       muted={muted}
     >
@@ -89,7 +89,7 @@ export function ScoringSection({ data, defaultOpen = true, muted = false }: Scor
       {data.improvement && (
         <div className="mt-4 rounded-lg border border-signal-green/30 bg-gradient-to-br from-signal-green-bg to-signal-green-bg/70 p-4">
           <div className="mb-2.5 flex items-center gap-1.5 text-[13px] font-bold text-signal-green">
-            💡 점수 개선 시뮬레이션
+            💡 점수 개선 예상 계산
           </div>
           <div className="grid grid-cols-2 gap-2.5">
             <div className="rounded-lg border bg-card p-3">

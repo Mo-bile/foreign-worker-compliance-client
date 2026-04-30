@@ -2,7 +2,7 @@ import type { ComplianceReportResponse } from "@/types/report";
 
 export const mockComplianceReport: ComplianceReportResponse = {
   id: "rpt-2026-03",
-  title: "2026년 3월 컴플라이언스 월간 리포트",
+  title: "2026년 3월 준수 현황 월간 리포트",
   period: "안산제조 주식회사 · 2026.03.01 ~ 2026.03.24 · 자동 생성",
   score: 73,
   scoreChange: 4,

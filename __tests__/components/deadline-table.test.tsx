@@ -16,7 +16,7 @@ function createDeadline(overrides: Partial<DeadlineWithWorkerName> = {}): Deadli
     deadlineType: overrides.deadlineType ?? "VISA_EXPIRY",
     dueDate: overrides.dueDate ?? "2026-01-15",
     status: overrides.status ?? "OVERDUE",
-    description: overrides.description ?? `테스트 데드라인 ${overrides.id ?? 1}`,
+    description: overrides.description ?? `테스트 주요 기한 ${overrides.id ?? 1}`,
   };
 }
 
@@ -26,7 +26,7 @@ const singleWorkerDeadlines: DeadlineWithWorkerName[] = Array.from({ length: 25 
     workerId: 1,
     workerName: "Worker-1",
     dueDate: `2026-${String((index % 12) + 1).padStart(2, "0")}-15`,
-    description: `테스트 데드라인 ${index + 1}`,
+    description: `테스트 주요 기한 ${index + 1}`,
   }),
 );
 
@@ -40,7 +40,7 @@ describe("DeadlineTable", () => {
         limit={5}
       />,
     );
-    expect(screen.getAllByText(/테스트 데드라인/)).toHaveLength(5);
+    expect(screen.getAllByText(/테스트 주요 기한/)).toHaveLength(5);
     expect(screen.queryByLabelText("다음 페이지")).toBeNull();
   });
 
@@ -100,7 +100,7 @@ describe("DeadlineTable", () => {
 
   it("빈_데이터일_때_메시지를_표시한다", () => {
     render(<DeadlineTable title="테스트" deadlines={[]} isLoading={false} />);
-    expect(screen.getByText("데이터가 없습니다")).toBeDefined();
+    expect(screen.getByText("표시할 내용이 없습니다")).toBeDefined();
   });
 
   it("hasUnfilteredData가_true이고_빈_배열이면_필터_빈_상태_메시지를_표시한다", () => {
@@ -110,16 +110,16 @@ describe("DeadlineTable", () => {
     expect(screen.getByText("조건에 맞는 결과가 없습니다")).toBeDefined();
   });
 
-  it("hasUnfilteredData가_false이고_빈_배열이면_데이터_없음_메시지를_표시한다", () => {
+  it("hasUnfilteredData가_false이고_빈_배열이면_내용_없음_메시지를_표시한다", () => {
     render(
       <DeadlineTable title="테스트" deadlines={[]} isLoading={false} hasUnfilteredData={false} />,
     );
-    expect(screen.getByText("데이터가 없습니다")).toBeDefined();
+    expect(screen.getByText("표시할 내용이 없습니다")).toBeDefined();
   });
 
   it("isError가_true이면_오류_메시지를_표시한다", () => {
     render(<DeadlineTable title="테스트" deadlines={undefined} isLoading={false} isError={true} />);
-    expect(screen.getByText(/오류가 발생했습니다/)).toBeDefined();
+    expect(screen.getByText(/내용을 불러오지 못했습니다/)).toBeDefined();
   });
 
   it("로딩_중에_스켈레톤을_표시한다", () => {
@@ -162,7 +162,7 @@ describe("DeadlineTable", () => {
         workerName: "Worker-1",
         dueDate: "2026-01-01",
         status: "COMPLETED",
-        description: "완료된 데드라인",
+        description: "완료된 주요 기한",
       }),
     ];
 
@@ -197,7 +197,7 @@ describe("DeadlineTable", () => {
   });
 
   describe("아코디언 그룹핑", () => {
-    it("비OVERDUE_데드라인은_가장_빠른_dueDate_순으로_정렬한다", () => {
+    it("비OVERDUE_항목은_가장_빠른_dueDate_순으로_정렬한다", () => {
       const upcomingDeadlines: DeadlineWithWorkerName[] = [
         createDeadline({
           id: 1,
@@ -226,7 +226,7 @@ describe("DeadlineTable", () => {
       ];
 
       render(
-        <DeadlineTable title="임박 데드라인" deadlines={upcomingDeadlines} isLoading={false} />,
+        <DeadlineTable title="다가오는 주요 기한" deadlines={upcomingDeadlines} isLoading={false} />,
       );
 
       const soonHeader = screen.getByRole("button", { name: /Worker-Soon — 임박 1건/ });
@@ -246,7 +246,7 @@ describe("DeadlineTable", () => {
           workerName: "Worker-A",
           dueDate: "2026-01-10",
           status: "OVERDUE",
-          description: "Worker-A deadline 1",
+          description: "Worker-A item 1",
         }),
         createDeadline({
           id: 20,
@@ -254,7 +254,7 @@ describe("DeadlineTable", () => {
           workerName: "Worker-A",
           dueDate: "2026-02-10",
           status: "OVERDUE",
-          description: "Worker-A deadline 2",
+          description: "Worker-A item 2",
         }),
         createDeadline({
           id: 30,
@@ -262,13 +262,13 @@ describe("DeadlineTable", () => {
           workerName: "Worker-B",
           dueDate: "2026-03-10",
           status: "OVERDUE",
-          description: "Worker-B deadline 1",
+          description: "Worker-B item 1",
         }),
       ];
 
       render(
         <DeadlineTable
-          title="기한초과 데드라인"
+          title="기한초과 항목"
           deadlines={multiWorkerDeadlines}
           isLoading={false}
           onComplete={onComplete}
@@ -288,7 +288,7 @@ describe("DeadlineTable", () => {
           workerName: "Worker-A",
           dueDate: "2026-01-10",
           status: "OVERDUE",
-          description: "Worker-A deadline 1",
+          description: "Worker-A item 1",
         }),
         createDeadline({
           id: 12,
@@ -296,7 +296,7 @@ describe("DeadlineTable", () => {
           workerName: "Worker-A",
           dueDate: "2026-01-20",
           status: "OVERDUE",
-          description: "Worker-A deadline 2",
+          description: "Worker-A item 2",
         }),
         createDeadline({
           id: 21,
@@ -304,23 +304,23 @@ describe("DeadlineTable", () => {
           workerName: "Worker-B",
           dueDate: "2026-03-10",
           status: "OVERDUE",
-          description: "Worker-B deadline 1",
+          description: "Worker-B item 1",
         }),
       ];
 
       render(
         <DeadlineTable
-          title="기한초과 데드라인"
+          title="기한초과 항목"
           deadlines={multiWorkerDeadlines}
           isLoading={false}
         />,
       );
 
-      expect(screen.getByText("Worker-A deadline 1")).toBeDefined();
+      expect(screen.getByText("Worker-A item 1")).toBeDefined();
 
       await userEvent.click(screen.getByRole("button", { name: /Worker-A — 기한초과 2건/ }));
 
-      expect(screen.queryByText("Worker-A deadline 1")).toBeNull();
+      expect(screen.queryByText("Worker-A item 1")).toBeNull();
     });
 
     it("title에_기한초과가_없으면_임박_라벨을_표시한다", () => {
@@ -345,7 +345,7 @@ describe("DeadlineTable", () => {
 
       render(
         <DeadlineTable
-          title="임박 데드라인 (30일)"
+          title="30일 안에 다가오는 주요 기한"
           deadlines={upcomingDeadlines}
           isLoading={false}
         />,

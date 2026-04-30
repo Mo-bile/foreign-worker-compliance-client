@@ -31,7 +31,7 @@ const NAV_SECTIONS: readonly NavSection[] = [
   { label: "메인", items: [{ href: "/", label: "대시보드", icon: LayoutDashboard }] },
   {
     label: "고용 전",
-    items: [{ href: "/simulator", label: "E-9 고용허가 시뮬레이터", icon: Lightbulb }],
+    items: [{ href: "/simulator", label: "E-9 고용허가 예상 계산", icon: Lightbulb }],
   },
   {
     label: "고용 후",

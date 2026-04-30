@@ -62,7 +62,7 @@ export default function CompliancePage() {
     (id: number) => {
       completeMutation.mutate(id, {
         onSuccess: () => {
-          toast.success("데드라인이 완료 처리되었습니다");
+          toast.success("주요 기한이 완료 처리되었습니다");
         },
       });
     },
@@ -95,7 +95,7 @@ export default function CompliancePage() {
 
       <Card>
         <CardContent className="flex flex-wrap items-center gap-3 pt-6">
-          <span className="text-sm text-muted-foreground">필터:</span>
+          <span className="text-sm text-muted-foreground">보기 조건:</span>
           <Select
             value={deadlineTypeFilter}
             onValueChange={(v) => {
@@ -104,7 +104,7 @@ export default function CompliancePage() {
             }}
           >
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="데드라인 유형 전체">{deadlineTypeFilter === "ALL" ? "전체" : DEADLINE_TYPE_LABELS[deadlineTypeFilter as DeadlineType]}</SelectValue>
+              <SelectValue placeholder="주요 기한 유형 전체">{deadlineTypeFilter === "ALL" ? "전체" : DEADLINE_TYPE_LABELS[deadlineTypeFilter as DeadlineType]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">전체</SelectItem>
@@ -138,7 +138,8 @@ export default function CompliancePage() {
       </Card>
 
       <DeadlineTable
-        title="기한초과 데드라인"
+        title="기한이 지난 항목"
+        variant="overdue"
         deadlines={overdue.deadlines?.items}
         isLoading={overdue.isLoading}
         isError={overdue.isError}
@@ -160,7 +161,8 @@ export default function CompliancePage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <DeadlineTable
-          title="임박 데드라인 (30일)"
+          title="30일 안에 다가오는 주요 기한"
+          variant="upcoming"
           deadlines={upcoming.deadlines?.items}
           isLoading={upcoming.isLoading}
           isError={upcoming.isError}

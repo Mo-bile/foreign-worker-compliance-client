@@ -17,7 +17,7 @@ interface FilterBarProps {
 
 export function FilterBar({ activeFilter, counts, onFilterChange }: FilterBarProps) {
   return (
-    <div role="group" aria-label="법령 필터" className="flex gap-2">
+    <div role="group" aria-label="법령 보기 조건" className="flex gap-2">
       {FILTERS.map(({ value, label }) => {
         const isActive = activeFilter === value;
         const count = counts?.[value];

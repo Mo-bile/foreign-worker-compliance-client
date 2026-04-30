@@ -160,7 +160,7 @@ export default function ReportsPage() {
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-lg font-semibold">사업장을 선택해주세요</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          컴플라이언스 리포트를 확인하려면 상단에서 사업장을 먼저 선택해야 합니다.
+          준수 현황 리포트를 확인하려면 상단에서 사업장을 먼저 선택해야 합니다.
         </p>
       </div>
     );
@@ -177,7 +177,7 @@ export default function ReportsPage() {
           <Card>
             <CardHeader className="border-b">
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <CardTitle>통합 컴플라이언스 점수</CardTitle>
+                <CardTitle>통합 준수 점수</CardTitle>
                 <div className="w-full md:w-56">
                   <Select value={selectedYearMonth} onValueChange={setYearMonth}>
                     <SelectTrigger className="w-full" aria-label="기준 월 선택">
@@ -234,7 +234,7 @@ export default function ReportsPage() {
         <CardHeader className="border-b">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="space-y-1">
-              <CardTitle>통합 컴플라이언스 점수</CardTitle>
+              <CardTitle>통합 준수 점수</CardTitle>
               <p className="text-sm text-muted-foreground">
                 {formatYearMonthLabel(data.yearMonth)} 기준 사업장의 월간 준수 현황입니다.
               </p>
@@ -284,7 +284,7 @@ export default function ReportsPage() {
                 </span>
               </div>
               <p className="mt-5 text-xs text-muted-foreground">
-                스냅샷 기준 시각: {formatSnapshot(data.snapshottedAt)}
+                확인한 시각: {formatSnapshot(data.snapshottedAt)}
               </p>
             </div>
 
@@ -292,12 +292,12 @@ export default function ReportsPage() {
               <div className="mb-5">
                 <h2 className="text-sm font-semibold">세부 항목</h2>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  보험 및 데드라인 준수 현황을 100점 기준으로 집계했습니다.
+                  보험 및 주요 기한 준수 현황을 100점 기준으로 집계했습니다.
                 </p>
               </div>
               <div className="space-y-5">
                 <BreakdownBar label="보험" value={data.breakdown.insurance} />
-                <BreakdownBar label="데드라인" value={data.breakdown.deadline} />
+                <BreakdownBar label="주요 기한" value={data.breakdown.deadline} />
               </div>
             </div>
           </div>

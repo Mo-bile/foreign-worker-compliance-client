@@ -12,7 +12,7 @@ export function useSimulation(companyId: number | null) {
         "/api/simulations",
         "POST",
         { ...data, companyId },
-        "시뮬레이션 요청에 실패했습니다",
+        "예상 계산 요청에 실패했습니다",
       );
     },
   });

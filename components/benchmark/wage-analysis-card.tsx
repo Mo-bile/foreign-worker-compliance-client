@@ -54,7 +54,7 @@ export function WageAnalysisCard({ wageAnalysis }: WageAnalysisCardProps) {
     <Card>
       <CardContent className="space-y-4 p-5">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold">💰 임금 구간 포지셔닝</h3>
+          <h3 className="text-sm font-bold">💰 임금 수준 비교</h3>
           <span className="rounded-full bg-[oklch(0.95_0.03_255)] px-2 py-0.5 text-[10px] font-semibold text-[oklch(0.45_0.12_255)]">
             {VISA_TYPE_LABELS[visaType as VisaType]}
           </span>

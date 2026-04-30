@@ -53,7 +53,7 @@ export function WorkerDeadlineTimeline({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">컴플라이언스 데드라인</CardTitle>
+        <CardTitle className="text-base">근로자별 주요 기한</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -70,11 +70,11 @@ export function WorkerDeadlineTimeline({
           </div>
         ) : isError ? (
           <EmptyState
-            message="데이터를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해 주세요."
+            message="내용을 불러오지 못했습니다. 페이지를 새로고침해 주세요."
             variant="error"
           />
         ) : !deadlines?.length ? (
-          <EmptyState message="등록된 데드라인이 없습니다" />
+          <EmptyState message="등록된 주요 기한이 없습니다" />
         ) : (
           <div className="relative pl-6">
             <div className="absolute left-[5px] top-1 bottom-1 w-0.5 bg-border" />

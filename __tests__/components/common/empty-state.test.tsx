@@ -4,8 +4,8 @@ import { EmptyState } from "@/components/common/empty-state";
 
 describe("EmptyState", () => {
   it("메시지를_렌더링한다", () => {
-    render(<EmptyState message="데이터가 없습니다" />);
-    expect(screen.getByText("데이터가 없습니다")).toBeInTheDocument();
+    render(<EmptyState message="내용이 없습니다" />);
+    expect(screen.getByText("내용이 없습니다")).toBeInTheDocument();
   });
 
   it("action이_있으면_함께_렌더링한다", () => {

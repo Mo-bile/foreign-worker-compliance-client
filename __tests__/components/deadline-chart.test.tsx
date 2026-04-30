@@ -24,17 +24,18 @@ function makeDeadline(
 describe("DeadlineChart", () => {
   it("로딩_중에_스켈레톤을_표시한다", () => {
     render(<DeadlineChart deadlines={undefined} isLoading={true} isError={false} />);
+    expect(screen.getByText("30일 안에 다가오는 주요 기한")).toBeDefined();
     expect(document.querySelectorAll("[data-slot='skeleton']").length).toBeGreaterThan(0);
   });
 
   it("에러_상태에서_오류_메시지를_표시한다", () => {
     render(<DeadlineChart deadlines={undefined} isLoading={false} isError />);
-    expect(screen.getByText(/오류가 발생했습니다/)).toBeDefined();
+    expect(screen.getByText(/내용을 불러오지 못했습니다/)).toBeDefined();
   });
 
   it("빈_배열일_때_빈_상태_메시지를_표시한다", () => {
     render(<DeadlineChart deadlines={[]} isLoading={false} isError={false} />);
-    expect(screen.getByText("데이터가 없습니다")).toBeDefined();
+    expect(screen.getByText("표시할 내용이 없습니다")).toBeDefined();
   });
 
   it("OVERDUE와_COMPLETED만_있으면_빈_상태를_표시한다", () => {
@@ -43,7 +44,7 @@ describe("DeadlineChart", () => {
       makeDeadline({ id: 2, status: "COMPLETED" }),
     ];
     render(<DeadlineChart deadlines={deadlines} isLoading={false} isError={false} />);
-    expect(screen.getByText("데이터가 없습니다")).toBeDefined();
+    expect(screen.getByText("표시할 내용이 없습니다")).toBeDefined();
   });
 
   it("범례에_상태_라벨이_표시된다", () => {
@@ -61,11 +62,11 @@ describe("DeadlineChart", () => {
   it("단일_날짜_단일_상태에서_정상_렌더한다", () => {
     const deadlines = [makeDeadline({ id: 1, status: "APPROACHING", dueDate: "2026-04-01" })];
     render(<DeadlineChart deadlines={deadlines} isLoading={false} isError={false} />);
-    expect(screen.queryByText("데이터가 없습니다")).toBeNull();
+    expect(screen.queryByText("표시할 내용이 없습니다")).toBeNull();
   });
 
   describe("groupDeadlinesByDateAndStatus", () => {
-    it("같은_날짜의_데드라인을_상태별로_집계한다", () => {
+    it("같은_날짜의_주요_기한을_상태별로_집계한다", () => {
       const deadlines = [
         makeDeadline({ id: 1, status: "URGENT", dueDate: "2026-04-01" }),
         makeDeadline({ id: 2, status: "URGENT", dueDate: "2026-04-01" }),
@@ -99,7 +100,7 @@ describe("DeadlineChart", () => {
       expect(result[1]?.sortKey).toBe("2026-04-10");
     });
 
-    it("잘못된_날짜_형식의_데드라인을_건너뛴다", () => {
+    it("잘못된_날짜_형식의_주요_기한을_건너뛴다", () => {
       const deadlines = [
         makeDeadline({ id: 1, status: "APPROACHING", dueDate: "" }),
         makeDeadline({ id: 2, status: "APPROACHING", dueDate: "20260401" }),

@@ -29,7 +29,7 @@ function getStatCards(benchmark: BenchmarkResponse): StatCardData[] {
 
   return [
     {
-      label: "임금 포지셔닝",
+      label: "임금 수준 비교",
       value: wageAnalysis ? `${wageAnalysis.companyAvgWage ?? "—"}만원` : "—",
       sub: wageAnalysis ? `${wageAnalysis.companyBracket ?? "—"} 구간` : "미입력",
       accentColor: "border-t-[oklch(0.6_0.15_255)]",

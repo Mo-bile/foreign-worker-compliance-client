@@ -251,7 +251,13 @@ describe("transformDashboardResponse", () => {
     it("ALERT_TITLE_MAP에_없는_deadlineType은_raw_값을_label로_사용한다", () => {
       const raw: DashboardRawResponse = {
         ...baseRaw,
-        alerts: [{ ...baseRaw.alerts[0], deadlineType: "UNKNOWN_TYPE" as any, dDay: -4 }],
+        alerts: [
+          {
+            ...baseRaw.alerts[0],
+            deadlineType: "UNKNOWN_TYPE" as DashboardRawResponse["alerts"][number]["deadlineType"],
+            dDay: -4,
+          },
+        ],
       };
       const result = transformDashboardResponse(raw);
       expect(result.alertGroups[0].label).toBe("UNKNOWN_TYPE");
@@ -301,7 +307,7 @@ describe("transformDashboardResponse", () => {
     it("category를_한글_label로_변환한다", () => {
       const result = transformDashboardResponse(baseRaw);
       expect(result.complianceScore.breakdown[0].label).toBe("보험 가입");
-      expect(result.complianceScore.breakdown[1].label).toBe("데드라인 준수");
+      expect(result.complianceScore.breakdown[1].label).toBe("주요 기한 준수");
     });
 
     it("score를_그대로_전달한다", () => {
@@ -377,7 +383,12 @@ describe("transformDashboardResponse", () => {
     it("알_수_없는_status는_overdue로_매핑한다", () => {
       const raw: DashboardRawResponse = {
         ...baseRaw,
-        upcomingDeadlines: [{ ...baseRaw.upcomingDeadlines[0], status: "UNKNOWN" as any }],
+        upcomingDeadlines: [
+          {
+            ...baseRaw.upcomingDeadlines[0],
+            status: "UNKNOWN" as DashboardRawResponse["upcomingDeadlines"][number]["status"],
+          },
+        ],
       };
       const result = transformDashboardResponse(raw);
       expect(result.timeline[0].urgency).toBe("overdue");

@@ -61,7 +61,7 @@ export function SpecialtyInsuranceCard({ visaType, deadlines }: SpecialtyInsuran
                       {DEADLINE_STATUS_LABELS[deadline.status]}
                     </span>
                   ) : (
-                    <span className="text-xs text-muted-foreground">데드라인 미등록</span>
+                    <span className="text-xs text-muted-foreground">기한 미등록</span>
                   )}
                 </div>
               );

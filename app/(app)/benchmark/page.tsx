@@ -41,7 +41,7 @@ export default function BenchmarkPage() {
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-lg font-semibold">사업장을 선택해주세요</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          벤치마크 리포트를 확인하려면 상단에서 사업장을 먼저 선택해야 합니다.
+          비교 진단 리포트를 확인하려면 상단에서 사업장을 먼저 선택해야 합니다.
         </p>
       </div>
     );
@@ -51,9 +51,9 @@ export default function BenchmarkPage() {
     <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
       <Info className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="space-y-1">
-        <p>사업장 진단 리포트는 회사 및 근로자 데이터와 외부 기준 데이터를 함께 분석합니다.</p>
+        <p>사업장 진단 리포트는 회사 및 근로자 정보와 외부 기준 정보를 함께 확인합니다.</p>
         <p>
-          임금 구간, E-9 퇴사 사유, 관리 체크리스트, 지역/업종 포지셔닝 기준을 바탕으로
+          임금 구간, E-9 퇴사 사유, 관리 체크리스트, 지역/업종 내 위치 기준을 바탕으로
           현재 사업장의 관리 상태를 진단합니다.
         </p>
         <p>
@@ -69,7 +69,7 @@ export default function BenchmarkPage() {
   if (isError) {
     return (
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-        <p className="text-sm font-medium text-destructive">벤치마크 조회에 실패했습니다</p>
+        <p className="text-sm font-medium text-destructive">비교 진단 조회에 실패했습니다</p>
         <p className="mt-1 text-xs text-muted-foreground">{error?.message}</p>
       </div>
     );
@@ -117,14 +117,14 @@ export default function BenchmarkPage() {
         <div className="space-y-2">
           <p className="text-xs font-bold tracking-wide text-muted-foreground">
             <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[oklch(0.6_0.15_255)]" />
-            포지셔닝
+            위치 비교
           </p>
           <div className="grid grid-cols-2 gap-4">
             {latest.wageAnalysis ? (
               <WageAnalysisCard wageAnalysis={latest.wageAnalysis} />
             ) : (
               <NullableAxisPlaceholder
-                title="임금 구간 포지셔닝"
+                title="임금 수준 비교"
                 fieldLabel="평균 월임금"
                 companyId={selectedCompanyId}
               />

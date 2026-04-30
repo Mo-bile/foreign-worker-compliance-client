@@ -30,7 +30,7 @@ describe("StabilityAnalysisCard", () => {
   it("DataSourceMeta 토글이 있다", () => {
     render(<StabilityAnalysisCard stabilityAnalysis={stability} />);
 
-    expect(screen.getByText("데이터 정보")).toBeInTheDocument();
+    expect(screen.getByText("기준 정보")).toBeInTheDocument();
   });
 
   it("CTA 클릭 가능 항목이 onReasonClick을 호출한다", () => {

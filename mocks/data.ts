@@ -241,7 +241,7 @@ export const mockWorkers: readonly WorkerResponse[] = [
   ...Array.from({ length: 23 }, (_, i) => generateWorker(i + 3)),
 ];
 
-// ─── 데드라인 목 데이터 ──────────────────────────────────
+// ─── 주요 기한 목 데이터 ──────────────────────────────────
 const SAMPLE_DEADLINE_TYPES = [
   "VISA_EXPIRY",
   "NATIONAL_PENSION_ENROLLMENT",

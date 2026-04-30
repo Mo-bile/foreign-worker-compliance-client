@@ -300,9 +300,9 @@ export function CompanyForm(props: CompanyFormProps) {
         </div>
       </div>
 
-      {/* 벤치마크 진단용 (선택) */}
+      {/* 비교 진단용 (선택) */}
       <div className="space-y-4 rounded-lg border border-dashed p-4 md:col-span-2">
-        <p className="text-sm font-medium text-muted-foreground">벤치마크 진단용 (선택)</p>
+        <p className="text-sm font-medium text-muted-foreground">비교 진단용 (선택)</p>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="flex flex-col gap-1.5">
@@ -324,7 +324,7 @@ export function CompanyForm(props: CompanyFormProps) {
               )}
             />
             <p className="text-sm text-muted-foreground">
-              미입력 시 임금 포지셔닝 진단이 생략됩니다
+              미입력 시 임금 수준 비교가 생략됩니다
             </p>
             {errors.averageForeignWorkerWage && (
               <p className="text-sm text-destructive">{errors.averageForeignWorkerWage.message}</p>

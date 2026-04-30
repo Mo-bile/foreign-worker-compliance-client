@@ -240,7 +240,7 @@ export const mockExceededResponse: SimulationResultResponse = {
     overallVerdict:
       "귀사는 현재 고용 한도(16명)를 모두 사용하고 있어 추가 채용이 불가합니다. 한도를 늘리려면 내국인 피보험자 수를 증가시키거나, 기존 외국인 근로자의 출국/사업장 변경 후 신청해야 합니다.",
     limitInsight: "내국인 33명 기준 고용 한도 16명이며, 현재 16명 전부 사용 중입니다.",
-    scoringInsight: "점수 시뮬레이션은 참고용입니다. 한도 확보가 우선입니다.",
+    scoringInsight: "점수 예상 계산은 참고용입니다. 한도 확보가 우선입니다.",
     quotaInsight: "쿼터에 여유가 있더라도 한도 초과 시 신청 자체가 불가합니다.",
     timelineInsight: "한도 내에서만 신청이 가능합니다.",
     actionItems: [

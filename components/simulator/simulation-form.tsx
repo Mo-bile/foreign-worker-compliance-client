@@ -144,7 +144,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-[15px]">
           <Lightbulb className="h-[18px] w-[18px]" />
-          시뮬레이션 조건
+          예상 계산 조건
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -286,7 +286,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
           {/* Section 4: Scoring checkboxes */}
           <div className="rounded-lg border border-border bg-muted p-4">
             <div className="mb-2 flex items-center gap-1.5">
-              <span className="text-xs font-semibold">✨ 배정 점수 시뮬레이션</span>
+              <span className="text-xs font-semibold">✨ 배정 점수 미리 계산</span>
               <span title="고용허가제는 점수가 높은 사업장부터 순차 배정됩니다">
                 <Info className="h-4 w-4 cursor-help text-muted-foreground" />
               </span>
@@ -419,18 +419,18 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
             {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>분석 중...</span>
+                <span>계산 중...</span>
               </>
             ) : (
               <>
                 <Lightbulb className="h-4 w-4" />
-                <span>시뮬레이션 실행</span>
+                <span>예상 계산하기</span>
               </>
             )}
           </button>
 
           <p className="text-center text-[10px] text-muted-foreground">
-            시뮬레이션 결과는 공공데이터 기반 추정이며
+            예상 계산 결과는 공공데이터 기반 추정이며
             <br />
             실제 배정 결과와 다를 수 있습니다.
           </p>

@@ -19,7 +19,7 @@ export function useComplianceReport(companyId: number | null | undefined, yearMo
 
       return fetchApi<ComplianceReport>(
         `/api/compliance-report?${searchParams.toString()}`,
-        "컴플라이언스 리포트 조회에 실패했습니다",
+        "준수 현황 리포트 조회에 실패했습니다",
       );
     },
     enabled: companyId != null && companyId > 0,

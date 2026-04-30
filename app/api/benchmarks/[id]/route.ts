@@ -23,7 +23,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   } catch (transformError) {
     console.error(`[GET /api/benchmarks/${benchmarkId}] Transform failed:`, transformError);
     return NextResponse.json(
-      { message: "벤치마크 데이터 처리 중 오류가 발생했습니다" },
+      { message: "비교 진단 정보 처리 중 오류가 발생했습니다" },
       { status: 500 },
     );
   }

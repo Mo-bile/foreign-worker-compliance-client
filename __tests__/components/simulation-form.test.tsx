@@ -125,9 +125,9 @@ describe("SimulationForm", () => {
   // ── Section rendering ──────────────────────────────────────────
 
   describe("섹션 렌더링", () => {
-    it("시뮬레이션 조건 제목을 렌더링한다", () => {
+    it("예상 계산 조건 제목을 렌더링한다", () => {
       renderForm();
-      expect(screen.getByText("시뮬레이션 조건")).toBeDefined();
+      expect(screen.getByText("예상 계산 조건")).toBeDefined();
     });
 
     it("자동 입력 안내 박스를 렌더링한다 (company 있을 때)", () => {
@@ -147,9 +147,9 @@ describe("SimulationForm", () => {
       expect(screen.getByLabelText(/희망 시기/)).toBeDefined();
     });
 
-    it("배정 점수 시뮬레이션 섹션을 렌더링한다", () => {
+    it("배정 점수 미리 계산 섹션을 렌더링한다", () => {
       renderForm();
-      expect(screen.getByText(/배정 점수 시뮬레이션/)).toBeDefined();
+      expect(screen.getByText(/배정 점수 미리 계산/)).toBeDefined();
     });
   });
 
@@ -250,7 +250,7 @@ describe("SimulationForm", () => {
       await user.selectOptions(timingSelect, "2026_Q2");
 
       // Submit
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -270,7 +270,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -290,7 +290,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -338,7 +338,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -352,7 +352,7 @@ describe("SimulationForm", () => {
   describe("제출 비활성화 조건", () => {
     it("desiredTiming이 선택되지 않으면 제출 버튼이 비활성화된다", () => {
       renderForm();
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       expect((submitButton as HTMLButtonElement).disabled).toBe(true);
     });
 
@@ -364,7 +364,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       expect((submitButton as HTMLButtonElement).disabled).toBe(true);
     });
 
@@ -375,7 +375,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /분석 중/ });
+      const submitButton = screen.getByRole("button", { name: /계산 중/ });
       expect((submitButton as HTMLButtonElement).disabled).toBe(true);
     });
 
@@ -386,7 +386,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       expect((submitButton as HTMLButtonElement).disabled).toBe(false);
     });
   });
@@ -402,7 +402,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q3");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -427,7 +427,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       const request = onSubmit.mock.calls[0][0];
@@ -446,7 +446,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       const request = onSubmit.mock.calls[0][0];
@@ -467,7 +467,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       const request = onSubmit.mock.calls[0][0];
@@ -497,24 +497,24 @@ describe("SimulationForm", () => {
   // ── isPending loading state ────────────────────────────────────
 
   describe("로딩 상태", () => {
-    it("isPending이면 '분석 중...' 텍스트를 표시한다", () => {
+    it("isPending이면 '계산 중...' 텍스트를 표시한다", () => {
       renderForm({ isPending: true });
-      expect(screen.getByText("분석 중...")).toBeDefined();
+      expect(screen.getByText("계산 중...")).toBeDefined();
     });
 
-    it("isPending이면 '시뮬레이션 실행' 텍스트를 표시하지 않는다", () => {
+    it("isPending이면 '예상 계산하기' 텍스트를 표시하지 않는다", () => {
       renderForm({ isPending: true });
-      expect(screen.queryByText("시뮬레이션 실행")).toBeNull();
+      expect(screen.queryByText("예상 계산하기")).toBeNull();
     });
 
-    it("isPending이 아니면 '시뮬레이션 실행' 텍스트를 표시한다", () => {
+    it("isPending이 아니면 '예상 계산하기' 텍스트를 표시한다", () => {
       renderForm({ isPending: false });
-      expect(screen.getByText("시뮬레이션 실행")).toBeDefined();
+      expect(screen.getByText("예상 계산하기")).toBeDefined();
     });
 
-    it("isPending이 아니면 '분석 중...' 텍스트를 표시하지 않는다", () => {
+    it("isPending이 아니면 '계산 중...' 텍스트를 표시하지 않는다", () => {
       renderForm({ isPending: false });
-      expect(screen.queryByText("분석 중...")).toBeNull();
+      expect(screen.queryByText("계산 중...")).toBeNull();
     });
   });
 
@@ -552,7 +552,7 @@ describe("SimulationForm", () => {
       const timingSelect = screen.getByLabelText(/희망 시기/) as HTMLSelectElement;
       await user.selectOptions(timingSelect, "2026_Q2");
 
-      const submitButton = screen.getByRole("button", { name: /시뮬레이션 실행/ });
+      const submitButton = screen.getByRole("button", { name: /예상 계산하기/ });
       await user.click(submitButton);
 
       const request = onSubmit.mock.calls[0][0];
@@ -565,7 +565,7 @@ describe("SimulationForm", () => {
   describe("면책 문구", () => {
     it("면책 문구를 렌더링한다", () => {
       renderForm();
-      expect(screen.getByText(/시뮬레이션 결과는 공공데이터 기반 추정이며/)).toBeDefined();
+      expect(screen.getByText(/예상 계산 결과는 공공데이터 기반 추정이며/)).toBeDefined();
     });
   });
 });

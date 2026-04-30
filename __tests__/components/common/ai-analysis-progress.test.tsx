@@ -13,9 +13,9 @@ describe("AiAnalysisProgress", () => {
       expect(screen.getByText("근로자 현황을 조회하고 있습니다...")).toBeDefined();
     });
 
-    it("benchmark는_임금_데이터로_시작한다", () => {
+    it("benchmark는_임금_정보로_시작한다", () => {
       render(<AiAnalysisProgress variant="benchmark" isPending={true} />);
-      expect(screen.getByText("사업장 임금 데이터를 수집하고 있습니다...")).toBeDefined();
+      expect(screen.getByText("사업장 임금 정보를 확인하고 있습니다...")).toBeDefined();
     });
 
     it("simulation는_고용_한도로_시작한다", () => {

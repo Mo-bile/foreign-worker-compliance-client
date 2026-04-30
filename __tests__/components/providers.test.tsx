@@ -27,7 +27,7 @@ describe("Providers 글로벌 에러 핸들링", () => {
   });
 
   it("mutation 에러 시 BE 메시지를 다이얼로그로 표시한다", async () => {
-    const beError = new Error("농축산업 업종은 아직 시뮬레이션을 지원하지 않습니다");
+    const beError = new Error("농축산업 업종은 아직 예상 계산을 지원하지 않습니다");
     render(
       <Providers>
         <MutationTestComponent error={beError} />
@@ -39,7 +39,7 @@ describe("Providers 글로벌 에러 핸들링", () => {
     await waitFor(() => {
       expect(screen.getByRole("alertdialog")).toBeInTheDocument();
       expect(
-        screen.getByText("농축산업 업종은 아직 시뮬레이션을 지원하지 않습니다"),
+        screen.getByText("농축산업 업종은 아직 예상 계산을 지원하지 않습니다"),
       ).toBeInTheDocument();
     });
   });

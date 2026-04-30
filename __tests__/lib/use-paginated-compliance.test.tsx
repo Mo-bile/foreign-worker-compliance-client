@@ -33,7 +33,7 @@ describe("usePaginatedOverdueDeadlines", () => {
     expect(result.current.deadlines!.totalItems).toBe(22);
   });
 
-  it("데드라인_유형_필터가_적용된다", async () => {
+  it("주요_기한_유형_필터가_적용된다", async () => {
     const { result } = renderHook(
       () => usePaginatedOverdueDeadlines(1, { deadlineType: "VISA_EXPIRY", status: "ALL" }, 1),
       { wrapper: createWrapper() },
@@ -66,7 +66,7 @@ describe("usePaginatedUpcomingDeadlines", () => {
     expect(result.current.deadlines!.totalItems).toBe(25);
   });
 
-  it("데드라인_유형_필터가_적용된다", async () => {
+  it("주요_기한_유형_필터가_적용된다", async () => {
     const { result } = renderHook(
       () =>
         usePaginatedUpcomingDeadlines(

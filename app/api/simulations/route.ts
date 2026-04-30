@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       Object.keys(raw ?? {}),
     );
     return NextResponse.json(
-      { message: "시뮬레이션 결과 처리 중 오류가 발생했습니다" },
+      { message: "예상 계산 결과 처리 중 오류가 발생했습니다" },
       { status: 502 },
     );
   }
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
   } catch (transformError) {
     console.error(`[POST /api/simulations] Transform failed for id=${raw.id}:`, transformError);
     return NextResponse.json(
-      { message: "시뮬레이션 결과 처리 중 오류가 발생했습니다" },
+      { message: "예상 계산 결과 처리 중 오류가 발생했습니다" },
       { status: 500 },
     );
   }

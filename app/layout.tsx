@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FWC - 외국인 근로자 컴플라이언스",
-  description: "외국인 근로자 고용 컴플라이언스 관리 시스템",
+  title: "FWC - 외국인 근로자 준수 관리",
+  description: "외국인 근로자 고용 준수 관리 시스템",
 };
 
 export default function RootLayout({ children }: { readonly children: React.ReactNode }) {

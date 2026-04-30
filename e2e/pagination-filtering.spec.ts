@@ -29,13 +29,13 @@ test.describe("Compliance 페이지 필터링", () => {
     await page.waitForSelector("table");
   });
 
-  test("통합_필터_바가_표시된다", async ({ page }) => {
-    await expect(page.getByText("필터:")).toBeVisible();
+  test("통합_보기_조건_바가_표시된다", async ({ page }) => {
+    await expect(page.getByText("보기 조건:")).toBeVisible();
   });
 
-  test("데드라인_유형_필터가_동작한다", async ({ page }) => {
+  test("주요_기한_유형_보기_조건이_동작한다", async ({ page }) => {
     await page.getByRole("combobox").first().click();
     await page.getByRole("option", { name: "비자 만료" }).click();
-    await expect(page.getByText("필터:")).toBeVisible();
+    await expect(page.getByText("보기 조건:")).toBeVisible();
   });
 });
