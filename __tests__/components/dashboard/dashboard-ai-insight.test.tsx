@@ -15,6 +15,17 @@ describe("DashboardAiInsight", () => {
   });
 
   describe("빈 상태 (aiInsight === null)", () => {
+    it("다크_모드_패널_스타일을_포함한다", () => {
+      const { container } = render(
+        <DashboardAiInsight aiInsight={null} isPending={false} onGenerate={mockOnGenerate} />,
+      );
+      const panel = container.firstElementChild as HTMLElement;
+
+      expect(panel.className).toContain("dark:border-border");
+      expect(panel.className).toContain("dark:from-card");
+      expect(panel.className).toContain("dark:to-[oklch(0.16_0.03_260)]");
+    });
+
     it("안내_문구와_AI_분석_버튼을_렌더링한다", () => {
       render(<DashboardAiInsight aiInsight={null} isPending={false} onGenerate={mockOnGenerate} />);
       expect(screen.getByText("아직 AI 분석 결과가 없습니다.")).toBeDefined();
