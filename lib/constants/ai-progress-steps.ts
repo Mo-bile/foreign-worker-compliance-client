@@ -33,7 +33,7 @@ const DASHBOARD_PRESET: ProgressPreset = {
     { label: "근로자 현황을 조회하고 있습니다...", sub: "비자 유형별 분포 확인", icon: "database" },
     {
       label: "보험 가입 현황을 확인하고 있습니다...",
-      sub: "4대보험 가입률 계산",
+      sub: "4대보험 의무 적용률 계산",
       icon: "database",
     },
     {

@@ -3,6 +3,8 @@ import type {
   DashboardResponse,
   DeadlineUrgency,
   AlertGroupUrgency,
+  AlertGroupCategory,
+  AlertGroupTiming,
   AlertGroup,
   TimelineItem,
 } from "@/types/dashboard";
@@ -11,6 +13,16 @@ describe("Dashboard Types", () => {
   it("AlertGroupUrgency_유니온이_3가지_값을_허용한다", () => {
     const urgencies: AlertGroupUrgency[] = ["critical", "warning", "caution"];
     expect(urgencies).toHaveLength(3);
+  });
+
+  it("AlertGroupCategory_유니온이_3가지_값을_허용한다", () => {
+    const categories: AlertGroupCategory[] = ["socialInsurance", "guaranteeInsurance", "other"];
+    expect(categories).toHaveLength(3);
+  });
+
+  it("AlertGroupTiming_유니온이_2가지_값을_허용한다", () => {
+    const timings: AlertGroupTiming[] = ["immediate", "scheduled"];
+    expect(timings).toHaveLength(2);
   });
 
   it("DeadlineUrgency_유니온이_4가지_값을_허용한다", () => {
@@ -24,10 +36,14 @@ describe("Dashboard Types", () => {
       label: "비자 만료 임박",
       count: 3,
       urgency: "critical",
+      category: "socialInsurance",
+      timing: "immediate",
       href: "/alerts/visa",
     };
     expect(alertGroup.count).toBe(3);
     expect(alertGroup.urgency).toBe("critical");
+    expect(alertGroup.category).toBe("socialInsurance");
+    expect(alertGroup.timing).toBe("immediate");
   });
 
   it("TimelineItem_구조가_올바르다", () => {
@@ -52,7 +68,7 @@ describe("Dashboard Types", () => {
         upcomingDeadlines: 5,
         deadlineBreakdown: { d7: 2, d30: 3 },
         urgentActions: 3,
-        urgentBreakdown: { visa: 1, insurance: 2 },
+        urgentBreakdown: { visa: 1, insurance: 2, socialInsurance: 2, guaranteeInsurance: 0 },
       },
       alertGroups: [],
       visaDistribution: [],

@@ -24,6 +24,9 @@ describe("GET /api/dashboard", () => {
     const data: DashboardResponse = await response.json();
     expect(data.stats.totalWorkers).toBe(12);
     expect(data.stats.insuranceRateChange).toBeNull();
+    expect(data.stats.urgentBreakdown.insurance).toBe(2);
+    expect(data.stats.urgentBreakdown.socialInsurance).toBe(2);
+    expect(data.stats.urgentBreakdown.guaranteeInsurance).toBe(0);
     expect(data.alertGroups.length).toBeGreaterThan(0);
     expect(data.alertGroups[0].urgency).toBeDefined();
     expect(data.alertGroups[0].label).toBeDefined();

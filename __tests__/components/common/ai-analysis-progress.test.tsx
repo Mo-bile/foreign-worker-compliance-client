@@ -44,6 +44,10 @@ describe("AiAnalysisProgress", () => {
         vi.advanceTimersByTime(1300);
       });
       expect(screen.getByText("2 / 12 단계")).toBeDefined();
+      act(() => {
+        vi.advanceTimersByTime(160);
+      });
+      expect(screen.getByText("4대보험 의무 적용률 계산")).toBeDefined();
     });
   });
 
