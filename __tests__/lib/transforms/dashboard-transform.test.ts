@@ -126,7 +126,98 @@ describe("transformDashboardResponse", () => {
       expect(result.stats.upcomingDeadlines).toBe(5);
       expect(result.stats.deadlineBreakdown).toEqual({ d7: 2, d30: 3 });
       expect(result.stats.urgentActions).toBe(3);
-      expect(result.stats.urgentBreakdown).toEqual({ visa: 1, insurance: 2 });
+      expect(result.stats.urgentBreakdown).toEqual({
+        visa: 1,
+        insurance: 2,
+        socialInsurance: 2,
+        guaranteeInsurance: 0,
+      });
+    });
+
+    it("신규_보험_긴급_분리_필드를_우선_전달한다", () => {
+      const raw = {
+        ...baseRaw,
+        stats: {
+          ...baseRaw.stats,
+          urgentActions: 17,
+          urgentBreakdown: {
+            visa: 0,
+            insurance: 13,
+            socialInsurance: 13,
+            guaranteeInsurance: 4,
+          },
+        },
+      } as DashboardRawResponse;
+
+      const result = transformDashboardResponse(raw);
+
+      expect(result.stats.urgentBreakdown.socialInsurance).toBe(13);
+      expect(result.stats.urgentBreakdown.guaranteeInsurance).toBe(4);
+    });
+
+    it("신규_필드가_없으면_insurance와_alerts에서_하위호환_값을_계산한다", () => {
+      const raw = {
+        ...baseRaw,
+        stats: {
+          ...baseRaw.stats,
+          urgentActions: 15,
+          urgentBreakdown: { visa: 0, insurance: 13 },
+        },
+        alerts: [
+          {
+            ...baseRaw.alerts[0],
+            deadlineType: "EXIT_GUARANTEE_INSURANCE",
+            status: "OVERDUE",
+            dDay: 2,
+          },
+          {
+            ...baseRaw.alerts[1],
+            deadlineType: "WAGE_GUARANTEE_INSURANCE",
+            status: "URGENT",
+            dDay: -1,
+          },
+        ],
+      } as DashboardRawResponse;
+
+      const result = transformDashboardResponse(raw);
+
+      expect(result.stats.urgentBreakdown.socialInsurance).toBe(13);
+      expect(result.stats.urgentBreakdown.guaranteeInsurance).toBe(2);
+    });
+
+    it("구버전_보험_fallback_합계가_urgentActions를_넘으면_4대보험_건수를_보정한다", () => {
+      const raw = {
+        ...baseRaw,
+        stats: {
+          ...baseRaw.stats,
+          urgentActions: 3,
+          urgentBreakdown: { visa: 1, insurance: 2 },
+        },
+        alerts: [
+          {
+            ...baseRaw.alerts[0],
+            deadlineType: "EXIT_GUARANTEE_INSURANCE",
+            status: "OVERDUE",
+            dDay: 2,
+          },
+          {
+            ...baseRaw.alerts[1],
+            deadlineType: "WAGE_GUARANTEE_INSURANCE",
+            status: "URGENT",
+            dDay: -1,
+          },
+        ],
+      } as DashboardRawResponse;
+
+      const result = transformDashboardResponse(raw);
+
+      expect(result.stats.urgentBreakdown.socialInsurance).toBe(0);
+      expect(result.stats.urgentBreakdown.guaranteeInsurance).toBe(2);
+      expect(
+        result.stats.urgentBreakdown.visa +
+          result.stats.urgentBreakdown.socialInsurance +
+          result.stats.urgentBreakdown.guaranteeInsurance,
+      ).toBeLessThanOrEqual(result.stats.urgentActions);
     });
   });
 
@@ -240,6 +331,50 @@ describe("transformDashboardResponse", () => {
       const result = transformDashboardResponse(baseRaw);
       const visaGroup = result.alertGroups.find((g) => g.deadlineType === "VISA_EXPIRY");
       expect(visaGroup?.href).toBe("/deadlines?type=VISA_EXPIRY");
+    });
+
+    it("알림_그룹에_보험_분류와_즉시조치_예정관리_구분을_포함한다", () => {
+      const raw = {
+        ...baseRaw,
+        alerts: [
+          {
+            ...baseRaw.alerts[0],
+            deadlineType: "NATIONAL_PENSION_ENROLLMENT",
+            status: "OVERDUE",
+            dDay: 2,
+          },
+          {
+            ...baseRaw.alerts[1],
+            deadlineType: "NATIONAL_PENSION_ENROLLMENT",
+            status: "APPROACHING",
+            dDay: -20,
+          },
+          {
+            ...baseRaw.alerts[2],
+            deadlineType: "EXIT_GUARANTEE_INSURANCE",
+            status: "URGENT",
+            dDay: -2,
+          },
+        ],
+      } as DashboardRawResponse;
+
+      const result = transformDashboardResponse(raw);
+      const immediateSocial = result.alertGroups.find(
+        (g) => g.deadlineType === "NATIONAL_PENSION_ENROLLMENT" && g.timing === "immediate",
+      );
+      const scheduledSocial = result.alertGroups.find(
+        (g) => g.deadlineType === "NATIONAL_PENSION_ENROLLMENT" && g.timing === "scheduled",
+      );
+      const guarantee = result.alertGroups.find(
+        (g) => g.deadlineType === "EXIT_GUARANTEE_INSURANCE",
+      );
+
+      expect(immediateSocial?.count).toBe(1);
+      expect(immediateSocial?.category).toBe("socialInsurance");
+      expect(scheduledSocial?.count).toBe(1);
+      expect(scheduledSocial?.category).toBe("socialInsurance");
+      expect(guarantee?.category).toBe("guaranteeInsurance");
+      expect(guarantee?.timing).toBe("immediate");
     });
 
     it("alerts가 빈 배열이면 빈 배열을 반환한다", () => {

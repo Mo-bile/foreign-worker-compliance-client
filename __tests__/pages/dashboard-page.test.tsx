@@ -41,9 +41,19 @@ describe("DashboardPage", () => {
     });
 
     expect(screen.getAllByText("12").length).toBeGreaterThan(0);
-    expect(screen.getByText("보험 가입률")).toBeDefined();
+    expect(screen.getByText("4대보험 의무 적용률")).toBeDefined();
     expect(screen.getByText("다가오는 주요 기한")).toBeDefined();
     expect(screen.getByText("긴급 조치 필요")).toBeDefined();
+    expect(screen.getByText("조치 알림")).toBeDefined();
+    expect(screen.getByText("즉시 조치")).toBeDefined();
+    expect(screen.getByText("예정 관리")).toBeDefined();
+    expect(screen.getByText(/즉시 조치 3건 · D-7 이내 2건 · D-30 이내 3건/)).toBeDefined();
+    expect(
+      screen.getByText(/비자 만료 1건 · 4대보험 신고 지연 2건 · 전용보험 가입 지연 0건/),
+    ).toBeDefined();
+    expect(screen.queryByText("보험 가입률")).toBeNull();
+    expect(screen.queryByText(/보험 미가입/)).toBeNull();
+    expect(screen.queryByText(/긴급 알림/)).toBeNull();
 
     expect(screen.getByText(/비자 만료 임박/)).toBeDefined();
     expect(screen.getAllByText(/건강보험 취득신고/).length).toBeGreaterThan(0);

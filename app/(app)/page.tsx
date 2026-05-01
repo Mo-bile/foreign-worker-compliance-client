@@ -72,7 +72,7 @@ export default function DashboardPage() {
             .join(" · ")}
         />
         <StatCard
-          title="보험 가입률"
+          title="4대보험 의무 적용률"
           value={stats.insuranceRate}
           icon={Shield}
           isLoading={false}
@@ -94,7 +94,7 @@ export default function DashboardPage() {
             icon={Clock}
             isLoading={false}
             className="border-t-[color:var(--signal-orange)]"
-            subtitle={`D-7 이내 ${stats.deadlineBreakdown.d7}건 · D-30 이내 ${stats.deadlineBreakdown.d30}건`}
+            subtitle={`즉시 조치 ${stats.urgentActions}건 · D-7 이내 ${stats.deadlineBreakdown.d7}건 · D-30 이내 ${stats.deadlineBreakdown.d30}건`}
           />
           <Link
             href="/deadlines"
@@ -110,7 +110,8 @@ export default function DashboardPage() {
           isLoading={false}
           variant="urgent"
           className="border-t-[color:var(--signal-red)]"
-          subtitle={`비자 만료 ${stats.urgentBreakdown.visa} · 보험 미가입 ${stats.urgentBreakdown.insurance}`}
+          valueSuffix="건"
+          subtitle={`비자 만료 ${stats.urgentBreakdown.visa}건 · 4대보험 신고 지연 ${stats.urgentBreakdown.socialInsurance}건 · 전용보험 가입 지연 ${stats.urgentBreakdown.guaranteeInsurance}건`}
         />
       </div>
 
@@ -121,7 +122,7 @@ export default function DashboardPage() {
           {/* Urgent Alerts */}
           <section>
             <div className="mb-3.5">
-              <h2 className="text-[15px] font-semibold">⚡ 긴급 알림</h2>
+              <h2 className="text-[15px] font-semibold">조치 알림</h2>
             </div>
             <AlertGroupCard alertGroups={data.alertGroups} />
           </section>

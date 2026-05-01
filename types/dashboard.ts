@@ -2,6 +2,8 @@ import type { VisaType, DeadlineType, DeadlineStatus } from "./api";
 
 export type DeadlineUrgency = "overdue" | "d7" | "d30" | "safe";
 export type AlertGroupUrgency = "critical" | "warning" | "caution";
+export type AlertGroupCategory = "socialInsurance" | "guaranteeInsurance" | "other";
+export type AlertGroupTiming = "immediate" | "scheduled";
 
 export interface AiInsight {
   readonly content: string;
@@ -13,6 +15,8 @@ export interface AlertGroup {
   readonly label: string;
   readonly count: number;
   readonly urgency: AlertGroupUrgency;
+  readonly category: AlertGroupCategory;
+  readonly timing: AlertGroupTiming;
   readonly href: string;
 }
 
@@ -56,7 +60,12 @@ export interface DashboardStats {
   readonly upcomingDeadlines: number;
   readonly deadlineBreakdown: { readonly d7: number; readonly d30: number };
   readonly urgentActions: number;
-  readonly urgentBreakdown: { readonly visa: number; readonly insurance: number };
+  readonly urgentBreakdown: {
+    readonly visa: number;
+    readonly insurance: number;
+    readonly socialInsurance: number;
+    readonly guaranteeInsurance: number;
+  };
 }
 
 export interface DashboardResponse {
@@ -88,7 +97,12 @@ export interface DashboardRawStats {
   readonly upcomingDeadlines: number;
   readonly deadlineBreakdown: { readonly d7: number; readonly d30: number };
   readonly urgentActions: number;
-  readonly urgentBreakdown: { readonly visa: number; readonly insurance: number };
+  readonly urgentBreakdown: {
+    readonly visa: number;
+    readonly insurance: number;
+    readonly socialInsurance?: number;
+    readonly guaranteeInsurance?: number;
+  };
 }
 
 export interface DashboardRawAlert {

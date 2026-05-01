@@ -8,6 +8,8 @@ import type {
   DashboardResponse,
   AlertGroup,
   AlertGroupUrgency,
+  AlertGroupCategory,
+  AlertGroupTiming,
   InsuranceSummaryItem,
   ComplianceBreakdownItem,
   DeadlineUrgency,
@@ -23,6 +25,18 @@ import { DEADLINE_TYPE_LABELS } from "@/types/api";
 const CRITICAL_DDAY_THRESHOLD = 0;
 const WARNING_DDAY_THRESHOLD = -7;
 const TIMELINE_MAX_ITEMS = 5;
+
+const SOCIAL_INSURANCE_DEADLINE_TYPES = new Set<DeadlineType>([
+  "NATIONAL_PENSION_ENROLLMENT",
+  "HEALTH_INSURANCE_ENROLLMENT",
+  "EMPLOYMENT_INSURANCE_ENROLLMENT",
+  "INDUSTRIAL_ACCIDENT_ENROLLMENT",
+]);
+
+const GUARANTEE_INSURANCE_DEADLINE_TYPES = new Set<DeadlineType>([
+  "EXIT_GUARANTEE_INSURANCE",
+  "WAGE_GUARANTEE_INSURANCE",
+]);
 
 const URGENCY_PRIORITY: Record<AlertGroupUrgency, number> = {
   critical: 0,
@@ -86,6 +100,40 @@ function toDeadlineUrgency(status: string): DeadlineUrgency {
   return "overdue";
 }
 
+function toAlertGroupTiming(status: string): AlertGroupTiming {
+  return status === "OVERDUE" || status === "URGENT" ? "immediate" : "scheduled";
+}
+
+function toAlertGroupCategory(deadlineType: DeadlineType): AlertGroupCategory {
+  if (SOCIAL_INSURANCE_DEADLINE_TYPES.has(deadlineType)) return "socialInsurance";
+  if (GUARANTEE_INSURANCE_DEADLINE_TYPES.has(deadlineType)) return "guaranteeInsurance";
+  return "other";
+}
+
+function countImmediateAlertsByTypes(
+  alerts: readonly DashboardRawAlert[],
+  deadlineTypes: ReadonlySet<DeadlineType>,
+): number {
+  return alerts.filter(
+    (alert) =>
+      deadlineTypes.has(alert.deadlineType) && toAlertGroupTiming(alert.status) === "immediate",
+  ).length;
+}
+
+function capLegacySocialInsuranceBreakdown(params: {
+  readonly urgentActions: number;
+  readonly visa: number;
+  readonly insurance: number;
+  readonly guaranteeInsurance: number;
+}): number {
+  const maxInsuranceActions = Math.max(params.urgentActions - params.visa, 0);
+  const socialInsurance = Math.min(params.insurance, maxInsuranceActions);
+  const totalInsuranceActions = socialInsurance + params.guaranteeInsurance;
+
+  if (totalInsuranceActions <= maxInsuranceActions) return socialInsurance;
+  return Math.max(maxInsuranceActions - params.guaranteeInsurance, 0);
+}
+
 function formatDateKorean(isoDate: string): string {
   const parts = isoDate.split("-");
   const month = Number(parts[1]);
@@ -102,32 +150,49 @@ function formatDateKorean(isoDate: string): string {
 function transformAlertGroups(alerts: readonly DashboardRawAlert[]): readonly AlertGroup[] {
   const grouped = new Map<
     string,
-    { alerts: readonly DashboardRawAlert[]; maxUrgency: AlertGroupUrgency }
+    {
+      deadlineType: DeadlineType;
+      timing: AlertGroupTiming;
+      category: AlertGroupCategory;
+      alerts: readonly DashboardRawAlert[];
+      maxUrgency: AlertGroupUrgency;
+    }
   >();
 
   for (const alert of alerts) {
-    const key = alert.deadlineType;
+    const deadlineType = alert.deadlineType;
+    const timing = toAlertGroupTiming(alert.status);
+    const category = toAlertGroupCategory(deadlineType);
+    const key = `${timing}:${deadlineType}`;
     const urgency = toAlertGroupUrgency(alert.dDay);
     const existing = grouped.get(key);
     if (existing) {
       grouped.set(key, {
+        deadlineType,
+        timing,
+        category,
         alerts: [...existing.alerts, alert],
         maxUrgency: higherUrgency(existing.maxUrgency, urgency),
       });
     } else {
-      grouped.set(key, { alerts: [alert], maxUrgency: urgency });
+      grouped.set(key, { deadlineType, timing, category, alerts: [alert], maxUrgency: urgency });
     }
   }
 
-  return [...grouped.entries()]
-    .map(([type, { alerts: groupAlerts, maxUrgency }]) => ({
-      deadlineType: type as DeadlineType,
-      label: ALERT_TITLE_MAP[type as DeadlineType] ?? type,
+  return [...grouped.values()]
+    .map(({ deadlineType, timing, category, alerts: groupAlerts, maxUrgency }) => ({
+      deadlineType,
+      label: ALERT_TITLE_MAP[deadlineType] ?? deadlineType,
       count: groupAlerts.length,
       urgency: maxUrgency,
-      href: `/deadlines?type=${type}`,
+      category,
+      timing,
+      href: `/deadlines?type=${deadlineType}`,
     }))
-    .sort((a, b) => URGENCY_PRIORITY[a.urgency] - URGENCY_PRIORITY[b.urgency]);
+    .sort((a, b) => {
+      if (a.timing !== b.timing) return a.timing === "immediate" ? -1 : 1;
+      return URGENCY_PRIORITY[a.urgency] - URGENCY_PRIORITY[b.urgency];
+    });
 }
 
 function transformTimeline(deadlines: readonly DashboardRawDeadline[]): readonly TimelineItem[] {
@@ -173,6 +238,18 @@ function transformComplianceBreakdown(raw: ComplianceRawBreakdownItem): Complian
 // ─── Main Transform ──────────────────────────────────────────────
 
 export function transformDashboardResponse(raw: DashboardRawResponse): DashboardResponse {
+  const guaranteeInsurance =
+    raw.stats.urgentBreakdown.guaranteeInsurance ??
+    countImmediateAlertsByTypes(raw.alerts, GUARANTEE_INSURANCE_DEADLINE_TYPES);
+  const socialInsurance =
+    raw.stats.urgentBreakdown.socialInsurance ??
+    capLegacySocialInsuranceBreakdown({
+      urgentActions: raw.stats.urgentActions,
+      visa: raw.stats.urgentBreakdown.visa,
+      insurance: raw.stats.urgentBreakdown.insurance,
+      guaranteeInsurance,
+    });
+
   return {
     stats: {
       totalWorkers: raw.stats.totalWorkers,
@@ -185,7 +262,11 @@ export function transformDashboardResponse(raw: DashboardRawResponse): Dashboard
       upcomingDeadlines: raw.stats.upcomingDeadlines,
       deadlineBreakdown: raw.stats.deadlineBreakdown,
       urgentActions: raw.stats.urgentActions,
-      urgentBreakdown: raw.stats.urgentBreakdown,
+      urgentBreakdown: {
+        ...raw.stats.urgentBreakdown,
+        socialInsurance,
+        guaranteeInsurance,
+      },
     },
     alertGroups: transformAlertGroups(raw.alerts),
     visaDistribution: raw.visaDistribution.map(transformVisaDistribution),
