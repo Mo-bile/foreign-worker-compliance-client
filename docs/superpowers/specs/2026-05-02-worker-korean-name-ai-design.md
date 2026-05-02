@@ -146,8 +146,10 @@ The basic information card may also include a `한글 이름` row if `koreanName
 
 Update `components/workers/worker-table.tsx`.
 
-- `NAME` search matches `worker.name` and `worker.koreanName`.
-- `ALL` search also matches `worker.name` and `worker.koreanName`.
+- Add a dedicated search type option: `한글 이름`.
+- `NAME` search matches only `worker.name`.
+- `KOREAN_NAME` search matches only `worker.koreanName`.
+- `ALL` search matches `worker.name` and `worker.koreanName`, plus the existing identifier fields.
 - Phone, registration number, and passport number scoped searches remain unchanged.
 - Existing name sorting continues to use only `worker.name`.
 
@@ -194,7 +196,8 @@ Update `__tests__/components/worker-table.test.tsx`.
 - `name` is rendered as the primary name.
 - `koreanName` renders as secondary text when present.
 - Missing `koreanName` does not duplicate `name`.
-- `NAME` search matches `koreanName`.
+- `NAME` search matches `name`.
+- `KOREAN_NAME` search matches `koreanName`.
 - `ALL` search matches `koreanName`.
 - Name sorting remains based on `name`.
 
@@ -254,6 +257,7 @@ Expected files:
 - Missing `koreanName` preserves the existing name-only display.
 - Missing `koreanName` does not duplicate `name`.
 - Search matches both `name` and `koreanName`.
+- Worker list search type includes a separate `한글 이름` option.
 - Sorting remains based on `name`.
 - AI suggestion failures do not block manual entry or worker save.
 - Unit tests cover schema, form, table, hook, and BFF route behavior.
