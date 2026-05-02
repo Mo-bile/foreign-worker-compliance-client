@@ -276,8 +276,22 @@ export const updateCompanyRequestSchema = refineWorkerCount(companyBaseFields);
 
 export type UpdateCompanyRequest = z.infer<typeof updateCompanyRequestSchema>;
 
+export const suggestWorkerKoreanNameRequestSchema = z.object({
+  name: z.string().min(1, "이름을 입력해주세요"),
+  nationalityCode: z.enum(NATIONALITIES, { error: "국적을 선택해주세요" }),
+});
+
+export type SuggestWorkerKoreanNameRequest = z.infer<
+  typeof suggestWorkerKoreanNameRequestSchema
+>;
+
+export interface SuggestWorkerKoreanNameResponse {
+  readonly koreanName: string;
+}
+
 export const registerWorkerRequestSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
+  koreanName: z.string().optional(),
   dateOfBirth: z
     .string()
     .regex(isoDateRegex, "날짜 형식: YYYY-MM-DD")
@@ -304,6 +318,7 @@ export type RegisterWorkerRequest = z.infer<typeof registerWorkerRequestSchema>;
 export const updateWorkerRequestSchema = z
   .object({
     name: z.string().min(1, "이름을 입력해주세요"),
+    koreanName: z.string().optional().or(z.literal("")),
     dateOfBirth: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
     contactPhone: z.string().optional().or(z.literal("")),
     contactEmail: z.string().email("올바른 이메일 형식이 아닙니다").optional().or(z.literal("")),
@@ -356,6 +371,7 @@ export interface InsuranceEligibilityDto {
 export interface WorkerResponse {
   readonly id: number;
   readonly name: string;
+  readonly koreanName: string | null;
   readonly nationality: Nationality;
   readonly visaType: VisaType;
   readonly visaExpiryDate: string;

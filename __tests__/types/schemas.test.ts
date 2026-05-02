@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   registerWorkerRequestSchema,
+  updateWorkerRequestSchema,
   type Nationality,
   type VisaType,
   NATIONALITIES,
@@ -130,6 +131,71 @@ describe("registerWorkerRequestSchema", () => {
     };
     const result = registerWorkerRequestSchema.safeParse(invalid);
     expect(result.success).toBe(false);
+  });
+
+  it("한글_이름이_있어도_등록_요청이_통과한다", () => {
+    const valid = {
+      name: "Nguyen Van A",
+      koreanName: "응우옌 반 아",
+      dateOfBirth: "1990-05-15",
+      nationality: "VIETNAM" as Nationality,
+      visaType: "E9" as VisaType,
+      visaExpiryDate: "2026-12-31",
+      entryDate: "2024-01-15",
+      contractStartDate: "2024-02-01",
+      companyId: 1,
+    };
+
+    const result = registerWorkerRequestSchema.safeParse(valid);
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.koreanName).toBe("응우옌 반 아");
+    }
+  });
+});
+
+describe("updateWorkerRequestSchema", () => {
+  it("한글_이름이_있어도_수정_요청이_통과한다", () => {
+    const valid = {
+      name: "Nguyen Van A",
+      koreanName: "응우옌 반 아",
+      dateOfBirth: "1990-05-15",
+      contactPhone: "",
+      contactEmail: "",
+      nationality: "VIETNAM" as Nationality,
+      visaType: "E9" as VisaType,
+      visaExpiryDate: "2026-12-31",
+      contractStartDate: "2024-02-01",
+      contractEndDate: "",
+      jobPosition: "",
+    };
+
+    const result = updateWorkerRequestSchema.safeParse(valid);
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.koreanName).toBe("응우옌 반 아");
+    }
+  });
+
+  it("한글_이름이_없어도_수정_요청이_통과한다", () => {
+    const valid = {
+      name: "Nguyen Van A",
+      dateOfBirth: "1990-05-15",
+      contactPhone: "",
+      contactEmail: "",
+      nationality: "VIETNAM" as Nationality,
+      visaType: "E9" as VisaType,
+      visaExpiryDate: "2026-12-31",
+      contractStartDate: "2024-02-01",
+      contractEndDate: "",
+      jobPosition: "",
+    };
+
+    const result = updateWorkerRequestSchema.safeParse(valid);
+
+    expect(result.success).toBe(true);
   });
 });
 
