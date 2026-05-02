@@ -42,12 +42,21 @@ const getWorkers: Parameters<typeof http.get>[1] = ({ request }) => {
 };
 
 const postWorker: Parameters<typeof http.post>[1] = async ({ request }) => {
-  const body = await request.json();
+  const body = (await request.json()) as Record<string, unknown>;
   return HttpResponse.json({
     ...mockWorkers[0],
     id: 3,
-    name: (body as Record<string, unknown>).name as string,
+    name: body.name as string,
+    koreanName: typeof body.koreanName === "string" ? body.koreanName : null,
   });
+};
+
+const postWorkerKoreanNameSuggest: Parameters<typeof http.post>[1] = async ({ request }) => {
+  const body = (await request.json()) as { name?: string; nationalityCode?: string };
+  if (!body.name || !body.nationalityCode) {
+    return HttpResponse.json({ message: "이름과 국적을 입력해주세요" }, { status: 400 });
+  }
+  return HttpResponse.json({ koreanName: "응우옌 반 안" }, { status: 202 });
 };
 
 const putWorker: Parameters<typeof http.put>[1] = ({ params }) => {
@@ -213,10 +222,12 @@ export const handlers = [
   http.get(`${BACKEND}/api/workers/:id`, getWorkerById),
   http.get(`${BACKEND}/api/workers`, getWorkers),
   http.post(`${BACKEND}/api/workers`, postWorker),
+  http.post(`${BACKEND}/api/workers/korean-name/suggest`, postWorkerKoreanNameSuggest),
   http.put(`${BACKEND}/api/workers/:id`, putWorker),
   http.get("*/api/workers/:id", getWorkerById),
   http.get("*/api/workers", getWorkers),
   http.post("*/api/workers", postWorker),
+  http.post("*/api/workers/korean-name/suggest", postWorkerKoreanNameSuggest),
   http.put("*/api/workers/:id", putWorker),
 
   // Companies

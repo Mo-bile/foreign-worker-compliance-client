@@ -5,6 +5,8 @@ import type {
   WorkerResponse,
   RegisterWorkerRequest,
   UpdateWorkerRequest,
+  SuggestWorkerKoreanNameRequest,
+  SuggestWorkerKoreanNameResponse,
   VisaType,
   WorkerStatus,
   InsuranceStatus,
@@ -63,6 +65,18 @@ export function useUpdateWorker(workerId: number) {
   });
 }
 
+export function useSuggestWorkerKoreanName() {
+  return useMutation<SuggestWorkerKoreanNameResponse, Error, SuggestWorkerKoreanNameRequest>({
+    mutationFn: (data) =>
+      mutateApi<SuggestWorkerKoreanNameResponse>(
+        "/api/workers/korean-name/suggest",
+        "POST",
+        data,
+        "한글 이름 추천에 실패했습니다",
+      ),
+  });
+}
+
 export interface WorkerFilterParams {
   readonly page: number;
   readonly search: string;
@@ -97,8 +111,10 @@ function filterWorkers(
   return workers.filter((worker) => {
     if (params.search.trim() !== "") {
       const searchLower = params.search.toLowerCase();
+      const koreanName = worker.koreanName?.toLowerCase() ?? "";
       const matchesSearch =
         worker.name.toLowerCase().includes(searchLower) ||
+        koreanName.includes(searchLower) ||
         worker.nationality.toLowerCase().includes(searchLower);
       if (!matchesSearch) return false;
     }

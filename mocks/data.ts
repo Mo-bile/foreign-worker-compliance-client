@@ -99,6 +99,7 @@ function generateWorker(id: number): WorkerResponse {
   return {
     id,
     name: `Worker-${id}`,
+    koreanName: id % 5 === 0 ? `워커 ${id}` : null,
     nationality,
     visaType,
     visaExpiryDate: `2027-${String((id % 12) + 1).padStart(2, "0")}-15`,
@@ -151,6 +152,7 @@ export const mockWorkers: readonly WorkerResponse[] = [
   {
     id: 1,
     name: "Nguyen Van A",
+    koreanName: "응우옌 반 아",
     nationality: "VIETNAM",
     visaType: "E9",
     visaExpiryDate: "2026-12-31",
@@ -196,6 +198,7 @@ export const mockWorkers: readonly WorkerResponse[] = [
   {
     id: 2,
     name: "Zhang Wei",
+    koreanName: null,
     nationality: "CHINA",
     visaType: "H2",
     visaExpiryDate: "2027-06-15",
