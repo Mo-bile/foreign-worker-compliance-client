@@ -55,6 +55,13 @@ export interface WorkerFormEditProps {
 
 type WorkerFormProps = WorkerFormCreateProps | WorkerFormEditProps;
 type WorkerFormValues = RegisterWorkerRequest & UpdateWorkerRequest;
+const KOREAN_NAME_HELP_ID = "koreanNameHelp";
+const KOREAN_NAME_MESSAGE_ID = "koreanNameMessage";
+const KOREAN_NAME_DESCRIBED_BY = `${KOREAN_NAME_HELP_ID} ${KOREAN_NAME_MESSAGE_ID}`;
+
+function getTrimmedValue(value: string | undefined): string {
+  return value?.trim() ?? "";
+}
 
 export function WorkerForm(props: WorkerFormProps) {
   const router = useRouter();
@@ -128,9 +135,10 @@ export function WorkerForm(props: WorkerFormProps) {
         },
   });
 
-  const handleSuggestKoreanName = () => {
-    const name = getValues("name")?.trim();
+  const handleSuggestKoreanName = async () => {
+    const name = getTrimmedValue(getValues("name"));
     const nationality = getValues("nationality");
+    const koreanName = getTrimmedValue(getValues("koreanName"));
 
     if (!name) {
       setKoreanNameMessage("이름을 입력한 뒤 AI로 생성해 주세요.");
@@ -145,26 +153,38 @@ export function WorkerForm(props: WorkerFormProps) {
     }
 
     setKoreanNameMessage(null);
-    suggestKoreanNameMutation.mutate(
-      { name, nationalityCode: nationality },
-      {
-        onSuccess: (result) => {
-          const koreanName = result.koreanName.trim();
-          if (!koreanName) {
-            setKoreanNameMessage("추천 결과가 비어 있습니다. 직접 입력해 주세요.");
-            toast.error("추천 결과가 비어 있습니다. 직접 입력해 주세요.");
-            return;
-          }
-          setValue("koreanName", koreanName, { shouldDirty: true });
-          setKoreanNameMessage("AI 추천값을 입력했습니다. 확인 후 저장해 주세요.");
-          toast.success("한글 이름 추천값을 입력했습니다. 확인 후 저장해 주세요.");
-        },
-        onError: (error) => {
-          setKoreanNameMessage(error.message || "한글 이름 추천에 실패했습니다");
-          toast.error(error.message || "한글 이름 추천에 실패했습니다");
-        },
-      },
-    );
+    try {
+      const result = await suggestKoreanNameMutation.mutateAsync({
+        name,
+        nationalityCode: nationality,
+      });
+      const staleResultMessage =
+        "입력값이 변경되어 추천 결과를 적용하지 않았습니다. 다시 생성해 주세요.";
+      const hasFormChanged =
+        getTrimmedValue(getValues("name")) !== name ||
+        getValues("nationality") !== nationality ||
+        getTrimmedValue(getValues("koreanName")) !== koreanName;
+
+      if (hasFormChanged) {
+        setKoreanNameMessage(staleResultMessage);
+        toast.error(staleResultMessage);
+        return;
+      }
+
+      const suggestedKoreanName = result.koreanName.trim();
+      if (!suggestedKoreanName) {
+        setKoreanNameMessage("추천 결과가 비어 있습니다. 직접 입력해 주세요.");
+        toast.error("추천 결과가 비어 있습니다. 직접 입력해 주세요.");
+        return;
+      }
+      setValue("koreanName", suggestedKoreanName, { shouldDirty: true });
+      setKoreanNameMessage("AI 추천값을 입력했습니다. 확인 후 저장해 주세요.");
+      toast.success("한글 이름 추천값을 입력했습니다. 확인 후 저장해 주세요.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "한글 이름 추천에 실패했습니다";
+      setKoreanNameMessage(message || "한글 이름 추천에 실패했습니다");
+      toast.error(message || "한글 이름 추천에 실패했습니다");
+    }
   };
 
   const onSubmit = (data: WorkerFormValues) => {
@@ -234,6 +254,7 @@ export function WorkerForm(props: WorkerFormProps) {
                 onClick={handleSuggestKoreanName}
                 disabled={suggestKoreanNameMutation.isPending}
                 aria-label="이름의 한글 발음 표기 AI로 생성"
+                aria-describedby={KOREAN_NAME_DESCRIBED_BY}
               >
                 <Sparkles />
                 {suggestKoreanNameMutation.isPending ? "생성 중..." : "AI로 생성"}
@@ -243,14 +264,22 @@ export function WorkerForm(props: WorkerFormProps) {
               id="koreanName"
               {...register("koreanName")}
               aria-invalid={!!errors.koreanName}
+              aria-describedby={KOREAN_NAME_DESCRIBED_BY}
               placeholder="응우옌 반 안"
             />
-            <p className="text-xs text-muted-foreground">
+            <p id={KOREAN_NAME_HELP_ID} className="text-xs text-muted-foreground">
               이름의 한글 발음 표기를 입력하세요. AI 추천 결과는 실제 발음과 다를 수 있으니 확인 후
               저장하세요.
             </p>
             {koreanNameMessage && (
-              <p className="text-xs text-muted-foreground">{koreanNameMessage}</p>
+              <p
+                id={KOREAN_NAME_MESSAGE_ID}
+                className="text-xs text-muted-foreground"
+                role="status"
+                aria-live="polite"
+              >
+                {koreanNameMessage}
+              </p>
             )}
             {errors.koreanName && (
               <p className="text-sm text-destructive">{errors.koreanName.message}</p>
