@@ -8,10 +8,10 @@
 
 ## References
 
-- Planning brief: `/Users/mojaeyeong/Documents/ownProject/foreign-worker-compliance-project-management/prompts/2026-05-02-worker-korean-name-ai-brief.md`
-- Integrated SPEC: `/Users/mojaeyeong/Documents/ownProject/foreign-worker-compliance-project-management/SPEC.md`
-- Frontend SPEC: `/Users/mojaeyeong/Documents/ownProject/foreign-worker-compliance-project-management/SPEC-frontend.md`
-- Decision log D20: `/Users/mojaeyeong/Documents/ownProject/foreign-worker-compliance-project-management/checklist.md`
+- Planning brief: project-management prompt `2026-05-02-worker-korean-name-ai-brief.md`
+- Integrated SPEC: project-management `SPEC.md`
+- Frontend SPEC: project-management `SPEC-frontend.md`
+- Decision log D20: project-management `checklist.md`
 - Reference article: `https://www.khan.co.kr/article/202604170600041`
 
 ## Product Rules

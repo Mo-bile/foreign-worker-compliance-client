@@ -277,7 +277,7 @@ export const updateCompanyRequestSchema = refineWorkerCount(companyBaseFields);
 export type UpdateCompanyRequest = z.infer<typeof updateCompanyRequestSchema>;
 
 export const suggestWorkerKoreanNameRequestSchema = z.object({
-  name: z.string().min(1, "이름을 입력해주세요"),
+  name: z.string().trim().min(1, "이름을 입력해주세요"),
   nationalityCode: z.enum(NATIONALITIES, { error: "국적을 선택해주세요" }),
 });
 

@@ -44,6 +44,22 @@ describe("POST /api/workers/korean-name/suggest", () => {
     await expect(response.json()).resolves.toMatchObject({ message: "이름을 입력해주세요" });
   });
 
+  it("name이_공백뿐이면_BE를_호출하지_않고_400을_반환한다", async () => {
+    let requestCount = 0;
+    server.use(
+      http.post(`${BACKEND}/api/workers/korean-name/suggest`, () => {
+        requestCount += 1;
+        return HttpResponse.json({ koreanName: "응우옌 반 안" }, { status: 202 });
+      }),
+    );
+
+    const response = await POST(makeRequest({ name: "   ", nationalityCode: "VIETNAM" }));
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({ message: "이름을 입력해주세요" });
+    expect(requestCount).toBe(0);
+  });
+
   it("nationalityCode가_없으면_400을_반환한다", async () => {
     const response = await POST(makeRequest({ name: "NGUYEN VAN AN" }));
 

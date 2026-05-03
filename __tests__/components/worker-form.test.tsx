@@ -118,12 +118,8 @@ describe("WorkerForm", () => {
     expect(koreanNameInput).toBeDefined();
     expect(suggestButton).toBeDefined();
     expect(helperText).toHaveAttribute("id", "koreanNameHelp");
-    expect(inputDescriptions).toEqual(
-      expect.arrayContaining(["koreanNameHelp", "koreanNameMessage"]),
-    );
-    expect(buttonDescriptions).toEqual(
-      expect.arrayContaining(["koreanNameHelp", "koreanNameMessage"]),
-    );
+    expect(inputDescriptions).toEqual(["koreanNameHelp"]);
+    expect(buttonDescriptions).toEqual(["koreanNameHelp"]);
   });
 
   it("이름이_없으면_AI_추천_API를_호출하지_않는다", async () => {
@@ -137,6 +133,14 @@ describe("WorkerForm", () => {
     expect(message).toHaveTextContent("이름을 입력한 뒤 AI로 생성해 주세요.");
     expect(message).toHaveAttribute("id", "koreanNameMessage");
     expect(message).toHaveAttribute("aria-live", "polite");
+    expect(screen.getByLabelText("한글 이름 (선택)")).toHaveAttribute(
+      "aria-describedby",
+      expect.stringContaining("koreanNameMessage"),
+    );
+    expect(screen.getByRole("button", { name: /AI로 생성/ })).toHaveAttribute(
+      "aria-describedby",
+      expect.stringContaining("koreanNameMessage"),
+    );
     expect(getSuggestionRequestCount()).toBe(0);
   });
 

@@ -78,6 +78,9 @@ export function WorkerForm(props: WorkerFormProps) {
     isError: companiesError,
   } = useCompanies();
   const { data: metadata } = useMetadata();
+  const koreanNameDescribedBy = koreanNameMessage
+    ? KOREAN_NAME_DESCRIBED_BY
+    : KOREAN_NAME_HELP_ID;
 
   const nationalityOptions = metadata
     ? metadata.nationalities.map((n) => ({ value: n.code, label: n.koreanName }))
@@ -254,7 +257,7 @@ export function WorkerForm(props: WorkerFormProps) {
                 onClick={handleSuggestKoreanName}
                 disabled={suggestKoreanNameMutation.isPending}
                 aria-label="이름의 한글 발음 표기 AI로 생성"
-                aria-describedby={KOREAN_NAME_DESCRIBED_BY}
+                aria-describedby={koreanNameDescribedBy}
               >
                 <Sparkles />
                 {suggestKoreanNameMutation.isPending ? "생성 중..." : "AI로 생성"}
@@ -264,7 +267,7 @@ export function WorkerForm(props: WorkerFormProps) {
               id="koreanName"
               {...register("koreanName")}
               aria-invalid={!!errors.koreanName}
-              aria-describedby={KOREAN_NAME_DESCRIBED_BY}
+              aria-describedby={koreanNameDescribedBy}
               placeholder="응우옌 반 안"
             />
             <p id={KOREAN_NAME_HELP_ID} className="text-xs text-muted-foreground">
