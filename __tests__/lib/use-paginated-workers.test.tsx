@@ -80,6 +80,28 @@ describe("usePaginatedWorkers", () => {
     expect(result.current.workers!.items.every((w) => w.nationality === "VIETNAM")).toBe(true);
   });
 
+  it("한글_이름으로_검색_필터가_적용된다", async () => {
+    const { result } = renderHook(
+      () =>
+        usePaginatedWorkers(1, {
+          page: 1,
+          search: "응우옌",
+          visaType: "ALL",
+          status: "ALL",
+          insuranceStatus: "ALL",
+        }),
+      { wrapper: createWrapper() },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.workers).toBeDefined();
+    expect(result.current.workers!.items.length).toBeGreaterThan(0);
+    expect(
+      result.current.workers!.items.every((w) => w.koreanName?.includes("응우옌")),
+    ).toBe(true);
+  });
+
   it("비자_유형_필터가_적용된다", async () => {
     const { result } = renderHook(
       () =>

@@ -3,10 +3,22 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { WorkerTable } from "@/components/workers/worker-table";
 import { mockWorkers } from "@/mocks/data";
+import type { WorkerResponse } from "@/types/api";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
+
+const makeWorker = (overrides: Partial<WorkerResponse> = {}): WorkerResponse => ({
+  ...mockWorkers[0],
+  id: 1000,
+  name: "Test Worker",
+  koreanName: null,
+  contactPhone: null,
+  passportNumber: null,
+  registrationNumber: null,
+  ...overrides,
+});
 
 describe("WorkerTable", () => {
   it("로딩_중에_스켈레톤을_표시한다", () => {
@@ -25,6 +37,41 @@ describe("WorkerTable", () => {
     expect(screen.getByText("010-1234-5678")).toBeDefined();
   });
 
+  it("한글_이름이_있으면_이름_셀에_보조_텍스트로_표시한다", () => {
+    render(
+      <WorkerTable
+        workers={[makeWorker({ name: "Nguyen Van A", koreanName: "응우옌 반 아" })]}
+        isLoading={false}
+      />,
+    );
+
+    const nameCell = screen.getByText("Nguyen Van A").closest("td");
+
+    expect(nameCell).not.toBeNull();
+    expect(within(nameCell as HTMLElement).getByText("응우옌 반 아")).toBeDefined();
+    expect(nameCell?.textContent?.indexOf("Nguyen Van A")).toBeLessThan(
+      nameCell?.textContent?.indexOf("응우옌 반 아") ?? -1,
+    );
+  });
+
+  it("한글_이름이_없거나_공백이면_이름을_중복_표시하지_않는다", () => {
+    render(
+      <WorkerTable
+        workers={[
+          makeWorker({ id: 2001, name: "Zhang Wei", koreanName: null }),
+          makeWorker({ id: 2002, name: "Blank Korean Name", koreanName: "   " }),
+        ]}
+        isLoading={false}
+      />,
+    );
+
+    const zhangNameCell = screen.getByText("Zhang Wei").closest("td");
+    const blankNameCell = screen.getByText("Blank Korean Name").closest("td");
+
+    expect(zhangNameCell?.textContent).toBe("Zhang Wei");
+    expect(blankNameCell?.textContent).toBe("Blank Korean Name");
+  });
+
   it("기본_정렬은_상태_오름차순이다_재직중이_먼저_나온다", () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     const rows = screen.getAllByRole("row");
@@ -37,6 +84,24 @@ describe("WorkerTable", () => {
     expect(statusHeader).toBeDefined();
     await userEvent.click(statusHeader);
     expect(screen.getByRole("columnheader", { name: "상태 ↓" })).toBeDefined();
+  });
+
+  it("이름_정렬은_한글_이름이_아닌_name_기준을_유지한다", async () => {
+    render(
+      <WorkerTable
+        workers={[
+          makeWorker({ id: 5001, name: "Bravo Worker", koreanName: "가가" }),
+          makeWorker({ id: 5002, name: "Alpha Worker", koreanName: "하하" }),
+        ]}
+        isLoading={false}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("columnheader", { name: "이름" }));
+
+    const rows = screen.getAllByRole("row");
+    expect(within(rows[1]).getByText("Alpha Worker")).toBeDefined();
+    expect(within(rows[2]).getByText("Bravo Worker")).toBeDefined();
   });
 
   it("다음_페이지로_이동하면_나머지_5건을_표시한다", async () => {
@@ -102,6 +167,15 @@ describe("WorkerTable", () => {
     expect(screen.getByText("조건에 맞는 근로자가 없습니다")).toBeDefined();
   });
 
+  it("전체_검색은_한글_이름을_검색한다", async () => {
+    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+
+    await userEvent.type(screen.getByRole("textbox"), "응우옌");
+
+    expect(screen.getByText("Nguyen Van A")).toBeDefined();
+    expect(screen.queryByText("Zhang Wei")).toBeNull();
+  });
+
   it.each([
     ["이름", "Nguyen", "Nguyen Van A"],
     ["전화번호", "01012345678", "Nguyen Van A"],
@@ -140,5 +214,44 @@ describe("WorkerTable", () => {
 
     expect(screen.getByText("Nguyen Van A")).toBeDefined();
     expect(screen.queryByText("Zhang Wei")).toBeNull();
+  });
+
+  it("검색_대상을_한글_이름으로_선택하면_한글_이름으로만_검색한다", async () => {
+    render(
+      <WorkerTable
+        workers={[
+          makeWorker({ id: 3001, name: "Alpha One", koreanName: "김알파" }),
+          makeWorker({ id: 3002, name: "김알파 Candidate", koreanName: null }),
+        ]}
+        isLoading={false}
+      />,
+    );
+    const searchTypeTrigger = screen.getByRole("combobox", { name: "전체 검색" });
+    await userEvent.click(searchTypeTrigger);
+    const koreanNameOption = await screen.findByRole("option", { name: "한글 이름" });
+    await userEvent.click(koreanNameOption);
+
+    await userEvent.type(screen.getByRole("textbox"), "김알파");
+
+    expect(screen.getByText("Alpha One")).toBeDefined();
+    expect(screen.getByText(/총 1건 중 1-1/)).toBeDefined();
+    expect(screen.queryByText("김알파 Candidate")).toBeNull();
+  });
+
+  it("검색_대상을_이름으로_선택하면_한글_이름은_검색하지_않는다", async () => {
+    render(
+      <WorkerTable
+        workers={[makeWorker({ id: 4001, name: "Alpha One", koreanName: "김알파" })]}
+        isLoading={false}
+      />,
+    );
+    const searchTypeTrigger = screen.getByRole("combobox", { name: "전체 검색" });
+    await userEvent.click(searchTypeTrigger);
+    const nameOption = await screen.findByRole("option", { name: "이름" });
+    await userEvent.click(nameOption);
+
+    await userEvent.type(screen.getByRole("textbox"), "김알파");
+
+    expect(screen.getByText("조건에 맞는 근로자가 없습니다")).toBeDefined();
   });
 });

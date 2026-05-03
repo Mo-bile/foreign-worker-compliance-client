@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import type { Resolver } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 
 import {
   registerWorkerRequestSchema,
@@ -16,13 +18,18 @@ import {
   VISA_TYPE_SHORT,
 } from "@/types/api";
 import type { RegisterWorkerRequest, UpdateWorkerRequest, WorkerResponse } from "@/types/api";
-import { useRegisterWorker, useUpdateWorker } from "@/lib/queries/use-workers";
+import {
+  useRegisterWorker,
+  useSuggestWorkerKoreanName,
+  useUpdateWorker,
+} from "@/lib/queries/use-workers";
 import { useCompanies } from "@/lib/queries/use-companies";
 import { useMetadata } from "@/lib/queries/use-metadata";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField } from "@/components/form/form-field";
@@ -48,6 +55,13 @@ export interface WorkerFormEditProps {
 
 type WorkerFormProps = WorkerFormCreateProps | WorkerFormEditProps;
 type WorkerFormValues = RegisterWorkerRequest & UpdateWorkerRequest;
+const KOREAN_NAME_HELP_ID = "koreanNameHelp";
+const KOREAN_NAME_MESSAGE_ID = "koreanNameMessage";
+const KOREAN_NAME_DESCRIBED_BY = `${KOREAN_NAME_HELP_ID} ${KOREAN_NAME_MESSAGE_ID}`;
+
+function getTrimmedValue(value: string | undefined): string {
+  return value?.trim() ?? "";
+}
 
 export function WorkerForm(props: WorkerFormProps) {
   const router = useRouter();
@@ -55,6 +69,8 @@ export function WorkerForm(props: WorkerFormProps) {
   const editWorkerId = isEdit ? props.workerId : 0;
   const registerMutation = useRegisterWorker();
   const updateMutation = useUpdateWorker(editWorkerId);
+  const suggestKoreanNameMutation = useSuggestWorkerKoreanName();
+  const [koreanNameMessage, setKoreanNameMessage] = useState<string | null>(null);
   const isPending = isEdit ? updateMutation.isPending : registerMutation.isPending;
   const {
     data: companies = [],
@@ -62,6 +78,9 @@ export function WorkerForm(props: WorkerFormProps) {
     isError: companiesError,
   } = useCompanies();
   const { data: metadata } = useMetadata();
+  const koreanNameDescribedBy = koreanNameMessage
+    ? KOREAN_NAME_DESCRIBED_BY
+    : KOREAN_NAME_HELP_ID;
 
   const nationalityOptions = metadata
     ? metadata.nationalities.map((n) => ({ value: n.code, label: n.koreanName }))
@@ -82,12 +101,15 @@ export function WorkerForm(props: WorkerFormProps) {
     register,
     handleSubmit,
     control,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm<WorkerFormValues>({
     resolver,
     defaultValues: isEdit
       ? {
           name: props.worker.name,
+          koreanName: props.worker.koreanName ?? "",
           dateOfBirth: props.worker.dateOfBirth,
           nationality: props.worker.nationality,
           visaType: props.worker.visaType,
@@ -100,6 +122,7 @@ export function WorkerForm(props: WorkerFormProps) {
         }
       : {
           name: "",
+          koreanName: "",
           dateOfBirth: "",
           passportNumber: "",
           nationality: undefined,
@@ -115,10 +138,63 @@ export function WorkerForm(props: WorkerFormProps) {
         },
   });
 
+  const handleSuggestKoreanName = async () => {
+    const name = getTrimmedValue(getValues("name"));
+    const nationality = getValues("nationality");
+    const koreanName = getTrimmedValue(getValues("koreanName"));
+
+    if (!name) {
+      setKoreanNameMessage("이름을 입력한 뒤 AI로 생성해 주세요.");
+      toast.error("이름을 입력한 뒤 AI로 생성해 주세요.");
+      return;
+    }
+
+    if (!nationality) {
+      setKoreanNameMessage("국적을 선택한 뒤 AI로 생성해 주세요.");
+      toast.error("국적을 선택한 뒤 AI로 생성해 주세요.");
+      return;
+    }
+
+    setKoreanNameMessage(null);
+    try {
+      const result = await suggestKoreanNameMutation.mutateAsync({
+        name,
+        nationalityCode: nationality,
+      });
+      const staleResultMessage =
+        "입력값이 변경되어 추천 결과를 적용하지 않았습니다. 다시 생성해 주세요.";
+      const hasFormChanged =
+        getTrimmedValue(getValues("name")) !== name ||
+        getValues("nationality") !== nationality ||
+        getTrimmedValue(getValues("koreanName")) !== koreanName;
+
+      if (hasFormChanged) {
+        setKoreanNameMessage(staleResultMessage);
+        toast.error(staleResultMessage);
+        return;
+      }
+
+      const suggestedKoreanName = result.koreanName.trim();
+      if (!suggestedKoreanName) {
+        setKoreanNameMessage("추천 결과가 비어 있습니다. 직접 입력해 주세요.");
+        toast.error("추천 결과가 비어 있습니다. 직접 입력해 주세요.");
+        return;
+      }
+      setValue("koreanName", suggestedKoreanName, { shouldDirty: true });
+      setKoreanNameMessage("AI 추천값을 입력했습니다. 확인 후 저장해 주세요.");
+      toast.success("한글 이름 추천값을 입력했습니다. 확인 후 저장해 주세요.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "한글 이름 추천에 실패했습니다";
+      setKoreanNameMessage(message || "한글 이름 추천에 실패했습니다");
+      toast.error(message || "한글 이름 추천에 실패했습니다");
+    }
+  };
+
   const onSubmit = (data: WorkerFormValues) => {
     if (isEdit) {
       const updateData: UpdateWorkerRequest = {
         name: data.name,
+        koreanName: getTrimmedValue(data.koreanName),
         dateOfBirth: data.dateOfBirth,
         contactPhone: data.contactPhone,
         contactEmail: data.contactEmail,
@@ -141,6 +217,7 @@ export function WorkerForm(props: WorkerFormProps) {
 
     const sanitized = {
       ...data,
+      koreanName: data.koreanName?.trim() || undefined,
       contractEndDate: data.contractEndDate || undefined,
       contactEmail: data.contactEmail || undefined,
       passportNumber: data.passportNumber || undefined,
@@ -162,7 +239,6 @@ export function WorkerForm(props: WorkerFormProps) {
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="grid grid-cols-1 gap-4 pb-6 md:grid-cols-2">
-          {/* 이름 */}
           <FormField<WorkerFormValues>
             label="이름"
             name="name"
@@ -170,6 +246,49 @@ export function WorkerForm(props: WorkerFormProps) {
             errors={errors}
             placeholder="홍길동"
           />
+
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="koreanName">한글 이름 (선택)</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleSuggestKoreanName}
+                disabled={suggestKoreanNameMutation.isPending}
+                aria-label="이름의 한글 발음 표기 AI로 생성"
+                aria-describedby={koreanNameDescribedBy}
+              >
+                <Sparkles />
+                {suggestKoreanNameMutation.isPending ? "생성 중..." : "AI로 생성"}
+              </Button>
+            </div>
+            <Input
+              id="koreanName"
+              {...register("koreanName")}
+              aria-invalid={!!errors.koreanName}
+              aria-describedby={koreanNameDescribedBy}
+              placeholder="응우옌 반 안"
+            />
+            <p id={KOREAN_NAME_HELP_ID} className="text-xs text-muted-foreground">
+              이름의 한글 발음 표기를 입력하세요. AI 추천 결과는 실제 발음과 다를 수 있으니 확인 후
+              저장하세요.
+            </p>
+            {koreanNameMessage && (
+              <p
+                id={KOREAN_NAME_MESSAGE_ID}
+                className="text-xs text-muted-foreground"
+                role="status"
+                aria-live="polite"
+              >
+                {koreanNameMessage}
+              </p>
+            )}
+            {errors.koreanName && (
+              <p className="text-sm text-destructive">{errors.koreanName.message}</p>
+            )}
+          </div>
+
           <FormField<WorkerFormValues>
             label="생년월일"
             name="dateOfBirth"

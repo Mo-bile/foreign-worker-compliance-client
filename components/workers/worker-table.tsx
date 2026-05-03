@@ -54,12 +54,19 @@ interface WorkerTableProps {
   readonly isLoading: boolean;
 }
 
-const SEARCH_TYPES = ["NAME", "PHONE", "REGISTRATION_NUMBER", "PASSPORT_NUMBER"] as const;
+const SEARCH_TYPES = [
+  "NAME",
+  "KOREAN_NAME",
+  "PHONE",
+  "REGISTRATION_NUMBER",
+  "PASSPORT_NUMBER",
+] as const;
 type SearchType = (typeof SEARCH_TYPES)[number];
 type SearchTypeFilter = SearchType | "ALL";
 
 const SEARCH_TYPE_LABELS: Record<SearchType, string> = {
   NAME: "이름",
+  KOREAN_NAME: "한글 이름",
   PHONE: "전화번호",
   REGISTRATION_NUMBER: "외국인등록번호",
   PASSPORT_NUMBER: "여권번호",
@@ -86,6 +93,7 @@ const matchesWorkerSearch = (
 
   const identifierSearch = normalizeIdentifierSearch(search);
   const matchesName = worker.name.toLowerCase().includes(textSearch);
+  const matchesKoreanName = normalizeTextSearch(worker.koreanName ?? "").includes(textSearch);
   const matchesPhone =
     identifierSearch !== "" && matchesIdentifierSearch(worker.contactPhone, identifierSearch);
   const matchesRegistrationNumber =
@@ -97,6 +105,8 @@ const matchesWorkerSearch = (
   switch (searchType) {
     case "NAME":
       return matchesName;
+    case "KOREAN_NAME":
+      return matchesKoreanName;
     case "PHONE":
       return matchesPhone;
     case "REGISTRATION_NUMBER":
@@ -104,7 +114,13 @@ const matchesWorkerSearch = (
     case "PASSPORT_NUMBER":
       return matchesPassportNumber;
     case "ALL":
-      return matchesName || matchesPhone || matchesRegistrationNumber || matchesPassportNumber;
+      return (
+        matchesName ||
+        matchesKoreanName ||
+        matchesPhone ||
+        matchesRegistrationNumber ||
+        matchesPassportNumber
+      );
   }
 };
 
@@ -312,6 +328,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                 const nationalityLabel =
                   NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
                 const statusClass = WORKER_STATUS_COLORS[worker.status];
+                const koreanName = worker.koreanName?.trim() ?? "";
 
                 return (
                   <TableRow
@@ -319,7 +336,16 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     className="cursor-pointer"
                     onClick={() => router.push(`/workers/${worker.id}`)}
                   >
-                    <TableCell className="font-medium">{worker.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="space-y-0.5">
+                        <div>{worker.name}</div>
+                        {koreanName ? (
+                          <div className="text-xs font-normal text-muted-foreground">
+                            {koreanName}
+                          </div>
+                        ) : null}
+                      </div>
+                    </TableCell>
                     <TableCell>{worker.contactPhone ?? "—"}</TableCell>
                     <TableCell>{nationalityLabel}</TableCell>
                     <TableCell>
