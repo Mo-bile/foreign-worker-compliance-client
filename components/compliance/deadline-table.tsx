@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -46,6 +47,18 @@ interface DeadlineTableProps {
 
 function getWorkerLabel(item: DeadlineWithWorkerName): string {
   return item.workerName?.trim() || `근로자 ${item.workerId}`;
+}
+
+function WorkerDetailLink({ workerId }: { readonly workerId: number }) {
+  return (
+    <Link
+      href={`/workers/${workerId}`}
+      className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+    >
+      상세 보기
+      <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+    </Link>
+  );
 }
 
 function groupByWorker(
@@ -240,7 +253,14 @@ export function DeadlineTable({
         ) : (
           <>
             {isSingleWorker ? (
-              renderTable(items, { onComplete, isCompleting, showWorkerId: true })
+              <>
+                {groups[0] && (
+                  <div className="mb-3 flex justify-end">
+                    <WorkerDetailLink workerId={groups[0].workerId} />
+                  </div>
+                )}
+                {renderTable(items, { onComplete, isCompleting, showWorkerId: true })}
+              </>
             ) : (
               <div className="space-y-3">
                 {groups.map((group) => {
@@ -249,35 +269,38 @@ export function DeadlineTable({
 
                   return (
                     <section key={group.workerId} className="overflow-hidden rounded-lg border">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="flex h-auto w-full items-center justify-between rounded-none px-4 py-3 text-left"
-                        aria-expanded={isExpanded}
-                        aria-controls={contentId}
-                        onClick={() => {
-                          setExpandedWorkers((current) => {
-                            const next = new Set(current);
+                      <div className="flex items-center gap-3 px-4 py-3">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="flex h-auto min-w-0 flex-1 items-center justify-between rounded-none px-0 py-0 text-left hover:bg-transparent aria-expanded:bg-transparent"
+                          aria-expanded={isExpanded}
+                          aria-controls={contentId}
+                          onClick={() => {
+                            setExpandedWorkers((current) => {
+                              const next = new Set(current);
 
-                            if (next.has(group.workerId)) {
-                              next.delete(group.workerId);
-                            } else {
-                              next.add(group.workerId);
-                            }
+                              if (next.has(group.workerId)) {
+                                next.delete(group.workerId);
+                              } else {
+                                next.add(group.workerId);
+                              }
 
-                            return next;
-                          });
-                        }}
-                      >
-                        <span className="font-medium">
-                          {group.workerLabel} — {groupStatusLabel} {group.deadlines.length}건
-                        </span>
-                        {isExpanded ? (
-                          <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-                        )}
-                      </Button>
+                              return next;
+                            });
+                          }}
+                        >
+                          <span className="min-w-0 truncate font-medium">
+                            {group.workerLabel} — {groupStatusLabel} {group.deadlines.length}건
+                          </span>
+                          {isExpanded ? (
+                            <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                          )}
+                        </Button>
+                        <WorkerDetailLink workerId={group.workerId} />
+                      </div>
                       {isExpanded && (
                         <div id={contentId} className="border-t px-4 py-3">
                           {renderTable(group.deadlines, {

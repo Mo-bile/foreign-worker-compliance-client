@@ -12,7 +12,7 @@ function createDeadline(overrides: Partial<DeadlineWithWorkerName> = {}): Deadli
   return {
     id: overrides.id ?? 1,
     workerId: overrides.workerId ?? 1,
-    workerName: overrides.workerName,
+    workerName: overrides.workerName ?? `근로자 ${overrides.workerId ?? 1}`,
     deadlineType: overrides.deadlineType ?? "VISA_EXPIRY",
     dueDate: overrides.dueDate ?? "2026-01-15",
     status: overrides.status ?? "OVERDUE",
@@ -384,6 +384,42 @@ describe("DeadlineTable", () => {
       );
 
       expect(screen.getByRole("button", { name: /Worker-A — 기한초과 1건/ })).toBeDefined();
+    });
+
+    it("근로자_그룹마다_상세보기_텍스트_링크를_표시한다", () => {
+      const multiWorkerDeadlines: DeadlineWithWorkerName[] = [
+        createDeadline({
+          id: 1,
+          workerId: 7,
+          workerName: "Worker-A",
+          dueDate: "2026-01-01",
+          status: "OVERDUE",
+          description: "Worker-A overdue",
+        }),
+        createDeadline({
+          id: 2,
+          workerId: 12,
+          workerName: "Worker-B",
+          dueDate: "2026-01-02",
+          status: "OVERDUE",
+          description: "Worker-B overdue",
+        }),
+      ];
+
+      render(
+        <DeadlineTable
+          title="기한초과 항목"
+          deadlines={multiWorkerDeadlines}
+          isLoading={false}
+          variant="overdue"
+        />,
+      );
+
+      const detailLinks = screen.getAllByRole("link", { name: "상세 보기" });
+
+      expect(detailLinks).toHaveLength(2);
+      expect(detailLinks[0]).toHaveAttribute("href", "/workers/7");
+      expect(detailLinks[1]).toHaveAttribute("href", "/workers/12");
     });
   });
 });
