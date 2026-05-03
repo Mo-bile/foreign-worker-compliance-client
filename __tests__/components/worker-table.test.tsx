@@ -86,6 +86,24 @@ describe("WorkerTable", () => {
     expect(screen.getByRole("columnheader", { name: "상태 ↓" })).toBeDefined();
   });
 
+  it("이름_정렬은_한글_이름이_아닌_name_기준을_유지한다", async () => {
+    render(
+      <WorkerTable
+        workers={[
+          makeWorker({ id: 5001, name: "Bravo Worker", koreanName: "가가" }),
+          makeWorker({ id: 5002, name: "Alpha Worker", koreanName: "하하" }),
+        ]}
+        isLoading={false}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("columnheader", { name: "이름" }));
+
+    const rows = screen.getAllByRole("row");
+    expect(within(rows[1]).getByText("Alpha Worker")).toBeDefined();
+    expect(within(rows[2]).getByText("Bravo Worker")).toBeDefined();
+  });
+
   it("다음_페이지로_이동하면_나머지_5건을_표시한다", async () => {
     render(<WorkerTable workers={mockWorkers} isLoading={false} />);
     await userEvent.click(screen.getByRole("button", { name: "다음 페이지" }));
