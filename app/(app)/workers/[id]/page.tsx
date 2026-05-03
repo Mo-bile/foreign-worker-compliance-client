@@ -20,7 +20,7 @@ import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-tim
 import {
   NATIONALITY_LABELS,
   VISA_TYPE_LABELS,
-  WORKER_STATUS_LABELS,
+  resolveWorkerStatusLabel,
   INSURANCE_TYPE_LABELS,
 } from "@/types/api";
 import { useWorker } from "@/lib/queries/use-workers";
@@ -101,7 +101,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">상태</dt>
-              <dd className="font-medium">{WORKER_STATUS_LABELS[w.status]}</dd>
+              <dd className="font-medium">{resolveWorkerStatusLabel(w.status)}</dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">계약 시작일</dt>

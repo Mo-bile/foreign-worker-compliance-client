@@ -11,6 +11,9 @@ import {
   WORKER_STATUS_LABELS,
   INSURANCE_STATUSES,
   INSURANCE_STATUS_LABELS,
+  resolveWorkerStatusLabel,
+  resolveWorkerStatusColor,
+  resolveWorkerStatusPriority,
 } from "@/types/api";
 import type {
   InsuranceEligibilityDto,
@@ -26,14 +29,6 @@ const VISA_FILTER_LABELS: Record<VisaType, string> = Object.fromEntries(
   VISA_TYPES.map((v) => [v, `${v} — ${VISA_TYPE_LABELS[v]}`]),
 ) as Record<VisaType, string>;
 
-const STATUS_PRIORITY: Record<string, number> = { ACTIVE: 0, INACTIVE: 1 };
-
-const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
-  ACTIVE:
-    "bg-[var(--signal-green-bg)] text-[var(--signal-green)] px-2 py-0.5 rounded-full text-xs font-medium",
-  INACTIVE:
-    "bg-[var(--signal-red-bg)] text-[var(--signal-red)] px-2 py-0.5 rounded-full text-xs font-medium",
-};
 import {
   Table,
   TableBody,
@@ -215,7 +210,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
         cmp = a.visaExpiryDate.localeCompare(b.visaExpiryDate);
         break;
       case "status":
-        cmp = (STATUS_PRIORITY[a.status] ?? 9) - (STATUS_PRIORITY[b.status] ?? 9);
+        cmp = resolveWorkerStatusPriority(a.status) - resolveWorkerStatusPriority(b.status);
         break;
       default:
         cmp = 0;
@@ -328,7 +323,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
               {paginated.items.map((worker) => {
                 const nationalityLabel =
                   NATIONALITY_LABELS[worker.nationality] ?? worker.nationality;
-                const statusClass = WORKER_STATUS_COLORS[worker.status];
+                const statusClass = resolveWorkerStatusColor(worker.status);
                 const koreanName = worker.koreanName?.trim() ?? "";
 
                 return (
@@ -352,7 +347,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     </TableCell>
                     <TableCell>{worker.visaExpiryDate}</TableCell>
                     <TableCell>
-                      <span className={statusClass}>{WORKER_STATUS_LABELS[worker.status]}</span>
+                      <span className={statusClass}>{resolveWorkerStatusLabel(worker.status)}</span>
                     </TableCell>
                     <TableCell>
                       <InsuranceSummaryCell eligibilities={worker.insuranceEligibilities} />

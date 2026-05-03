@@ -83,10 +83,23 @@ describe("WorkerTable", () => {
     expect(blankCells[1]).toHaveTextContent("—");
   });
 
-  it("기본_정렬은_상태_오름차순이다_재직중이_먼저_나온다", () => {
-    render(<WorkerTable workers={mockWorkers} isLoading={false} />);
+  it("기본_정렬은_상태_오름차순이다_REVIEW_REQUIRED가_먼저_나온다", () => {
+    render(
+      <WorkerTable
+        workers={[
+          makeWorker({ id: 9001, name: "ENDED Worker", status: "ENDED" }),
+          makeWorker({ id: 9002, name: "REVIEW_REQUIRED Worker", status: "REVIEW_REQUIRED" }),
+          makeWorker({ id: 9003, name: "ACTIVE Worker", status: "ACTIVE" }),
+          makeWorker({ id: 9004, name: "UPCOMING Worker", status: "UPCOMING" }),
+        ]}
+        isLoading={false}
+      />,
+    );
     const rows = screen.getAllByRole("row");
-    expect(within(rows[1]).getByText("재직중")).toBeDefined();
+    expect(within(rows[1]).getByText("확인 필요")).toBeDefined();
+    expect(within(rows[2]).getByText("입사 예정")).toBeDefined();
+    expect(within(rows[3]).getByText("재직중")).toBeDefined();
+    expect(within(rows[4]).getByText("고용종료")).toBeDefined();
   });
 
   it("상태_헤더_클릭시_정렬_방향이_토글된다", async () => {
@@ -145,6 +158,48 @@ describe("WorkerTable", () => {
   it("빈_데이터일_때_등록된_근로자가_없습니다_메시지를_표시한다", () => {
     render(<WorkerTable workers={[]} isLoading={false} />);
     expect(screen.getByText("등록된 근로자가 없습니다")).toBeDefined();
+  });
+
+  it("입사_예정자는_재직중_필터에_포함되지_않는다_과거_INACTIVE_라벨_오류_회귀_방지", async () => {
+    render(
+      <WorkerTable
+        workers={[
+          makeWorker({ id: 9101, name: "Upcoming Worker", status: "UPCOMING" }),
+          makeWorker({ id: 9102, name: "Active Worker", status: "ACTIVE" }),
+        ]}
+        isLoading={false}
+      />,
+    );
+    const trigger = screen.getByRole("combobox", { name: "상태 전체" });
+    await userEvent.click(trigger);
+    const option = await screen.findByRole("option", { name: "재직중" });
+    await userEvent.click(option);
+    expect(screen.queryByText("Upcoming Worker")).toBeNull();
+    expect(screen.getByText("Active Worker")).toBeDefined();
+  });
+
+  it("REVIEW_REQUIRED_상태_워커가_확인_필요_배지로_표시된다", () => {
+    render(
+      <WorkerTable
+        workers={[makeWorker({ id: 9201, status: "REVIEW_REQUIRED" })]}
+        isLoading={false}
+      />,
+    );
+    expect(screen.getByText("확인 필요")).toBeDefined();
+  });
+
+  it("BE에서_unknown_status가_와도_확인_필요로_렌더된다_FE_BE_동기화_윈도우", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(
+      <WorkerTable
+        workers={[
+          makeWorker({ id: 9301, name: "Mystery Worker", status: "FUTURE_STATUS" as never }),
+        ]}
+        isLoading={false}
+      />,
+    );
+    expect(screen.getByText("확인 필요")).toBeDefined();
+    warn.mockRestore();
   });
 
   it("보험_상태_필터에서_가입제외를_선택하면_가입제외_보험이_있는_근로자만_표시한다", async () => {
