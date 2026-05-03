@@ -6,6 +6,7 @@ import { WorkerForm } from "@/components/workers/worker-form";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CompanyProvider } from "@/lib/contexts/company-context";
 import { server } from "@/mocks/server";
+import { mockWorkers } from "@/mocks/data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
@@ -244,5 +245,29 @@ describe("WorkerForm", () => {
     await waitFor(() => expect(received).toBeDefined());
     expect(received).not.toHaveProperty("koreanName", "   ");
     expect(received?.koreanName).toBeUndefined();
+  });
+
+  it("수정_제출에서_기존_한글_이름을_비우면_빈_문자열을_보낸다", async () => {
+    const user = userEvent.setup();
+    const worker = { ...mockWorkers[0], id: 99, koreanName: "응우옌 반 안" };
+    let received: Record<string, unknown> | undefined;
+    let receivedWorkerId: string | readonly string[] | undefined;
+    server.use(
+      http.put("*/api/workers/:id", async ({ request, params }) => {
+        receivedWorkerId = params.id;
+        received = (await request.json()) as Record<string, unknown>;
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+    renderWithProviders(<WorkerForm mode="edit" worker={worker} workerId={worker.id} />);
+
+    const koreanNameInput = screen.getByLabelText("한글 이름 (선택)");
+    expect(koreanNameInput).toHaveValue("응우옌 반 안");
+    await user.clear(koreanNameInput);
+    await user.click(screen.getByRole("button", { name: "수정" }));
+
+    await waitFor(() => expect(received).toBeDefined());
+    expect(receivedWorkerId).toBe(String(worker.id));
+    expect(received).toHaveProperty("koreanName", "");
   });
 });

@@ -191,7 +191,7 @@ export function WorkerForm(props: WorkerFormProps) {
     if (isEdit) {
       const updateData: UpdateWorkerRequest = {
         name: data.name,
-        koreanName: data.koreanName?.trim() || undefined,
+        koreanName: getTrimmedValue(data.koreanName),
         dateOfBirth: data.dateOfBirth,
         contactPhone: data.contactPhone,
         contactEmail: data.contactEmail,
