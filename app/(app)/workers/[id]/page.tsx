@@ -52,11 +52,15 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
 
   const w = worker.data;
   if (!w) return null;
+  const koreanName = w.koreanName?.trim();
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{w.name}</h1>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{w.name}</h1>
+          {koreanName && <p className="mt-1 text-sm text-muted-foreground">{koreanName}</p>}
+        </div>
         <Link
           href={`/workers/${workerId}/edit`}
           className={buttonVariants({ variant: "outline", size: "sm" })}
@@ -71,6 +75,12 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         </CardHeader>
         <CardContent>
           <dl className="grid gap-4 md:grid-cols-2">
+            {koreanName && (
+              <div>
+                <dt className="text-sm text-muted-foreground">한글 이름</dt>
+                <dd className="font-medium">{koreanName}</dd>
+              </div>
+            )}
             <div>
               <dt className="text-sm text-muted-foreground">생년월일</dt>
               <dd className="font-medium">{w.dateOfBirth}</dd>
