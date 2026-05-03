@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   registerWorkerRequestSchema,
   updateWorkerRequestSchema,
@@ -11,6 +11,10 @@ import {
   VISA_TYPES,
   REGIONS,
   INDUSTRY_CATEGORIES,
+  resolveWorkerStatusLabel,
+  resolveWorkerStatusColor,
+  WORKER_STATUS_COLORS,
+  resolveWorkerStatusPriority,
 } from "@/types/api";
 
 describe("registerWorkerRequestSchema", () => {
@@ -208,8 +212,11 @@ describe("enum 상수", () => {
     expect(VISA_TYPES).toHaveLength(8);
   });
 
-  it("WORKER_STATUSES는_2개_값을_가진다", () => {
-    expect(WORKER_STATUSES).toHaveLength(2);
+  it("WORKER_STATUSES는_4개_값을_가진다", () => {
+    expect(WORKER_STATUSES).toHaveLength(4);
+    expect(WORKER_STATUSES).toEqual(
+      expect.arrayContaining(["UPCOMING", "ACTIVE", "ENDED", "REVIEW_REQUIRED"]),
+    );
   });
 
   it("REGIONS는_17개_값을_가진다", () => {
@@ -229,5 +236,64 @@ describe("enum 상수", () => {
     expect(DEADLINE_TYPES).toContain("HEALTH_INSURANCE_ENROLLMENT");
     expect(DEADLINE_TYPES).toContain("EXIT_GUARANTEE_INSURANCE");
     expect(DEADLINE_TYPES).toContain("WAGE_GUARANTEE_INSURANCE");
+  });
+});
+
+describe("resolveWorkerStatusLabel", () => {
+  it("4가지_정의된_상태에_대한_라벨을_반환한다", () => {
+    expect(resolveWorkerStatusLabel("UPCOMING")).toBe("입사 예정");
+    expect(resolveWorkerStatusLabel("ACTIVE")).toBe("재직중");
+    expect(resolveWorkerStatusLabel("ENDED")).toBe("고용종료");
+    expect(resolveWorkerStatusLabel("REVIEW_REQUIRED")).toBe("확인 필요");
+  });
+
+  it("알_수_없는_상태는_확인_필요로_폴백하고_console_warn을_호출한다", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(resolveWorkerStatusLabel("MYSTERIOUS")).toBe("확인 필요");
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
+  });
+
+  it("과거_INACTIVE_값도_확인_필요로_폴백한다_BE_FE_동기화_윈도우_방어", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(resolveWorkerStatusLabel("INACTIVE")).toBe("확인 필요");
+    warn.mockRestore();
+  });
+});
+
+describe("resolveWorkerStatusColor", () => {
+  it("4가지_정의된_상태에_대한_색상_클래스를_반환한다", () => {
+    expect(resolveWorkerStatusColor("UPCOMING")).toBe(WORKER_STATUS_COLORS.UPCOMING);
+    expect(resolveWorkerStatusColor("ACTIVE")).toBe(WORKER_STATUS_COLORS.ACTIVE);
+    expect(resolveWorkerStatusColor("ENDED")).toBe(WORKER_STATUS_COLORS.ENDED);
+    expect(resolveWorkerStatusColor("REVIEW_REQUIRED")).toBe(
+      WORKER_STATUS_COLORS.REVIEW_REQUIRED,
+    );
+  });
+
+  it("알_수_없는_상태는_REVIEW_REQUIRED_색상으로_폴백한다", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(resolveWorkerStatusColor("MYSTERIOUS")).toBe(WORKER_STATUS_COLORS.REVIEW_REQUIRED);
+    warn.mockRestore();
+  });
+});
+
+describe("resolveWorkerStatusPriority", () => {
+  it("우선순위는_REVIEW_REQUIRED→UPCOMING→ACTIVE→ENDED_순서다", () => {
+    expect(resolveWorkerStatusPriority("REVIEW_REQUIRED")).toBeLessThan(
+      resolveWorkerStatusPriority("UPCOMING"),
+    );
+    expect(resolveWorkerStatusPriority("UPCOMING")).toBeLessThan(
+      resolveWorkerStatusPriority("ACTIVE"),
+    );
+    expect(resolveWorkerStatusPriority("ACTIVE")).toBeLessThan(
+      resolveWorkerStatusPriority("ENDED"),
+    );
+  });
+
+  it("unknown은_REVIEW_REQUIRED보다도_위로_정렬된다", () => {
+    expect(resolveWorkerStatusPriority("UNKNOWN")).toBeLessThan(
+      resolveWorkerStatusPriority("REVIEW_REQUIRED"),
+    );
   });
 });

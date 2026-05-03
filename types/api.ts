@@ -111,13 +111,69 @@ export const DEADLINE_STATUSES = [
 export type DeadlineStatus = (typeof DEADLINE_STATUSES)[number];
 
 // ─── WorkerStatus ────────────────────────────────────────────
-export const WORKER_STATUSES = ["ACTIVE", "INACTIVE"] as const;
+export const WORKER_STATUSES = [
+  "UPCOMING",
+  "ACTIVE",
+  "ENDED",
+  "REVIEW_REQUIRED",
+] as const;
 export type WorkerStatus = (typeof WORKER_STATUSES)[number];
 
 export const WORKER_STATUS_LABELS: Record<WorkerStatus, string> = {
+  UPCOMING: "입사 예정",
   ACTIVE: "재직중",
-  INACTIVE: "퇴사",
+  ENDED: "고용종료",
+  REVIEW_REQUIRED: "확인 필요",
 };
+
+// 정렬 우선순위 (REVIEW_REQUIRED → UPCOMING → ACTIVE → ENDED, 브리프 §PR-α)
+export const WORKER_STATUS_PRIORITY: Record<WorkerStatus, number> = {
+  REVIEW_REQUIRED: 0,
+  UPCOMING: 1,
+  ACTIVE: 2,
+  ENDED: 3,
+};
+
+const STATUS_BADGE_BASE = "px-2 py-0.5 rounded-full text-xs font-medium";
+
+export const WORKER_STATUS_COLORS: Record<WorkerStatus, string> = {
+  UPCOMING: `bg-[var(--signal-blue-bg)] text-[var(--signal-blue)] ${STATUS_BADGE_BASE}`,
+  ACTIVE: `bg-[var(--signal-green-bg)] text-[var(--signal-green)] ${STATUS_BADGE_BASE}`,
+  ENDED: `bg-[var(--signal-gray-bg)] text-[var(--signal-gray)] ${STATUS_BADGE_BASE}`,
+  REVIEW_REQUIRED: `bg-[var(--signal-orange-bg)] text-[var(--signal-orange)] ${STATUS_BADGE_BASE}`,
+};
+
+const KNOWN_WORKER_STATUSES = new Set<string>(WORKER_STATUSES);
+
+function isKnownWorkerStatus(value: string): value is WorkerStatus {
+  return KNOWN_WORKER_STATUSES.has(value);
+}
+
+export function resolveWorkerStatusLabel(status: string): string {
+  if (isKnownWorkerStatus(status)) return WORKER_STATUS_LABELS[status];
+  warnUnknownWorkerStatus(status);
+  return "확인 필요";
+}
+
+export function resolveWorkerStatusColor(status: string): string {
+  if (isKnownWorkerStatus(status)) return WORKER_STATUS_COLORS[status];
+  warnUnknownWorkerStatus(status);
+  return WORKER_STATUS_COLORS.REVIEW_REQUIRED;
+}
+
+export function resolveWorkerStatusPriority(status: string): number {
+  if (isKnownWorkerStatus(status)) return WORKER_STATUS_PRIORITY[status];
+  return -1; // unknown은 REVIEW_REQUIRED보다 위로 정렬 — 즉시 사용자 인지 유도
+}
+
+function warnUnknownWorkerStatus(status: string): void {
+  if (process.env.NODE_ENV === "production") return;
+  if (typeof console === "undefined") return;
+  console.warn(
+    `[worker-status] Unknown WorkerStatus "${status}" — fallback "확인 필요" 적용. ` +
+      `BE-FE 동기화 누락 의심.`,
+  );
+}
 
 // ─── Filter Utility Type ─────────────────────────────────────
 export type FilterOption<T extends string> = T | "ALL";
