@@ -73,7 +73,7 @@ const SAMPLE_NATIONALITIES = [
   "NEPAL",
 ] as const;
 const SAMPLE_VISA_TYPES = ["E9", "H2", "E7", "E8", "F2", "F5", "F6", "E7_4"] as const;
-const SAMPLE_STATUSES = ["ACTIVE", "INACTIVE"] as const;
+const SAMPLE_STATUSES = ["UPCOMING", "ACTIVE", "ENDED", "REVIEW_REQUIRED"] as const;
 const SAMPLE_INSURANCE_CODES = [
   "MANDATORY",
   "FULL_MANDATORY",
@@ -87,7 +87,7 @@ const INSURANCE_DISCLAIMER =
 function generateWorker(id: number): WorkerResponse {
   const natIdx = id % SAMPLE_NATIONALITIES.length;
   const visaIdx = id % SAMPLE_VISA_TYPES.length;
-  const statusIdx = id % 2;
+  const statusIdx = id % SAMPLE_STATUSES.length;
   const insIdx = id % SAMPLE_INSURANCE_CODES.length;
   const empInsIdx = (insIdx + 1) % SAMPLE_INSURANCE_CODES.length;
   const nationality = SAMPLE_NATIONALITIES[natIdx];
