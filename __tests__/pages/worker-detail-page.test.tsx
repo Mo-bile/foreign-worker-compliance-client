@@ -34,16 +34,14 @@ async function renderWorkerDetailPage(workerId: string) {
 }
 
 describe("WorkerDetailPage", () => {
-  it("한글_이름이_있으면_제목_아래와_기본_정보에_표시한다", async () => {
+  it("한글_이름이_있으면_제목에_병기하고_기본_정보에_중복_표시하지_않는다", async () => {
     await renderWorkerDetailPage("1");
 
-    const heading = await screen.findByRole("heading", { name: "Nguyen Van A" });
-    const headingGroup = heading.parentElement;
+    const heading = await screen.findByRole("heading", { name: /Nguyen Van A/ });
 
-    expect(headingGroup).not.toBeNull();
-    expect(within(headingGroup as HTMLElement).getByText("응우옌 반 아")).toBeDefined();
-    expect(screen.getByText("한글 이름")).toBeDefined();
-    expect(screen.getByText("한글 이름").parentElement?.textContent).toContain("응우옌 반 아");
+    expect(heading).toHaveTextContent("Nguyen Van A");
+    expect(within(heading).getByText("응우옌 반 아")).toBeDefined();
+    expect(screen.queryByText("한글 이름")).toBeNull();
   });
 
   it("한글_이름이_없으면_기본_정보에_대체_텍스트를_표시하지_않는다", async () => {

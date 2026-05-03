@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import type { Resolver } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
@@ -55,6 +55,7 @@ export interface WorkerFormEditProps {
 
 type WorkerFormProps = WorkerFormCreateProps | WorkerFormEditProps;
 type WorkerFormValues = RegisterWorkerRequest & UpdateWorkerRequest;
+const NAME_HELP_ID = "nameHelp";
 const KOREAN_NAME_HELP_ID = "koreanNameHelp";
 const KOREAN_NAME_MESSAGE_ID = "koreanNameMessage";
 const KOREAN_NAME_DESCRIBED_BY = `${KOREAN_NAME_HELP_ID} ${KOREAN_NAME_MESSAGE_ID}`;
@@ -137,6 +138,10 @@ export function WorkerForm(props: WorkerFormProps) {
           contactEmail: "",
         },
   });
+  const koreanNameValue = useWatch({ control, name: "koreanName" });
+  const hasKoreanNameValue = getTrimmedValue(koreanNameValue) !== "";
+  const isSuggestKoreanNameDisabled =
+    suggestKoreanNameMutation.isPending || hasKoreanNameValue;
 
   const handleSuggestKoreanName = async () => {
     const name = getTrimmedValue(getValues("name"));
@@ -245,6 +250,8 @@ export function WorkerForm(props: WorkerFormProps) {
             register={register}
             errors={errors}
             placeholder="홍길동"
+            description="여권·체류 서류에 기재된 기본 이름입니다."
+            descriptionId={NAME_HELP_ID}
           />
 
           <div className="flex flex-col gap-1.5">
@@ -255,7 +262,7 @@ export function WorkerForm(props: WorkerFormProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleSuggestKoreanName}
-                disabled={suggestKoreanNameMutation.isPending}
+                disabled={isSuggestKoreanNameDisabled}
                 aria-label="이름의 한글 발음 표기 AI로 생성"
                 aria-describedby={koreanNameDescribedBy}
               >
@@ -268,11 +275,10 @@ export function WorkerForm(props: WorkerFormProps) {
               {...register("koreanName")}
               aria-invalid={!!errors.koreanName}
               aria-describedby={koreanNameDescribedBy}
-              placeholder="응우옌 반 안"
+              placeholder="한글 발음 표기 입력"
             />
             <p id={KOREAN_NAME_HELP_ID} className="text-xs text-muted-foreground">
-              이름의 한글 발음 표기를 입력하세요. AI 추천 결과는 실제 발음과 다를 수 있으니 확인 후
-              저장하세요.
+              이름의 한글 발음 표기입니다. AI 추천 결과는 확인 후 저장하세요.
             </p>
             {koreanNameMessage && (
               <p

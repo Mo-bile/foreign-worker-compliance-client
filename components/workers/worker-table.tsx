@@ -295,6 +295,7 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                 >
                   이름{sortIndicator("name")}
                 </TableHead>
+                <TableHead>한글명</TableHead>
                 <TableHead>전화번호</TableHead>
                 <TableHead
                   className="cursor-pointer select-none"
@@ -336,15 +337,9 @@ export function WorkerTable({ workers, isLoading }: WorkerTableProps) {
                     className="cursor-pointer"
                     onClick={() => router.push(`/workers/${worker.id}`)}
                   >
-                    <TableCell className="font-medium">
-                      <div className="space-y-0.5">
-                        <div>{worker.name}</div>
-                        {koreanName ? (
-                          <div className="text-xs font-normal text-muted-foreground">
-                            {koreanName}
-                          </div>
-                        ) : null}
-                      </div>
+                    <TableCell className="font-medium">{worker.name}</TableCell>
+                    <TableCell className={koreanName ? "" : "text-muted-foreground"}>
+                      {koreanName || "—"}
                     </TableCell>
                     <TableCell>{worker.contactPhone ?? "—"}</TableCell>
                     <TableCell>{nationalityLabel}</TableCell>

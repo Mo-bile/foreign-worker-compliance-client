@@ -37,7 +37,7 @@ describe("WorkerTable", () => {
     expect(screen.getByText("010-1234-5678")).toBeDefined();
   });
 
-  it("한글_이름이_있으면_이름_셀에_보조_텍스트로_표시한다", () => {
+  it("한글명이_별도_컬럼에_표시된다", () => {
     render(
       <WorkerTable
         workers={[makeWorker({ name: "Nguyen Van A", koreanName: "응우옌 반 아" })]}
@@ -45,16 +45,19 @@ describe("WorkerTable", () => {
       />,
     );
 
+    const row = screen.getByText("Nguyen Van A").closest("tr");
     const nameCell = screen.getByText("Nguyen Van A").closest("td");
 
+    expect(screen.getByRole("columnheader", { name: "한글명" })).toBeDefined();
+    expect(row).not.toBeNull();
     expect(nameCell).not.toBeNull();
-    expect(within(nameCell as HTMLElement).getByText("응우옌 반 아")).toBeDefined();
-    expect(nameCell?.textContent?.indexOf("Nguyen Van A")).toBeLessThan(
-      nameCell?.textContent?.indexOf("응우옌 반 아") ?? -1,
-    );
+    expect(within(nameCell as HTMLElement).queryByText("응우옌 반 아")).toBeNull();
+    expect(
+      within(row as HTMLElement).getByRole("cell", { name: "응우옌 반 아" }),
+    ).toBeDefined();
   });
 
-  it("한글_이름이_없거나_공백이면_이름을_중복_표시하지_않는다", () => {
+  it("한글명이_없거나_공백이면_한글명_컬럼에_대시를_표시하고_이름을_중복_표시하지_않는다", () => {
     render(
       <WorkerTable
         workers={[
@@ -65,11 +68,19 @@ describe("WorkerTable", () => {
       />,
     );
 
-    const zhangNameCell = screen.getByText("Zhang Wei").closest("td");
-    const blankNameCell = screen.getByText("Blank Korean Name").closest("td");
+    const zhangRow = screen.getByText("Zhang Wei").closest("tr");
+    const blankRow = screen.getByText("Blank Korean Name").closest("tr");
 
-    expect(zhangNameCell?.textContent).toBe("Zhang Wei");
-    expect(blankNameCell?.textContent).toBe("Blank Korean Name");
+    expect(zhangRow).not.toBeNull();
+    expect(blankRow).not.toBeNull();
+
+    const zhangCells = within(zhangRow as HTMLElement).getAllByRole("cell");
+    const blankCells = within(blankRow as HTMLElement).getAllByRole("cell");
+
+    expect(zhangCells[0]).toHaveTextContent("Zhang Wei");
+    expect(zhangCells[1]).toHaveTextContent("—");
+    expect(blankCells[0]).toHaveTextContent("Blank Korean Name");
+    expect(blankCells[1]).toHaveTextContent("—");
   });
 
   it("기본_정렬은_상태_오름차순이다_재직중이_먼저_나온다", () => {

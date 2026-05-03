@@ -58,8 +58,12 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{w.name}</h1>
-          {koreanName && <p className="mt-1 text-sm text-muted-foreground">{koreanName}</p>}
+          <h1 className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-2xl font-bold">
+            <span>{w.name}</span>
+            {koreanName && (
+              <span className="text-base font-medium text-muted-foreground">{koreanName}</span>
+            )}
+          </h1>
         </div>
         <Link
           href={`/workers/${workerId}/edit`}
@@ -75,12 +79,6 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         </CardHeader>
         <CardContent>
           <dl className="grid gap-4 md:grid-cols-2">
-            {koreanName && (
-              <div>
-                <dt className="text-sm text-muted-foreground">한글 이름</dt>
-                <dd className="font-medium">{koreanName}</dd>
-              </div>
-            )}
             <div>
               <dt className="text-sm text-muted-foreground">생년월일</dt>
               <dd className="font-medium">{w.dateOfBirth}</dd>

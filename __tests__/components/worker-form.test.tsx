@@ -106,18 +106,24 @@ describe("WorkerForm", () => {
   it("한글_이름_필드와_AI_생성_버튼을_렌더링한다", async () => {
     renderWithProviders(<WorkerForm mode="create" />);
 
+    const nameInput = screen.getByLabelText("이름");
     const koreanNameInput = screen.getByLabelText("한글 이름 (선택)");
     const suggestButton = screen.getByRole("button", { name: /AI로 생성/ });
+    const nameHelperText = screen.getByText("여권·체류 서류에 기재된 기본 이름입니다.");
     const helperText = screen.getByText(
-      "이름의 한글 발음 표기를 입력하세요. AI 추천 결과는 실제 발음과 다를 수 있으니 확인 후 저장하세요.",
+      "이름의 한글 발음 표기입니다. AI 추천 결과는 확인 후 저장하세요.",
     );
+    const nameInputDescriptions = nameInput.getAttribute("aria-describedby")?.split(/\s+/);
     const inputDescriptions = koreanNameInput.getAttribute("aria-describedby")?.split(/\s+/);
     const buttonDescriptions = suggestButton.getAttribute("aria-describedby")?.split(/\s+/);
 
-    expect(screen.getByLabelText("이름")).toBeDefined();
+    expect(nameInput).toBeDefined();
     expect(koreanNameInput).toBeDefined();
+    expect(koreanNameInput).toHaveAttribute("placeholder", "한글 발음 표기 입력");
     expect(suggestButton).toBeDefined();
+    expect(nameHelperText).toHaveAttribute("id", "nameHelp");
     expect(helperText).toHaveAttribute("id", "koreanNameHelp");
+    expect(nameInputDescriptions).toEqual(["nameHelp"]);
     expect(inputDescriptions).toEqual(["koreanNameHelp"]);
     expect(buttonDescriptions).toEqual(["koreanNameHelp"]);
   });
@@ -176,7 +182,24 @@ describe("WorkerForm", () => {
 
     expect(await screen.findByDisplayValue("응우옌 반 안")).toBeDefined();
     expect(received).toEqual({ name: "NGUYEN VAN AN", nationalityCode: "VIETNAM" });
+    expect(screen.getByRole("button", { name: /AI로 생성/ })).toBeDisabled();
     expect(screen.queryByText("근로자가 등록되었습니다")).toBeNull();
+  });
+
+  it("한글_이름_값이_있으면_AI_생성_버튼을_비활성화하고_값을_비우면_활성화한다", async () => {
+    const user = userEvent.setup();
+    const worker = { ...mockWorkers[0], id: 99, koreanName: "응우옌 반 안" };
+    renderWithProviders(<WorkerForm mode="edit" worker={worker} workerId={worker.id} />);
+
+    const koreanNameInput = screen.getByLabelText("한글 이름 (선택)");
+    const suggestButton = screen.getByRole("button", { name: /AI로 생성/ });
+
+    expect(koreanNameInput).toHaveValue("응우옌 반 안");
+    expect(suggestButton).toBeDisabled();
+
+    await user.clear(koreanNameInput);
+
+    expect(suggestButton).toBeEnabled();
   });
 
   it("입력값이_변경되면_늦게_도착한_AI_추천_결과를_적용하지_않는다", async () => {
