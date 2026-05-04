@@ -8,15 +8,18 @@ describe("ImpactBox", () => {
       <ImpactBox
         level="HIGH"
         description="사업장 내 영향도가 높은 법령 변경입니다."
-        actions={["서류를 검토하세요", "담당자에게 공유하세요"]}
+        actions={[
+          { label: "서류를 검토하세요", primary: true },
+          { label: "담당자에게 공유하세요", primary: false },
+        ]}
       />,
     );
 
     expect(screen.getByText("✦ AI 안내 — 공식 출처 + 사업장 정보 기반")).toBeInTheDocument();
     expect(screen.getByText("영향도: 높음")).toBeInTheDocument();
     expect(screen.getByText("사업장 내 영향도가 높은 법령 변경입니다.")).toBeInTheDocument();
-    expect(screen.getByText("→ 서류를 검토하세요")).toBeInTheDocument();
-    expect(screen.getByText("→ 담당자에게 공유하세요")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "서류를 검토하세요" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "담당자에게 공유하세요" })).toBeInTheDocument();
   });
 
   it.each([

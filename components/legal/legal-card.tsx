@@ -103,7 +103,7 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
               <ImpactBox
                 level={data.level}
                 description={data.description}
-                actions={data.actions.map((action) => action.label)}
+                actions={data.actions}
               />
               {change.officialSourceUrl && (
                 <a

@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { ActionRow } from "./action-row";
+import type { LegalAction } from "@/types/legal";
 
 const LEVEL_STYLES: Record<string, { label: string; className: string }> = {
   HIGH: { label: "높음", className: "text-signal-red bg-signal-red-bg" },
@@ -9,7 +11,7 @@ const LEVEL_STYLES: Record<string, { label: string; className: string }> = {
 interface ImpactBoxProps {
   readonly level?: string;
   readonly description?: string;
-  readonly actions?: readonly string[];
+  readonly actions?: readonly LegalAction[];
 }
 
 export function ImpactBox({ level, description, actions }: ImpactBoxProps) {
@@ -36,13 +38,7 @@ export function ImpactBox({ level, description, actions }: ImpactBoxProps) {
       )}
       {description && <p className="mb-2 text-sm text-muted-foreground">{description}</p>}
       {actions && actions.length > 0 && (
-        <ul className="space-y-1">
-          {actions.map((action) => (
-            <li key={action} className="text-sm text-muted-foreground">
-              → {action}
-            </li>
-          ))}
-        </ul>
+        <ActionRow actions={actions} />
       )}
     </div>
   );
