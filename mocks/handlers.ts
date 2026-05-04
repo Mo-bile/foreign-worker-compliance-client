@@ -19,6 +19,10 @@ function addDays(isoDate: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+function normalizeOptionalDate(value: unknown): string | null {
+  return typeof value === "string" && value.trim() !== "" ? value : null;
+}
+
 // ─── Shared handler callbacks ───────────────────────────
 
 const getWorkerById: Parameters<typeof http.get>[1] = ({ params }) => {
@@ -65,8 +69,9 @@ const postWorkerKoreanNameSuggest: Parameters<typeof http.post>[1] = async ({ re
   return HttpResponse.json({ koreanName: "응우옌 반 안" }, { status: 202 });
 };
 
-const putWorker: Parameters<typeof http.put>[1] = ({ params }) => {
-  const worker = mockWorkers.find((w) => w.id === Number(params.id));
+const putWorker: Parameters<typeof http.put>[1] = async ({ params, request }) => {
+  const id = Number(params.id);
+  const worker = mockWorkers.find((w) => w.id === id);
   if (!worker) {
     return HttpResponse.json(
       {
@@ -79,6 +84,28 @@ const putWorker: Parameters<typeof http.put>[1] = ({ params }) => {
       { status: 404 },
     );
   }
+
+  // PR-δ: ENDED + employmentInfo 변경 시 400 차단 (BE D38 정책 시뮬)
+  if (worker.status === "ENDED") {
+    const body = (await request.json()) as Record<string, unknown>;
+    const employmentInfoChanged =
+      body.contractStartDate !== worker.contractStartDate ||
+      normalizeOptionalDate(body.contractEndDate) !==
+        normalizeOptionalDate(worker.contractEndDate);
+    if (employmentInfoChanged) {
+      return HttpResponse.json(
+        {
+          status: 400,
+          message:
+            "이 워커는 고용종료 상태입니다. 계약 정보를 변경하려면 먼저 고용종료를 복원해주세요 " +
+            "(POST /api/workers/{id}/restore-employment).",
+          timestamp: new Date().toISOString(),
+        },
+        { status: 400 },
+      );
+    }
+  }
+
   return new HttpResponse(null, { status: 204 });
 };
 
