@@ -57,18 +57,24 @@ const infoSchema = z.object({
 
 const workersSchema = z
   .object({
-    employeeCount: z.number().int().min(1, "1명 이상이어야 합니다"),
+    employeeCount: z.number().int().min(1, "1명 이상이어야 합니다").optional(),
     domesticInsuredCount: z.number().int().min(0, "0명 이상이어야 합니다").optional(),
-    foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
+    // foreignWorkerCount: 제거 (PR-β D21)
   })
-  .refine((d) => d.foreignWorkerCount <= d.employeeCount, {
-    message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
-    path: ["foreignWorkerCount"],
-  });
+  .refine(
+    (d) =>
+      d.domesticInsuredCount == null ||
+      d.employeeCount == null ||
+      d.domesticInsuredCount <= d.employeeCount,
+    {
+      message: "내국인 피보험자 수는 총 직원 수를 초과할 수 없습니다",
+      path: ["domesticInsuredCount"],
+    },
+  );
 
 const benchmarkSchema = z.object({
   averageForeignWorkerWage: z.number().positive("양수를 입력해주세요").optional(),
-  recentYearTerminationCount: z.number().int().min(0, "0 이상이어야 합니다").optional(),
+  // recentYearTerminationCount: 제거 (PR-β D21)
 });
 
 // ─── Props ──────────────────────────────────────────────
@@ -272,9 +278,8 @@ function WorkersForm({
   } = useForm<z.infer<typeof workersSchema>>({
     resolver: zodResolver(workersSchema),
     defaultValues: {
-      employeeCount: company.employeeCount,
+      employeeCount: company.employeeCount ?? undefined,
       domesticInsuredCount: company.domesticInsuredCount ?? undefined,
-      foreignWorkerCount: company.foreignWorkerCount,
     },
   });
 
@@ -293,23 +298,9 @@ function WorkersForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="employeeCount">총 직원 수</Label>
-          <Input
-            id="employeeCount"
-            type="number"
-            {...register("employeeCount", { valueAsNumber: true })}
-            aria-invalid={!!errors.employeeCount}
-          />
-          <p className="text-xs text-muted-foreground">내·외국인 포함 상시근로자</p>
-          {errors.employeeCount && (
-            <p className="text-sm text-destructive">{errors.employeeCount.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="domesticInsuredCount">내국인 피보험자 수</Label>
+          <Label htmlFor="domesticInsuredCount">내국인 고용보험 피보험자 수</Label>
           <Input
             id="domesticInsuredCount"
             type="number"
@@ -317,23 +308,25 @@ function WorkersForm({
               setValueAs: (v: string) => (v === "" ? undefined : Number(v)),
             })}
           />
-          <p className="text-xs text-muted-foreground">고용 한도 산정 기준 (선택)</p>
+          <p className="text-xs text-muted-foreground">고용허용 인원 산정 기준 (수동 입력)</p>
           {errors.domesticInsuredCount && (
             <p className="text-sm text-destructive">{errors.domesticInsuredCount.message}</p>
           )}
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="foreignWorkerCount">외국인 근로자 수</Label>
+          <Label htmlFor="employeeCount">상시근로자 수 (선택)</Label>
           <Input
-            id="foreignWorkerCount"
+            id="employeeCount"
             type="number"
-            {...register("foreignWorkerCount", { valueAsNumber: true })}
-            aria-invalid={!!errors.foreignWorkerCount}
+            {...register("employeeCount", {
+              setValueAs: (v: string) => (v === "" ? undefined : Number(v)),
+            })}
+            aria-invalid={!!errors.employeeCount}
           />
-          <p className="text-xs text-muted-foreground">등록된 외국인 근로자 수</p>
-          {errors.foreignWorkerCount && (
-            <p className="text-sm text-destructive">{errors.foreignWorkerCount.message}</p>
+          <p className="text-xs text-muted-foreground">사업장 규모 판단 참고값 (수동 입력, 미입력 가능)</p>
+          {errors.employeeCount && (
+            <p className="text-sm text-destructive">{errors.employeeCount.message}</p>
           )}
         </div>
       </div>
@@ -369,7 +362,6 @@ function BenchmarkForm({
     resolver: zodResolver(benchmarkSchema),
     defaultValues: {
       averageForeignWorkerWage: company.averageForeignWorkerWage ?? undefined,
-      recentYearTerminationCount: company.recentYearTerminationCount ?? undefined,
     },
   });
 
@@ -388,7 +380,7 @@ function BenchmarkForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-6 gap-y-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="averageForeignWorkerWage">외국인 근로자 평균 월임금</Label>
           <Input
@@ -402,22 +394,6 @@ function BenchmarkForm({
           <p className="text-xs text-muted-foreground">미입력 시 임금 수준 비교가 생략됩니다</p>
           {errors.averageForeignWorkerWage && (
             <p className="text-sm text-destructive">{errors.averageForeignWorkerWage.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="recentYearTerminationCount">최근 1년 퇴사 외국인 수</Label>
-          <Input
-            id="recentYearTerminationCount"
-            type="number"
-            placeholder="명"
-            {...register("recentYearTerminationCount", {
-              setValueAs: (v: string) => (v === "" ? undefined : Number(v)),
-            })}
-          />
-          <p className="text-xs text-muted-foreground">미입력 시 고용 안정성 진단이 생략됩니다</p>
-          {errors.recentYearTerminationCount && (
-            <p className="text-sm text-destructive">{errors.recentYearTerminationCount.message}</p>
           )}
         </div>
       </div>

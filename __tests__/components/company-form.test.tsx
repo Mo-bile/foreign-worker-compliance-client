@@ -27,8 +27,8 @@ describe("CompanyForm", () => {
     expect(screen.getByLabelText("사업자번호")).toBeDefined();
     expect(screen.getByLabelText("지역")).toBeDefined();
     expect(screen.getByLabelText("업종")).toBeDefined();
-    expect(screen.getByLabelText("총 직원 수")).toBeDefined();
-    expect(screen.getByLabelText("외국인 근로자 수")).toBeDefined();
+    expect(screen.getByLabelText("상시근로자 수 (선택)")).toBeDefined();
+    expect(screen.queryByLabelText("외국인 근로자 수")).toBeNull();
     expect(screen.getByLabelText("주소")).toBeDefined();
     expect(screen.getByLabelText("연락처")).toBeDefined();
   });
@@ -50,7 +50,6 @@ describe("CompanyForm", () => {
           region: "SEOUL",
           industryCategory: "MANUFACTURING",
           employeeCount: 10,
-          foreignWorkerCount: 5,
           address: "서울",
           contactPhone: "02-1234",
         }}

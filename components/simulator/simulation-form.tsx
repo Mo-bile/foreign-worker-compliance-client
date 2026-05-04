@@ -161,7 +161,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
               <p className="text-xs text-muted-foreground">
                 {REGION_LABELS[company.region] ?? company.region} ·{" "}
                 {INDUSTRY_CATEGORY_LABELS[company.industryCategory] ?? company.industryCategory} ·
-                상시근로자 {company.employeeCount}명
+                상시근로자 {company.employeeCount != null ? `${company.employeeCount}명` : "—"}
               </p>
             </div>
           )}
@@ -199,7 +199,7 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
                 <label className="text-[13px] font-medium">현재 고용 중인 외국인</label>
                 <input
                   type="number"
-                  value={company?.foreignWorkerCount ?? 0}
+                  value={company?.derivedCounts.activeForeignWorkerCount ?? 0}
                   readOnly
                   className="rounded-md border border-input bg-secondary px-3 py-2 text-sm text-muted-foreground"
                 />

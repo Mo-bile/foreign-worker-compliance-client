@@ -9,14 +9,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyDetailCard } from "@/components/companies/company-detail-card";
 import { CompanyEditModal } from "@/components/settings/company-edit-modal";
 import type { EditSection } from "@/components/settings/company-edit-modal";
+import { ForeignWorkerStatusSection } from "@/components/settings/foreign-worker-status-section";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import { useCompany } from "@/lib/queries/use-companies";
-import { useWorkers } from "@/lib/queries/use-workers";
 
 export default function MyCompanyPage() {
   const { selectedCompanyId } = useCompanyContext();
   const company = useCompany(selectedCompanyId ?? 0);
-  const workers = useWorkers(selectedCompanyId);
   const [editSection, setEditSection] = useState<EditSection | null>(null);
 
   if (selectedCompanyId == null) {
@@ -44,7 +43,6 @@ export default function MyCompanyPage() {
     );
   }
 
-  const workerCount = workers.data?.length ?? 0;
   const c = company.data;
 
   return (
@@ -69,29 +67,40 @@ export default function MyCompanyPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <dl className="grid gap-4 md:grid-cols-3">
+          {/* (1) 수동 입력 섹션 */}
+          <dl className="grid gap-4 md:grid-cols-2">
             <div>
-              <dt className="text-sm text-muted-foreground">총 직원 수</dt>
-              <dd className="font-medium">{c.employeeCount}명</dd>
-              <p className="text-xs text-muted-foreground">내·외국인 포함 상시근로자</p>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">내국인 피보험자 수</dt>
+              <dt className="text-sm text-muted-foreground">내국인 고용보험 피보험자 수</dt>
               <dd className="font-medium">
                 {c.domesticInsuredCount != null ? `${c.domesticInsuredCount}명` : "—"}
               </dd>
-              <p className="text-xs text-muted-foreground">고용 한도 산정 기준</p>
+              <p className="text-xs text-muted-foreground">고용허용 인원 산정 기준 (수동 입력)</p>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground">외국인 근로자 수</dt>
-              <dd className="font-medium">{c.foreignWorkerCount}명</dd>
-              <p className="text-xs text-muted-foreground">등록된 외국인 근로자 수</p>
+              <dt className="text-sm text-muted-foreground">상시근로자 수 (선택)</dt>
+              <dd className="font-medium">
+                {c.employeeCount != null ? `${c.employeeCount}명` : "—"}
+              </dd>
+              <p className="text-xs text-muted-foreground">사업장 규모 판단 참고값 (수동 입력, 미입력 가능)</p>
             </div>
           </dl>
-          <div className="flex items-center justify-between border-t pt-3">
-            <p className="text-sm">
-              소속 근로자 <span className="font-semibold">{workerCount}명</span>
+
+          {/* (2) 자동 집계 섹션 */}
+          <div className="border-t pt-4">
+            <ForeignWorkerStatusSection derivedCounts={c.derivedCounts} />
+          </div>
+
+          {/* (3) 등록 기준 인원 */}
+          <div className="border-t pt-3">
+            <dt className="text-sm text-muted-foreground">등록 기준 인원</dt>
+            <dd className="text-lg font-semibold">{c.derivedCounts.registeredWorkforceTotal}명</dd>
+            <p className="text-xs text-muted-foreground">
+              내국인 피보험자 + 등록 재직 외국인 (자동 표시)
             </p>
+          </div>
+
+          {/* (4) 근로자 관리 링크 */}
+          <div className="flex items-center justify-end border-t pt-3">
             <Link href="/workers" className="text-sm text-primary hover:underline">
               근로자 관리 →
             </Link>
@@ -114,22 +123,14 @@ export default function MyCompanyPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <dl className="grid gap-4 md:grid-cols-2">
-            <div>
-              <dt className="text-sm text-muted-foreground">외국인 근로자 평균 월임금</dt>
-              <dd className="font-medium">
-                {c.averageForeignWorkerWage != null ? `${c.averageForeignWorkerWage}만원` : "—"}
-              </dd>
-              <p className="text-xs text-muted-foreground">미입력 시 임금 수준 비교가 생략됩니다</p>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">최근 1년 퇴사 외국인 수</dt>
-              <dd className="font-medium">
-                {c.recentYearTerminationCount != null ? `${c.recentYearTerminationCount}명` : "—"}
-              </dd>
-              <p className="text-xs text-muted-foreground">미입력 시 고용 안정성 진단이 생략됩니다</p>
-            </div>
-          </dl>
+          <div>
+            <dt className="text-sm text-muted-foreground">외국인 근로자 평균 월임금</dt>
+            <dd className="font-medium">
+              {c.averageForeignWorkerWage != null ? `${c.averageForeignWorkerWage}만원` : "—"}
+            </dd>
+            <p className="text-xs text-muted-foreground">미입력 시 임금 수준 비교가 생략됩니다</p>
+          </div>
+          {/* "최근 1년 퇴사 외국인 수": 제거 (자동 집계 카드로 대체, PR-β D21) */}
         </CardContent>
       </Card>
 

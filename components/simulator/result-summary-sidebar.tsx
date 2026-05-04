@@ -28,7 +28,7 @@ export function ResultSummarySidebar({
           </p>
           <p>
             <strong className="text-foreground">현 외국인:</strong>{" "}
-            {company?.foreignWorkerCount ?? "—"}명
+            {company?.derivedCounts.activeForeignWorkerCount ?? "—"}명
           </p>
           <p>
             <strong className="text-foreground">희망 채용:</strong> {request.desiredWorkers}명

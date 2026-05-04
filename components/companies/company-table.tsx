@@ -126,8 +126,8 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
                 <TableHead>사업자번호</TableHead>
                 <TableHead>지역</TableHead>
                 <TableHead>업종</TableHead>
-                <TableHead>총 직원</TableHead>
-                <TableHead>외국인 근로자</TableHead>
+                <TableHead>상시근로자</TableHead>
+                <TableHead>재직 외국인</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -143,8 +143,8 @@ export function CompanyTable({ companies, isLoading }: CompanyTableProps) {
                   <TableCell>
                     {INDUSTRY_CATEGORY_LABELS[c.industryCategory] ?? c.industryCategory}
                   </TableCell>
-                  <TableCell>{c.employeeCount}명</TableCell>
-                  <TableCell>{c.foreignWorkerCount}명</TableCell>
+                  <TableCell>{c.employeeCount != null ? `${c.employeeCount}명` : "—"}</TableCell>
+                  <TableCell>{c.derivedCounts.activeForeignWorkerCount}명</TableCell>
                 </TableRow>
               ))}
             </TableBody>

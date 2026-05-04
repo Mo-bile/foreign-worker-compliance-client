@@ -87,7 +87,7 @@ export function CompanyForm(props: CompanyFormProps) {
           industryCategory: undefined,
           industrySubCategory: "",
           employeeCount: undefined,
-          foreignWorkerCount: undefined,
+          // foreignWorkerCount: 제거 (PR-β D21)
           address: "",
           contactPhone: "",
         },
@@ -264,16 +264,16 @@ export function CompanyForm(props: CompanyFormProps) {
           인원 정보 (고용 한도 산정에 사용)
         </p>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
-            label="총 직원 수"
+            label="상시근로자 수 (선택)"
             name="employeeCount"
             register={register}
             errors={errors}
             type="number"
             placeholder="50"
-            registerOptions={{ valueAsNumber: true }}
-            description="내·외국인 포함 상시근로자"
+            registerOptions={{ setValueAs: (v: string) => (v === "" ? undefined : Number(v)) }}
+            description="사업장 규모 판단 참고값 (수동 입력, 미입력 가능)"
           />
 
           <FormField
@@ -286,17 +286,6 @@ export function CompanyForm(props: CompanyFormProps) {
             registerOptions={{ setValueAs: (v: string) => (v === "" ? undefined : Number(v)) }}
             description="고용 한도 산정 기준 (선택)"
           />
-
-          <FormField
-            label="외국인 근로자 수"
-            name="foreignWorkerCount"
-            register={register}
-            errors={errors}
-            type="number"
-            placeholder="10"
-            registerOptions={{ valueAsNumber: true }}
-            description="등록된 외국인 근로자 수"
-          />
         </div>
       </div>
 
@@ -304,7 +293,7 @@ export function CompanyForm(props: CompanyFormProps) {
       <div className="space-y-4 rounded-lg border border-dashed p-4 md:col-span-2">
         <p className="text-sm font-medium text-muted-foreground">비교 진단용 (선택)</p>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="averageForeignWorkerWage">외국인 근로자 평균 월임금</Label>
             <Controller
@@ -330,32 +319,7 @@ export function CompanyForm(props: CompanyFormProps) {
               <p className="text-sm text-destructive">{errors.averageForeignWorkerWage.message}</p>
             )}
           </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="recentYearTerminationCount">최근 1년 퇴사 외국인 수</Label>
-            <Controller
-              name="recentYearTerminationCount"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  id="recentYearTerminationCount"
-                  type="number"
-                  placeholder="명"
-                  value={field.value ?? ""}
-                  onChange={(e) =>
-                    field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
-                  }
-                  aria-invalid={!!errors.recentYearTerminationCount}
-                />
-              )}
-            />
-            <p className="text-sm text-muted-foreground">미입력 시 고용 안정성 진단이 생략됩니다</p>
-            {errors.recentYearTerminationCount && (
-              <p className="text-sm text-destructive">
-                {errors.recentYearTerminationCount.message}
-              </p>
-            )}
-          </div>
+          {/* "최근 1년 퇴사 외국인 수": 제거 (자동 집계 카드로 대체, PR-β D21) */}
         </div>
       </div>
     </>

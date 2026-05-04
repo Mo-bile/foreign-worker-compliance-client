@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SimulationForm } from "@/components/simulator/simulation-form";
+import { createMockCompany } from "@/__tests__/fixtures/company";
 import type { CompanyResponse } from "@/types/api";
 import type { MetadataResponse } from "@/types/metadata";
 
@@ -14,24 +15,7 @@ vi.mock("@/lib/queries/use-metadata", () => ({
 
 // ─── Fixtures ────────────────────────────────────────────────────
 
-const mockCompany: CompanyResponse = {
-  id: 1,
-  name: "테스트 회사",
-  businessNumber: "123-45-67890",
-  region: "SEOUL",
-  subRegion: null,
-  industryCategory: "MANUFACTURING",
-  industrySubCategory: null,
-  employeeCount: 50,
-  foreignWorkerCount: 5,
-  domesticInsuredCount: 30,
-  address: "서울시 종로구",
-  contactPhone: "02-1234-5678",
-  averageForeignWorkerWage: null,
-  recentYearTerminationCount: null,
-  createdAt: "2026-01-01T00:00:00Z",
-  updatedAt: "2026-03-01T00:00:00Z",
-};
+const mockCompany: CompanyResponse = createMockCompany();
 
 const mockMetadata: MetadataResponse = {
   nationalities: [

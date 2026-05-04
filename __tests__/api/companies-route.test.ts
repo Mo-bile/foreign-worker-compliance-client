@@ -35,7 +35,6 @@ describe("POST /api/companies", () => {
         region: "SEOUL",
         industryCategory: "MANUFACTURING",
         employeeCount: 50,
-        foreignWorkerCount: 10,
         address: "서울시 강남구",
         contactPhone: "02-1234-5678",
       }),
@@ -67,7 +66,7 @@ describe("POST /api/companies", () => {
     expect(res.status).toBe(400);
   });
 
-  it("foreignWorkerCount가_employeeCount보다_크면_400을_반환한다", async () => {
+  it("domesticInsuredCount가_employeeCount보다_크면_400을_반환한다", async () => {
     const req = makeRequest("http://localhost:3000/api/companies", {
       method: "POST",
       body: JSON.stringify({
@@ -76,7 +75,7 @@ describe("POST /api/companies", () => {
         region: "SEOUL",
         industryCategory: "MANUFACTURING",
         employeeCount: 10,
-        foreignWorkerCount: 20,
+        domesticInsuredCount: 20,
         address: "주소",
         contactPhone: "02-1234-5678",
       }),
@@ -139,7 +138,6 @@ describe("PUT /api/companies/:id", () => {
         region: "BUSAN",
         industryCategory: "CONSTRUCTION",
         employeeCount: 60,
-        foreignWorkerCount: 15,
         address: "부산시",
         contactPhone: "051-1234-5678",
       }),
