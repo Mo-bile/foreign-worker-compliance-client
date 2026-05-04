@@ -179,7 +179,10 @@ export default function ReportsPage() {
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <CardTitle>통합 준수 점수</CardTitle>
                 <div className="w-full md:w-56">
-                  <Select value={selectedYearMonth} onValueChange={setYearMonth}>
+                  <Select
+                    value={selectedYearMonth}
+                    onValueChange={(v) => setYearMonth(v ?? undefined)}
+                  >
                     <SelectTrigger className="w-full" aria-label="기준 월 선택">
                       <SelectValue placeholder="기준 월 선택">{yearMonthOptions.find((o) => o.value === selectedYearMonth)?.label}</SelectValue>
                     </SelectTrigger>
@@ -240,7 +243,10 @@ export default function ReportsPage() {
               </p>
             </div>
             <div className="w-full md:w-56">
-              <Select value={selectedYearMonth} onValueChange={setYearMonth}>
+              <Select
+                value={selectedYearMonth}
+                onValueChange={(v) => setYearMonth(v ?? undefined)}
+              >
                 <SelectTrigger className="w-full" aria-label="기준 월 선택">
                   <SelectValue placeholder="기준 월 선택">{yearMonthOptions.find((o) => o.value === selectedYearMonth)?.label}</SelectValue>
                 </SelectTrigger>
