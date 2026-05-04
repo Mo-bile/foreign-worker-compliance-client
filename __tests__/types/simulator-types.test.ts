@@ -15,7 +15,7 @@ import type {
   AiInsightsResponse,
   AdditionalBonusBE,
   WhatIfScenarioBE,
-  ScoringBonusItemBE,
+  ScoringItemBE,
   QuotaHistoryItem,
   TimelineStepBE,
 } from "@/types/simulator";
@@ -272,7 +272,7 @@ describe("SimulationResultResponse shape", () => {
     whatIfScenarios: [mockWhatIfScenario],
   };
 
-  const mockScoringBonusItem: ScoringBonusItemBE = {
+  const mockScoringBonusItem: ScoringItemBE = {
     code: "PRIORITY_INDUSTRY",
     displayName: "우선 지원 업종",
     points: 5,
