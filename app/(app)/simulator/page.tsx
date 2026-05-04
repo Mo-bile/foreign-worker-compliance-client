@@ -7,6 +7,7 @@ import { InputGuide } from "@/components/simulator/input-guide";
 import { ResultSummarySidebar } from "@/components/simulator/result-summary-sidebar";
 import { VerdictCard } from "@/components/simulator/verdict-card";
 import { ScoringSection } from "@/components/simulator/scoring-section";
+import { AutoSuggestedDeductionsCard } from "@/components/simulator/auto-suggested-deductions-card";
 import { QuotaSection } from "@/components/simulator/quota-section";
 import { TimelineSection } from "@/components/simulator/timeline-section";
 import { AiSummarySection } from "@/components/simulator/ai-summary-section";
@@ -58,6 +59,15 @@ export default function SimulatorPage() {
   function handleEdit() {
     mutation.reset();
     setLastRequest(null);
+  }
+
+  function handleResubmit(codesToAdd: readonly string[]) {
+    if (!lastRequest) return;
+    const existingCodes = result?.currentAppliedScoringCodes ?? lastRequest.appliedScoringCodes;
+    const newCodes = Array.from(new Set([...existingCodes, ...codesToAdd]));
+    const nextRequest = { ...lastRequest, appliedScoringCodes: newCodes };
+    setLastRequest(nextRequest);
+    mutation.mutate(nextRequest);
   }
 
   // ─── Input mode ───
@@ -143,6 +153,13 @@ export default function SimulatorPage() {
 
               {/* ② Scoring */}
               <ScoringSection data={result.scoring} defaultOpen={!isExceeded} muted={isExceeded} />
+
+              {/* ②-bis Auto-suggested Deductions (D36, PR-ε) */}
+              <AutoSuggestedDeductionsCard
+                autoSuggested={result.autoSuggested}
+                onResubmit={handleResubmit}
+                isPending={mutation.isPending}
+              />
 
               {/* ③ Quota */}
               <QuotaSection data={result.quota} defaultOpen={!isExceeded} muted={isExceeded} />
