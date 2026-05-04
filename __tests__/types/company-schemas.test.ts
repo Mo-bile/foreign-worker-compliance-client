@@ -42,7 +42,6 @@ describe("createCompanyRequestSchema", () => {
     region: "SEOUL" as Region,
     industryCategory: "MANUFACTURING" as IndustryCategory,
     employeeCount: 50,
-    foreignWorkerCount: 10,
     address: "서울시 강남구",
     contactPhone: "02-1234-5678",
   };
@@ -60,11 +59,11 @@ describe("createCompanyRequestSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("외국인근로자수가_총직원수를_초과하면_실패한다", () => {
+  it("내국인피보험자수가_총직원수를_초과하면_실패한다", () => {
     const result = createCompanyRequestSchema.safeParse({
       ...validRequest,
       employeeCount: 10,
-      foreignWorkerCount: 20,
+      domesticInsuredCount: 20,
     });
     expect(result.success).toBe(false);
   });
@@ -91,7 +90,6 @@ describe("updateCompanyRequestSchema", () => {
       region: "BUSAN",
       industryCategory: "CONSTRUCTION",
       employeeCount: 30,
-      foreignWorkerCount: 5,
       address: "부산시 해운대구",
       contactPhone: "051-1234-5678",
     });

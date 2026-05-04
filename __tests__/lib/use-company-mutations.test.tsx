@@ -25,7 +25,6 @@ const validCreateData = {
   region: "SEOUL" as const,
   industryCategory: "MANUFACTURING" as const,
   employeeCount: 50,
-  foreignWorkerCount: 10,
   address: "서울시 강남구",
   contactPhone: "02-1234-5678",
 };
@@ -35,7 +34,6 @@ const validUpdateData = {
   region: "BUSAN" as const,
   industryCategory: "CONSTRUCTION" as const,
   employeeCount: 60,
-  foreignWorkerCount: 15,
   address: "부산시 해운대구",
   contactPhone: "051-9876-5432",
 };

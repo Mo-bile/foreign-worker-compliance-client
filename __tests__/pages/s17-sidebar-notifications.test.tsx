@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { server } from "@/mocks/server";
+import { createMockCompany } from "@/__tests__/fixtures/company";
 
 // ─── Mocks ──────────────────────────────────────────────
 
@@ -14,15 +15,15 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/contexts/company-context", () => ({
   useCompanyContext: () => ({
     selectedCompanyId: 1,
-    selectedCompany: { id: 1, name: "테스트 사업장" },
-    companies: [],
+    selectedCompany: mockCompanyData,
+    companies: [mockCompanyData],
     isLoading: false,
     isError: false,
     setSelectedCompanyId: vi.fn(),
   }),
 }));
 
-const mockCompanyData = {
+const mockCompanyData = createMockCompany({
   id: 1,
   name: "테스트 사업장",
   businessNumber: "123-45-67890",
@@ -32,15 +33,17 @@ const mockCompanyData = {
   industrySubCategory: null,
   employeeCount: 50,
   domesticInsuredCount: null,
-  foreignWorkerCount: 10,
   address: "서울시 강남구",
   contactPhone: "02-1234-5678",
   contactEmail: "test@demo.test",
   averageForeignWorkerWage: null,
-  recentYearTerminationCount: null,
   createdAt: "2026-01-01",
   updatedAt: "2026-01-01",
-};
+  derivedCounts: {
+    activeForeignWorkerCount: 3,
+    registeredWorkforceTotal: 3,
+  },
+});
 
 vi.mock("@/lib/queries/use-companies", () => ({
   useCompany: () => ({
@@ -256,25 +259,7 @@ describe("NotificationLogTable", () => {
 });
 
 describe("CompanyEditModal", () => {
-  const mockCompany = {
-    id: 1,
-    name: "테스트 회사",
-    businessNumber: "123-45-67890",
-    region: "SEOUL" as const,
-    subRegion: null,
-    industryCategory: "MANUFACTURING" as const,
-    industrySubCategory: null,
-    employeeCount: 50,
-    foreignWorkerCount: 5,
-    domesticInsuredCount: 30,
-    address: "서울시 종로구",
-    contactPhone: "02-1234-5678",
-    contactEmail: "test@demo.test",
-    averageForeignWorkerWage: null,
-    recentYearTerminationCount: null,
-    createdAt: "2026-01-01T00:00:00Z",
-    updatedAt: "2026-03-01T00:00:00Z",
-  };
+  const mockCompany = createMockCompany();
 
   it("open=true일 때 모달이 표시된다", () => {
     renderWithQuery(
@@ -312,7 +297,8 @@ describe("MyCompanyPage — 내 사업장 정보", () => {
     renderWithQuery(<MyCompanyPage />);
     expect(screen.getByText("내 사업장 정보")).toBeInTheDocument();
     expect(screen.getByText("123-45-67890")).toBeInTheDocument();
-    expect(screen.getByText("3명")).toBeInTheDocument();
+    expect(screen.getByText("재직중 (전체)")).toBeInTheDocument();
+    expect(screen.getAllByText("3명").length).toBeGreaterThan(0);
   });
 
   it("각 카드에 수정 버튼이 있다", () => {
