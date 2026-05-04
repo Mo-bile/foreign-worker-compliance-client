@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    ".worktrees/**", // PR-δ: PR-α/β/γ에서 4회 false positive 유발한 worktree build 산출물 항구 차단
   ]),
 ]);
 
