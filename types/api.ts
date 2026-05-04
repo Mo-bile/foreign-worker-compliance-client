@@ -320,6 +320,28 @@ export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
 // ─── Zod Schemas ──────────────────────────────────────────
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
+function isExistingIsoDate(value: string): boolean {
+  if (!isoDateRegex.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+export function getKoreaTodayIsoDate(date: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 // ─── Company Schemas ─────────────────────────────────────
 export const companyBaseFields = z.object({
   name: z.string().min(1, "회사명을 입력해주세요"),
@@ -558,7 +580,11 @@ export const INSURANCE_DEREGISTRATION_NOTICE =
 
 export const endEmploymentRequestSchema = z
   .object({
-    endedAt: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
+    endedAt: z
+      .string()
+      .regex(isoDateRegex, "날짜 형식: YYYY-MM-DD")
+      .refine(isExistingIsoDate, "존재하지 않는 날짜입니다")
+      .refine((value) => value <= getKoreaTodayIsoDate(), "미래 날짜는 입력할 수 없습니다"),
     reason: z.enum(EMPLOYMENT_END_REASONS, { error: "종료 사유를 선택해주세요" }),
     employerFault: z.boolean().nullable().optional(),
     memo: z.string().max(500, "메모는 500자 이내로 입력해주세요").nullable().optional(),

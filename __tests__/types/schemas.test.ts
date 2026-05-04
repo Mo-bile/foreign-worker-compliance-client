@@ -19,7 +19,15 @@ import {
   resolveWorkerStatusPriority,
   endEmploymentRequestSchema,
   EMPLOYMENT_END_REASONS,
+  getKoreaTodayIsoDate,
 } from "@/types/api";
+
+function addDays(isoDate: string, days: number): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
 
 describe("registerWorkerRequestSchema", () => {
   it("유효한_요청을_통과시킨다", () => {
@@ -433,6 +441,19 @@ describe("endEmploymentRequestSchema", () => {
   it("잘못된_날짜_형식_실패한다", () => {
     expect(
       endEmploymentRequestSchema.safeParse({ endedAt: "2026/05/01", reason: "OTHER" }).success,
+    ).toBe(false);
+  });
+
+  it("존재하지_않는_날짜는_실패한다", () => {
+    expect(
+      endEmploymentRequestSchema.safeParse({ endedAt: "2026-02-31", reason: "OTHER" }).success,
+    ).toBe(false);
+  });
+
+  it("미래_종료일은_실패한다", () => {
+    const tomorrow = addDays(getKoreaTodayIsoDate(), 1);
+    expect(
+      endEmploymentRequestSchema.safeParse({ endedAt: tomorrow, reason: "OTHER" }).success,
     ).toBe(false);
   });
 

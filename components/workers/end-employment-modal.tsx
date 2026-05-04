@@ -24,6 +24,7 @@ import {
   EMPLOYMENT_END_REASONS,
   EMPLOYMENT_END_REASON_LABELS,
   endEmploymentRequestSchema,
+  getKoreaTodayIsoDate,
   INSURANCE_DEREGISTRATION_NOTICE,
 } from "@/types/api";
 import type { EndEmploymentRequest, EmploymentEndReason } from "@/types/api";
@@ -43,7 +44,7 @@ export function EndEmploymentModal({
   workerName,
 }: EndEmploymentModalProps) {
   const mutation = useEndEmployment(workerId);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getKoreaTodayIsoDate();
 
   const {
     register,

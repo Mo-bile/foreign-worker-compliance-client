@@ -150,6 +150,8 @@ export function useEndEmployment(workerId: number) {
       queryClient.invalidateQueries({ queryKey: ["workers"] });
       queryClient.invalidateQueries({ queryKey: ["workers", workerId] });
       queryClient.invalidateQueries({ queryKey: ["compliance"] });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 }
@@ -168,6 +170,8 @@ export function useRestoreEmployment(workerId: number) {
       queryClient.invalidateQueries({ queryKey: ["workers"] });
       queryClient.invalidateQueries({ queryKey: ["workers", workerId] });
       queryClient.invalidateQueries({ queryKey: ["compliance"] });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 }
