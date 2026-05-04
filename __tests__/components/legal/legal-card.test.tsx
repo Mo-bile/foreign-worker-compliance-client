@@ -28,10 +28,9 @@ const mockChange: LegalChange = {
   officialSourceUrl: "https://www.law.go.kr/example",
   icon: "⚖️",
   detectedDate: "2026-03-18",
-  status: "action_required",
   badge: { text: "조치 필요", color: "red" },
   dDay: -13,
-} as LegalChange;
+};
 
 const resolvedChange: LegalChange = {
   id: 3,
@@ -48,9 +47,9 @@ const resolvedChange: LegalChange = {
   officialSourceUrl: "https://www.law.go.kr/example",
   icon: "🏥",
   detectedDate: "2026-02-15",
-  status: "resolved",
+  dDay: null,
   badge: { text: "확인 완료", color: "green" },
-} as LegalChange;
+};
 
 describe("LegalCard", () => {
   it("renders card header with title and badge", () => {

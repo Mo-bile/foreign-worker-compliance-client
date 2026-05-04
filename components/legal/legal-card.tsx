@@ -21,7 +21,7 @@ interface LegalCardProps {
 export function LegalCard({ change, companyId }: LegalCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const bodyId = useId();
-  const isResolved = change.status === "resolved";
+  const isResolved = change.acknowledged === true;
 
   const { data, isLoading, isError, refetch } = useLegalImpact(change.id, companyId, isOpen);
 
@@ -100,7 +100,11 @@ export function LegalCard({ change, companyId }: LegalCardProps) {
             </div>
           ) : data ? (
             <>
-              <ImpactBox level={data.level} description={data.description} actions={data.actions} />
+              <ImpactBox
+                level={data.level}
+                description={data.description}
+                actions={data.actions}
+              />
               {change.officialSourceUrl && (
                 <a
                   href={change.officialSourceUrl}

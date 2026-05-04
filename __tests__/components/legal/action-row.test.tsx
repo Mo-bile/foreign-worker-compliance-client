@@ -7,7 +7,7 @@ describe("ActionRow", () => {
   it("renders all action buttons", () => {
     const actions: LegalAction[] = [
       { label: "계약서 갱신 시작", primary: true },
-      { label: "확인 완료 처리" },
+      { label: "확인 완료 처리", primary: false },
     ];
     render(<ActionRow actions={actions} />);
     expect(screen.getByText("계약서 갱신 시작")).toBeInTheDocument();

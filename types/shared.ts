@@ -1,4 +1,8 @@
-export type SignalColor = "red" | "orange" | "yellow" | "blue" | "green" | "gray";
+import { z } from "zod";
+
+export const SIGNAL_COLORS = ["red", "orange", "yellow", "blue", "green", "gray"] as const;
+export const signalColorSchema = z.enum(SIGNAL_COLORS);
+export type SignalColor = z.infer<typeof signalColorSchema>;
 
 export interface DataSource {
   readonly name: string;

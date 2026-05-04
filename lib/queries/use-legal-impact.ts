@@ -5,7 +5,7 @@ import { fetchApi } from "./query-utils";
 import type { LegalImpact } from "@/types/legal";
 
 export function useLegalImpact(
-  changeId: string,
+  changeId: number,
   companyId: number | null | undefined,
   enabled: boolean,
 ) {

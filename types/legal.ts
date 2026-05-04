@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { signalColorSchema } from "./shared";
 
 export const LEGAL_CATEGORIES = [
   "IMMIGRATION",
@@ -41,6 +42,19 @@ export const displayStatusSchema = z.enum(DISPLAY_STATUSES);
 
 export const sourceTypeSchema = z.enum(SOURCE_TYPES);
 
+export const legalBadgeSchema = z.object({
+  text: z.string(),
+  color: signalColorSchema,
+});
+
+export const legalActionSchema = z.object({
+  label: z.string(),
+  primary: z.boolean(),
+});
+
+export type LegalBadge = z.infer<typeof legalBadgeSchema>;
+export type LegalAction = z.infer<typeof legalActionSchema>;
+
 export const legalChangeSchema = z.object({
   id: z.number(),
   title: z.string(),
@@ -54,13 +68,18 @@ export const legalChangeSchema = z.object({
   displayStatus: displayStatusSchema,
   sourceType: sourceTypeSchema,
   officialSourceUrl: z.string().url().nullable(),
+  icon: z.string(),
+  detectedDate: z.string(),
+  dDay: z.number().nullable(),
+  badge: legalBadgeSchema,
+  description: z.string().optional(),
 });
 
 export const legalChangesResponseSchema = z.array(legalChangeSchema);
 
 export const legalImpactSchema = z.object({
   level: impactLevelSchema,
-  actions: z.array(z.string()),
+  actions: z.array(legalActionSchema),
   description: z.string(),
 });
 

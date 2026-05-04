@@ -23,13 +23,12 @@ interface TimelineLegalChange extends LegalChange {
     readonly text: string;
     readonly color: SignalColor;
   };
-  readonly dDay?: number;
 }
 
-function getDDay(effectiveDate: string): number | undefined {
+function getDDay(effectiveDate: string): number | null {
   const target = new Date(effectiveDate);
   if (Number.isNaN(target.getTime())) {
-    return undefined;
+    return null;
   }
 
   const today = new Date();
@@ -58,7 +57,7 @@ function toTimelineChange(change: LegalChange): TimelineLegalChange {
     detectedDate: change.effectiveDate,
     status,
     badge,
-    dDay: status === "resolved" ? undefined : getDDay(change.effectiveDate),
+    dDay: status === "resolved" ? null : getDDay(change.effectiveDate),
   };
 }
 
