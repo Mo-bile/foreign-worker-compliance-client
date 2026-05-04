@@ -17,6 +17,8 @@ import {
   resolveWorkerStatusColor,
   WORKER_STATUS_COLORS,
   resolveWorkerStatusPriority,
+  endEmploymentRequestSchema,
+  EMPLOYMENT_END_REASONS,
 } from "@/types/api";
 
 describe("registerWorkerRequestSchema", () => {
@@ -380,5 +382,73 @@ describe("updateCompanyRequestSchema", () => {
     const invalid = { ...valid, employeeCount: 50, domesticInsuredCount: 60 };
     const result = updateCompanyRequestSchema.safeParse(invalid);
     expect(result.success).toBe(false);
+  });
+});
+
+describe("endEmploymentRequestSchema", () => {
+  it("필수_필드만으로_통과한다", () => {
+    expect(
+      endEmploymentRequestSchema.safeParse({ endedAt: "2026-05-01", reason: "CONTRACT_EXPIRY" }).success,
+    ).toBe(true);
+  });
+
+  it("WORKPLACE_CHANGE_사유_시_employerFault_undefined면_실패", () => {
+    const result = endEmploymentRequestSchema.safeParse({
+      endedAt: "2026-05-01",
+      reason: "WORKPLACE_CHANGE",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("WORKPLACE_CHANGE_사유_시_employerFault_null도_허용한다", () => {
+    expect(
+      endEmploymentRequestSchema.safeParse({
+        endedAt: "2026-05-01",
+        reason: "WORKPLACE_CHANGE",
+        employerFault: null,
+      }).success,
+    ).toBe(true);
+  });
+
+  it("WORKPLACE_CHANGE_사유_시_employerFault_true_OK", () => {
+    expect(
+      endEmploymentRequestSchema.safeParse({
+        endedAt: "2026-05-01",
+        reason: "WORKPLACE_CHANGE",
+        employerFault: true,
+      }).success,
+    ).toBe(true);
+  });
+
+  it("memo_500자_초과_시_실패한다", () => {
+    expect(
+      endEmploymentRequestSchema.safeParse({
+        endedAt: "2026-05-01",
+        reason: "OTHER",
+        memo: "x".repeat(501),
+      }).success,
+    ).toBe(false);
+  });
+
+  it("잘못된_날짜_형식_실패한다", () => {
+    expect(
+      endEmploymentRequestSchema.safeParse({ endedAt: "2026/05/01", reason: "OTHER" }).success,
+    ).toBe(false);
+  });
+
+  it("9가지_사유_모두_유효하다", () => {
+    for (const reason of EMPLOYMENT_END_REASONS) {
+      const data =
+        reason === "WORKPLACE_CHANGE"
+          ? { endedAt: "2026-05-01", reason, employerFault: null }
+          : { endedAt: "2026-05-01", reason };
+      expect(endEmploymentRequestSchema.safeParse(data).success).toBe(true);
+    }
+  });
+});
+
+describe("EMPLOYMENT_END_REASONS 상수", () => {
+  it("9개_값을_가진다", () => {
+    expect(EMPLOYMENT_END_REASONS).toHaveLength(9);
   });
 });
