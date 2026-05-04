@@ -54,8 +54,8 @@ export default function EditCompanyPage({ params }: { readonly params: Promise<{
           subRegion: company.subRegion ?? undefined,
           industryCategory: company.industryCategory,
           industrySubCategory: company.industrySubCategory ?? undefined,
-          employeeCount: company.employeeCount,
-          foreignWorkerCount: company.foreignWorkerCount,
+          employeeCount: company.employeeCount ?? undefined,
+          // foreignWorkerCount: 제거 (PR-β D21)
           address: company.address,
           contactPhone: company.contactPhone,
         }}
