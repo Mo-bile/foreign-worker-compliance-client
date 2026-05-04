@@ -20,6 +20,10 @@ export function AutoSuggestedDeductionsCard({
 
   if (autoSuggested.length === 0) return null;
 
+  const visibleCodes = new Set(autoSuggested.map((item) => item.code));
+  const visibleSelectedCodes = Array.from(selected).filter((code) => visibleCodes.has(code));
+  const visibleSelected = new Set(visibleSelectedCodes);
+
   function toggle(code: string) {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -45,7 +49,7 @@ export function AutoSuggestedDeductionsCard({
             <label className="flex items-start gap-2 text-sm">
               <input
                 type="checkbox"
-                checked={selected.has(item.code)}
+                checked={visibleSelected.has(item.code)}
                 onChange={() => toggle(item.code)}
                 className="mt-0.5"
                 aria-label={item.displayName}
@@ -66,8 +70,8 @@ export function AutoSuggestedDeductionsCard({
         <Button
           variant="default"
           size="sm"
-          onClick={() => onResubmit(Array.from(selected))}
-          disabled={selected.size === 0 || isPending}
+          onClick={() => onResubmit(visibleSelectedCodes)}
+          disabled={visibleSelectedCodes.length === 0 || isPending}
         >
           {isPending ? "처리 중..." : "다시 시뮬레이션"}
         </Button>

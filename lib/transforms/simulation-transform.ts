@@ -142,6 +142,15 @@ function buildScoringRows(
     });
   }
 
+  for (const item of scoring.appliedDeductionItems) {
+    rows.push({
+      label: item.displayName,
+      score: `-${item.points}점`,
+      status: "✓",
+      isDeduction: true,
+    });
+  }
+
   for (const item of scoring.availableBonusItems) {
     const isDeduction = deductionCodes.has(item.code);
     rows.push({

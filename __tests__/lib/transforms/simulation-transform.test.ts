@@ -120,6 +120,32 @@ describe("scoring 테이블 rows", () => {
     expect(rows[4].status).toBe("미해당");
   });
 
+  it("적용된_감점_항목이_-점수_형식으로_표시된다", () => {
+    const resultWithDeduction = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      scoringAnalysis: {
+        ...mockWithinQuotaResponse.scoringAnalysis,
+        appliedDeductionItems: [
+          {
+            code: "LABOR_VIOLATION_MODERATE",
+            displayName: "노동관계법 위반(폭행폭언·임금체불)",
+            points: 6,
+            applied: true,
+          },
+        ],
+      },
+    });
+
+    const deductionRow = resultWithDeduction.scoring.tableRows.find(
+      (row) => row.label === "노동관계법 위반(폭행폭언·임금체불)",
+    );
+    expect(deductionRow).toMatchObject({
+      score: "-6점",
+      status: "✓",
+      isDeduction: true,
+    });
+  });
+
   it("마지막_row가_합계이며_estimatedScore로_표시된다", () => {
     const lastRow = rows[rows.length - 1];
     expect(lastRow.label).toBe("합계");

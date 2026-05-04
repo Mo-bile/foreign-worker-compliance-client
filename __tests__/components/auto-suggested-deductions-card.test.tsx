@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AutoSuggestedDeductionsCard } from "@/components/simulator/auto-suggested-deductions-card";
+import type { Mock } from "vitest";
 import type { AutoSuggestedDeductionDisplay } from "@/types/simulator";
 
 const mockSuggestion: AutoSuggestedDeductionDisplay = {
@@ -12,11 +13,19 @@ const mockSuggestion: AutoSuggestedDeductionDisplay = {
   triggerCountLabel: "관련 워커 1명",
 };
 
+const nextSuggestion: AutoSuggestedDeductionDisplay = {
+  code: "OTHER_DEDUCTION",
+  displayName: "기타 감점 후보",
+  pointsLabel: "-3점",
+  reason: "새로 감지된 감점 후보",
+  triggerCountLabel: "관련 워커 2명",
+};
+
 describe("AutoSuggestedDeductionsCard", () => {
-  let onResubmit: ReturnType<typeof vi.fn>;
+  let onResubmit: Mock<(codesToAdd: readonly string[]) => void>;
 
   beforeEach(() => {
-    onResubmit = vi.fn();
+    onResubmit = vi.fn<(codesToAdd: readonly string[]) => void>();
   });
 
   it("autoSuggested_빈_배열_시_카드_자체_비노출", () => {
@@ -81,5 +90,37 @@ describe("AutoSuggestedDeductionsCard", () => {
     await userEvent.click(screen.getByRole("checkbox"));
     await userEvent.click(screen.getByRole("button", { name: /다시 시뮬레이션/ }));
     expect(onResubmit).toHaveBeenCalledWith(["LABOR_VIOLATION_MODERATE"]);
+  });
+
+  it("autoSuggested_변경_시_보이는_선택_코드만_재시뮬레이션에_사용", async () => {
+    const { rerender } = render(
+      <AutoSuggestedDeductionsCard
+        autoSuggested={[mockSuggestion]}
+        onResubmit={onResubmit}
+        isPending={false}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("checkbox", { name: mockSuggestion.displayName }));
+    expect(
+      (screen.getByRole("button", { name: /다시 시뮬레이션/ }) as HTMLButtonElement).disabled,
+    ).toBe(false);
+
+    rerender(
+      <AutoSuggestedDeductionsCard
+        autoSuggested={[nextSuggestion]}
+        onResubmit={onResubmit}
+        isPending={false}
+      />,
+    );
+
+    expect(
+      (screen.getByRole("button", { name: /다시 시뮬레이션/ }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+
+    await userEvent.click(screen.getByRole("checkbox", { name: nextSuggestion.displayName }));
+    await userEvent.click(screen.getByRole("button", { name: /다시 시뮬레이션/ }));
+
+    expect(onResubmit).toHaveBeenCalledWith(["OTHER_DEDUCTION"]);
   });
 });
