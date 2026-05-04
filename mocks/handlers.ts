@@ -19,6 +19,10 @@ function addDays(isoDate: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+function normalizeOptionalDate(value: unknown): string | null {
+  return typeof value === "string" && value.trim() !== "" ? value : null;
+}
+
 // ─── Shared handler callbacks ───────────────────────────
 
 const getWorkerById: Parameters<typeof http.get>[1] = ({ params }) => {
@@ -86,7 +90,8 @@ const putWorker: Parameters<typeof http.put>[1] = async ({ params, request }) =>
     const body = (await request.json()) as Record<string, unknown>;
     const employmentInfoChanged =
       body.contractStartDate !== worker.contractStartDate ||
-      body.contractEndDate !== worker.contractEndDate;
+      normalizeOptionalDate(body.contractEndDate) !==
+        normalizeOptionalDate(worker.contractEndDate);
     if (employmentInfoChanged) {
       return HttpResponse.json(
         {

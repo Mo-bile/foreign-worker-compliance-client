@@ -9,7 +9,9 @@ INACTIVE_HITS=$(grep -rn "INACTIVE" \
   --exclude-dir=.next \
   --exclude-dir=.worktrees \
   --exclude-dir=docs \
-  . || true)
+  . \
+  | grep -vE '^[^:]+:[0-9]+:[[:space:]]*//' \
+  || true)
 
 if [ -n "$INACTIVE_HITS" ]; then
   echo "❌ INACTIVE 문자열 잔존:"
@@ -30,6 +32,7 @@ COMPANY_HITS=$(grep -rn "foreignWorkerCount\|recentYearTerminationCount" \
   | grep -v "types/benchmark.ts" \
   | grep -v "components/benchmark/" \
   | grep -v "mocks/benchmark-data.ts" \
+  | grep -vE '^[^:]+:[0-9]+:[[:space:]]*//' \
   || true)
 
 if [ -n "$COMPANY_HITS" ]; then

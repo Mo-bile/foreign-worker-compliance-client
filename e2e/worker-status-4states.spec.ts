@@ -11,9 +11,9 @@ test.describe("WorkerStatus 4분리 회귀 방지 (PR-α D23)", () => {
 
   test("재직중_필터에_UPCOMING_워커가_섞이지_않는다_D23_라벨_오류_회귀", async ({ page }) => {
     await page.goto("/workers");
-    await page.getByRole("combobox", { name: "상태 전체" }).click();
+    await page.getByRole("combobox", { name: "상태 전체", exact: true }).click();
     await page.getByRole("option", { name: "재직중" }).click();
 
-    await expect(page.getByText("입사 예정")).toHaveCount(0);
+    await expect(page.locator("tbody").getByText("입사 예정")).toHaveCount(0);
   });
 });

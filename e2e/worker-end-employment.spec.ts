@@ -4,7 +4,7 @@ test.describe("워커 고용종료 lifecycle 회귀 방지 (PR-γ)", () => {
   test("ACTIVE_워커_고용종료_처리_플로우_토스트에_4대보험_안내_포함", async ({ page }) => {
     await page.goto("/workers/1");
     await page.getByRole("button", { name: "고용종료 처리" }).click();
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("alertdialog")).toBeVisible();
 
     await page.getByLabel("종료 사유").click();
     await page.getByRole("option", { name: "계약만료" }).click();
@@ -20,7 +20,7 @@ test.describe("워커 고용종료 lifecycle 회귀 방지 (PR-γ)", () => {
     await expect(page.getByText("시스템 자동 추론값")).toBeVisible();
 
     await page.getByRole("button", { name: "고용종료 확정" }).click();
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("alertdialog")).toBeVisible();
   });
 
   test("ENDED_워커_contract_편집_시도_시_400_차단_토스트", async ({ page }) => {
@@ -28,7 +28,8 @@ test.describe("워커 고용종료 lifecycle 회귀 방지 (PR-γ)", () => {
     await page.getByLabel("계약 종료일").fill("2027-01-01");
     await page.getByRole("button", { name: /수정$/ }).click();
 
-    await expect(page.getByText(/이 워커는 고용종료 상태입니다/)).toBeVisible();
-    await expect(page.getByText(/고용종료를 복원해주세요/)).toBeVisible();
+    const notifications = page.locator('section[aria-label="Notifications alt+T"]');
+    await expect(notifications.getByText(/이 워커는 고용종료 상태입니다/)).toBeVisible();
+    await expect(notifications.getByText(/고용종료를 복원해주세요/)).toBeVisible();
   });
 });
