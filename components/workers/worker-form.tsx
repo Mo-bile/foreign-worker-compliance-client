@@ -216,6 +216,7 @@ export function WorkerForm(props: WorkerFormProps) {
           toast.success("근로자 정보가 수정되었습니다");
           router.push(`/workers/${editWorkerId}`);
         },
+        onError: (error) => toast.error(error.message),
       });
       return;
     }

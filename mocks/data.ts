@@ -1,4 +1,9 @@
-import type { WorkerResponse, ComplianceDeadlineResponse, CompanyResponse } from "@/types/api";
+import type {
+  WorkerResponse,
+  ComplianceDeadlineResponse,
+  CompanyResponse,
+  TerminationInfoDto,
+} from "@/types/api";
 
 // ─── 사업장 목 데이터 ──────────────────────────────────
 export const mockCompanies: readonly CompanyResponse[] = [
@@ -123,6 +128,68 @@ const SAMPLE_INSURANCE_CODES = [
 const INSURANCE_DISCLAIMER =
   "본 판정은 관리 보조 목적이며 법적 자문이 아닙니다. 정확한 가입 요건은 관할 공단에 확인하세요.";
 
+function generateTerminationInfo(id: number, status: string): TerminationInfoDto | null {
+  // ENDED 5건 (id 6, 10, 14, 18, 22): 4종 사유 분산 + OTHER 1건
+  if (status === "ENDED") {
+    const reasonsByIdx: ReadonlyArray<TerminationInfoDto> = [
+      {
+        endedAt: "2026-03-10",
+        reason: "CONTRACT_EXPIRY",
+        employerFault: null,
+        memo: null,
+        confirmed: true,
+        systemInferred: false,
+      },
+      {
+        endedAt: "2026-02-15",
+        reason: "VOLUNTARY_RESIGNATION",
+        employerFault: null,
+        memo: "본인 사유로 조기 퇴사",
+        confirmed: true,
+        systemInferred: false,
+      },
+      {
+        endedAt: "2026-04-01",
+        reason: "WORKPLACE_CHANGE",
+        employerFault: true,
+        memo: "임금체불로 사업장 변경 신청",
+        confirmed: true,
+        systemInferred: false,
+      },
+      {
+        endedAt: "2026-01-20",
+        reason: "RETURN_HOME",
+        employerFault: null,
+        memo: null,
+        confirmed: true,
+        systemInferred: false,
+      },
+      {
+        endedAt: "2026-03-25",
+        reason: "OTHER",
+        employerFault: null,
+        memo: "기타 사유",
+        confirmed: true,
+        systemInferred: false,
+      },
+    ];
+    const idx = [6, 10, 14, 18, 22].indexOf(id);
+    return idx >= 0 ? reasonsByIdx[idx] : reasonsByIdx[0];
+  }
+  // REVIEW_REQUIRED 6건 중 id=3만 systemInferred 백필 시나리오
+  if (status === "REVIEW_REQUIRED" && id === 3) {
+    return {
+      endedAt: "2026-04-30",
+      reason: "CONTRACT_EXPIRY",
+      employerFault: null,
+      memo: null,
+      confirmed: false,
+      systemInferred: true,
+    };
+  }
+  return null;
+}
+
 function generateWorker(id: number): WorkerResponse {
   const natIdx = id % SAMPLE_NATIONALITIES.length;
   const visaIdx = id % SAMPLE_VISA_TYPES.length;
@@ -183,6 +250,7 @@ function generateWorker(id: number): WorkerResponse {
     entryDate: `2024-${String((id % 12) + 1).padStart(2, "0")}-15`,
     registrationNumber: id % 3 === 0 ? `${String(800101 + id)}-${String(1000000 + id)}` : null,
     companyId: (id % 3) + 1,
+    terminationInfo: generateTerminationInfo(id, status),
   };
 }
 
@@ -233,6 +301,7 @@ export const mockWorkers: readonly WorkerResponse[] = [
     entryDate: "2024-06-15",
     registrationNumber: "950315-5123456",
     companyId: 1,
+    terminationInfo: null,
   },
   {
     id: 2,
@@ -279,6 +348,7 @@ export const mockWorkers: readonly WorkerResponse[] = [
     entryDate: "2023-11-20",
     registrationNumber: null,
     companyId: 1,
+    terminationInfo: null,
   },
   ...Array.from({ length: 23 }, (_, i) => generateWorker(i + 3)),
 ];

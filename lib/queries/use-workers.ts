@@ -5,6 +5,9 @@ import type {
   WorkerResponse,
   RegisterWorkerRequest,
   UpdateWorkerRequest,
+  EndEmploymentRequest,
+  EndEmploymentResponse,
+  RestoreEmploymentResponse,
   SuggestWorkerKoreanNameRequest,
   SuggestWorkerKoreanNameResponse,
   VisaType,
@@ -130,5 +133,45 @@ function filterWorkers(
     }
 
     return true;
+  });
+}
+
+export function useEndEmployment(workerId: number) {
+  const queryClient = useQueryClient();
+  return useMutation<EndEmploymentResponse, Error, EndEmploymentRequest>({
+    mutationFn: (data) =>
+      mutateApi<EndEmploymentResponse>(
+        `/api/workers/${workerId}/end-employment`,
+        "POST",
+        data,
+        "고용종료 처리에 실패했습니다",
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
+      queryClient.invalidateQueries({ queryKey: ["workers", workerId] });
+      queryClient.invalidateQueries({ queryKey: ["compliance"] });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+}
+
+export function useRestoreEmployment(workerId: number) {
+  const queryClient = useQueryClient();
+  return useMutation<RestoreEmploymentResponse, Error, void>({
+    mutationFn: () =>
+      mutateApi<RestoreEmploymentResponse>(
+        `/api/workers/${workerId}/restore-employment`,
+        "POST",
+        {},
+        "고용종료 복원에 실패했습니다",
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
+      queryClient.invalidateQueries({ queryKey: ["workers", workerId] });
+      queryClient.invalidateQueries({ queryKey: ["compliance"] });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
   });
 }

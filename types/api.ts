@@ -126,6 +126,32 @@ export const WORKER_STATUS_LABELS: Record<WorkerStatus, string> = {
   REVIEW_REQUIRED: "확인 필요",
 };
 
+// ─── EmploymentEndReason ────────────────────────────────────
+export const EMPLOYMENT_END_REASONS = [
+  "CONTRACT_EXPIRY",
+  "VOLUNTARY_RESIGNATION",
+  "DISMISSAL",
+  "WORKPLACE_CHANGE",
+  "RETURN_HOME",
+  "DISAPPEARANCE",
+  "DEATH",
+  "VISA_STATUS_CHANGE",
+  "OTHER",
+] as const;
+export type EmploymentEndReason = (typeof EMPLOYMENT_END_REASONS)[number];
+
+export const EMPLOYMENT_END_REASON_LABELS: Record<EmploymentEndReason, string> = {
+  CONTRACT_EXPIRY: "계약만료",
+  VOLUNTARY_RESIGNATION: "자발적 퇴사",
+  DISMISSAL: "해고",
+  WORKPLACE_CHANGE: "사업장 변경",
+  RETURN_HOME: "귀국",
+  DISAPPEARANCE: "이탈·소재불명",
+  DEATH: "사망",
+  VISA_STATUS_CHANGE: "체류자격 변경",
+  OTHER: "기타",
+};
+
 // 정렬 우선순위 (REVIEW_REQUIRED → UPCOMING → ACTIVE → ENDED, 브리프 §PR-α)
 export const WORKER_STATUS_PRIORITY: Record<WorkerStatus, number> = {
   REVIEW_REQUIRED: 0,
@@ -294,6 +320,28 @@ export const DEADLINE_STATUS_LABELS: Record<DeadlineStatus, string> = {
 // ─── Zod Schemas ──────────────────────────────────────────
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
+function isExistingIsoDate(value: string): boolean {
+  if (!isoDateRegex.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+export function getKoreaTodayIsoDate(date: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 // ─── Company Schemas ─────────────────────────────────────
 export const companyBaseFields = z.object({
   name: z.string().min(1, "회사명을 입력해주세요"),
@@ -454,6 +502,15 @@ export interface InsuranceEligibilityDto {
   readonly note: string | null;
 }
 
+export interface TerminationInfoDto {
+  readonly endedAt: string;                  // ISO date "YYYY-MM-DD"
+  readonly reason: EmploymentEndReason;
+  readonly employerFault: boolean | null;    // WORKPLACE_CHANGE에서만 의미
+  readonly memo: string | null;
+  readonly confirmed: boolean;
+  readonly systemInferred: boolean;
+}
+
 export interface WorkerResponse {
   readonly id: number;
   readonly name: string;
@@ -474,6 +531,7 @@ export interface WorkerResponse {
   readonly entryDate: string | null;
   readonly registrationNumber: string | null;
   readonly companyId: number;
+  readonly terminationInfo: TerminationInfoDto | null;
 }
 
 export interface ComplianceDeadlineResponse {
@@ -493,3 +551,50 @@ export interface ErrorResponse {
   readonly alertMessage?: string;
   readonly timestamp: string;
 }
+
+export interface DeadlineSummary {
+  readonly id: number;
+  readonly type: DeadlineType;
+  readonly dueDate: string;
+  readonly description: string;
+}
+
+export interface EndEmploymentResponse {
+  readonly workerId: number;
+  readonly endedAt: string;
+  readonly status: WorkerStatus;
+  readonly createdDeadlines: readonly DeadlineSummary[];
+  readonly autoCompletedDeadlines: readonly DeadlineSummary[];
+  readonly preservedDeadlineCount: number;
+}
+
+export interface RestoreEmploymentResponse {
+  readonly workerId: number;
+  readonly status: WorkerStatus;
+  readonly removedChangeReportDeadlineIds: readonly number[];
+}
+
+// PM SPEC §2-6 D29 명시 문구. termination-info-card + 토스트에서 재사용
+export const INSURANCE_DEREGISTRATION_NOTICE =
+  "4대보험 자격상실 신고도 잊지 마세요 — 국민연금·고용보험·산재보험은 다음 달 15일까지, 건강보험은 14일 이내 처리해야 합니다.";
+
+export const endEmploymentRequestSchema = z
+  .object({
+    endedAt: z
+      .string()
+      .regex(isoDateRegex, "날짜 형식: YYYY-MM-DD")
+      .refine(isExistingIsoDate, "존재하지 않는 날짜입니다")
+      .refine((value) => value <= getKoreaTodayIsoDate(), "미래 날짜는 입력할 수 없습니다"),
+    reason: z.enum(EMPLOYMENT_END_REASONS, { error: "종료 사유를 선택해주세요" }),
+    employerFault: z.boolean().nullable().optional(),
+    memo: z.string().max(500, "메모는 500자 이내로 입력해주세요").nullable().optional(),
+  })
+  .refine(
+    (d) => d.reason !== "WORKPLACE_CHANGE" || d.employerFault !== undefined,
+    {
+      message: "사업장 변경 사유 선택 시 사업주 귀책 여부를 선택해주세요",
+      path: ["employerFault"],
+    },
+  );
+
+export type EndEmploymentRequest = z.infer<typeof endEmploymentRequestSchema>;
