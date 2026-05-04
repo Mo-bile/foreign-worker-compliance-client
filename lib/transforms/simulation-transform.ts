@@ -2,6 +2,8 @@ import DOMPurify from "isomorphic-dompurify";
 import type {
   SimulationResultResponse,
   SimulationResponse,
+  AutoSuggestedDeduction,
+  AutoSuggestedDeductionDisplay,
   SimulationVerdict,
   VerdictDisplayData,
   AdditionalBonusDisplay,
@@ -137,6 +139,15 @@ function buildScoringRows(
       score: isDeduction ? `-${item.points}점` : `+${item.points}점`,
       status: "✓",
       isDeduction,
+    });
+  }
+
+  for (const item of scoring.appliedDeductionItems) {
+    rows.push({
+      label: item.displayName,
+      score: `-${item.points}점`,
+      status: "✓",
+      isDeduction: true,
     });
   }
 
@@ -306,6 +317,25 @@ function buildRecommendation(
 
 // ─── Main Transform ──────────────────────────────────────────────
 
+function transformAutoSuggestedDeductions(
+  items: readonly AutoSuggestedDeduction[],
+): readonly AutoSuggestedDeductionDisplay[] {
+  return items.map((item) => ({
+    code: item.code,
+    displayName: item.displayName,
+    pointsLabel: `-${item.points}점`,
+    reason: item.reason,
+    triggerCountLabel: `관련 워커 ${item.triggerCount}명`,
+  }));
+}
+
+function collectAppliedScoringCodes(scoringAnalysis: ScoringAnalysis): readonly string[] {
+  return [
+    ...scoringAnalysis.appliedBonusItems.filter((i) => i.applied).map((i) => i.code),
+    ...scoringAnalysis.appliedDeductionItems.filter((i) => i.applied).map((i) => i.code),
+  ];
+}
+
 export function transformSimulationResult(
   raw: SimulationResultResponse,
   deductionCodes: ReadonlySet<string> = new Set(),
@@ -317,6 +347,10 @@ export function transformSimulationResult(
     id: String(raw.id),
     verdict: buildVerdict(employmentLimitAnalysis, raw.desiredWorkers),
     scoring: buildScoring(scoringAnalysis, deductionCodes),
+    autoSuggested: transformAutoSuggestedDeductions(
+      raw.scoringAnalysis.autoSuggestedDeductions,
+    ),
+    currentAppliedScoringCodes: collectAppliedScoringCodes(raw.scoringAnalysis),
     quota: buildQuota(quotaStatus),
     timeline: buildTimeline(timelineEstimate),
     aiSummary: sanitize(aiInsights.overallVerdict),

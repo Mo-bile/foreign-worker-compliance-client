@@ -120,6 +120,32 @@ describe("scoring 테이블 rows", () => {
     expect(rows[4].status).toBe("미해당");
   });
 
+  it("적용된_감점_항목이_-점수_형식으로_표시된다", () => {
+    const resultWithDeduction = transformSimulationResult({
+      ...mockWithinQuotaResponse,
+      scoringAnalysis: {
+        ...mockWithinQuotaResponse.scoringAnalysis,
+        appliedDeductionItems: [
+          {
+            code: "LABOR_VIOLATION_MODERATE",
+            displayName: "노동관계법 위반(폭행폭언·임금체불)",
+            points: 6,
+            applied: true,
+          },
+        ],
+      },
+    });
+
+    const deductionRow = resultWithDeduction.scoring.tableRows.find(
+      (row) => row.label === "노동관계법 위반(폭행폭언·임금체불)",
+    );
+    expect(deductionRow).toMatchObject({
+      score: "-6점",
+      status: "✓",
+      isDeduction: true,
+    });
+  });
+
   it("마지막_row가_합계이며_estimatedScore로_표시된다", () => {
     const lastRow = rows[rows.length - 1];
     expect(lastRow.label).toBe("합계");
@@ -360,6 +386,52 @@ describe("top-level 필드", () => {
   it("createdAt이_그대로_전달된다", () => {
     const result = transformSimulationResult(mockWithinQuotaResponse);
     expect(result.createdAt).toBe("2026-03-30T14:32:00Z");
+  });
+});
+
+describe("transformSimulationResult — autoSuggestedDeductions + currentAppliedScoringCodes", () => {
+  it("autoSuggestedDeductions_1건_pointsLabel_triggerCountLabel_변환", () => {
+    const result = transformSimulationResult(mockWithinQuotaResponse);
+    expect(result.autoSuggested).toHaveLength(1);
+    expect(result.autoSuggested[0]).toMatchObject({
+      code: "LABOR_VIOLATION_MODERATE",
+      pointsLabel: "-6점",
+      triggerCountLabel: "관련 워커 1명",
+    });
+  });
+
+  it("appliedBonusItems_2개_appliedDeductionItems_1개_currentAppliedScoringCodes_3개_합산", () => {
+    const response = {
+      ...mockWithinQuotaResponse,
+      scoringAnalysis: {
+        ...mockWithinQuotaResponse.scoringAnalysis,
+        appliedBonusItems: [
+          { code: "BONUS_1", displayName: "Bonus 1", points: 5, applied: true },
+          { code: "BONUS_2", displayName: "Bonus 2", points: 3, applied: true },
+        ],
+        appliedDeductionItems: [
+          { code: "DEDUCT_1", displayName: "Deduct 1", points: 6, applied: true },
+        ],
+      },
+    };
+    const result = transformSimulationResult(response);
+    expect(result.currentAppliedScoringCodes).toEqual(["BONUS_1", "BONUS_2", "DEDUCT_1"]);
+  });
+
+  it("appliedBonusItems_applied_false는_currentAppliedScoringCodes에서_제외", () => {
+    const response = {
+      ...mockWithinQuotaResponse,
+      scoringAnalysis: {
+        ...mockWithinQuotaResponse.scoringAnalysis,
+        appliedBonusItems: [
+          { code: "BONUS_APPLIED", displayName: "Applied", points: 5, applied: true },
+          { code: "BONUS_NOT", displayName: "Not Applied", points: 5, applied: false },
+        ],
+        appliedDeductionItems: [],
+      },
+    };
+    const result = transformSimulationResult(response);
+    expect(result.currentAppliedScoringCodes).toEqual(["BONUS_APPLIED"]);
   });
 });
 

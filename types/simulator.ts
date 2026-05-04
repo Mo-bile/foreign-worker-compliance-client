@@ -79,16 +79,31 @@ export interface EmploymentLimitAnalysis {
   readonly whatIfScenarios: readonly WhatIfScenarioBE[];
 }
 
-export interface ScoringBonusItemBE {
+export interface ScoringItemBE {
   readonly code: string;
   readonly displayName: string;
   readonly points: number;
   readonly applied: boolean;
 }
 
+// 호환성 alias (점진 마이그레이션, 기존 사용처 영향 0)
+export type ScoringBonusItemBE = ScoringItemBE;
+
+// PR-EF D36: BE가 워커 lifecycle 데이터(recentYearEmployerFaultEndCount 등)에서 자동 매핑한 감점 후보
+export interface AutoSuggestedDeduction {
+  readonly code: string;          // "LABOR_VIOLATION_MODERATE"
+  readonly displayName: string;   // "노동관계법 위반(폭행폭언·임금체불)"
+  readonly points: number;        // 6 (감점 절댓값)
+  readonly reason: string;        // "최근 1년 사업주 귀책 사업장 변경 1명"
+  readonly triggerCount: number;  // 1
+}
+
 export interface ScoringAnalysis {
-  readonly appliedBonusItems: readonly ScoringBonusItemBE[];
-  readonly availableBonusItems: readonly ScoringBonusItemBE[];
+  readonly appliedBonusItems: readonly ScoringItemBE[];
+  readonly availableBonusItems: readonly ScoringItemBE[];
+  readonly appliedDeductionItems: readonly ScoringItemBE[];      // PR-ε 신규
+  readonly availableDeductionItems: readonly ScoringItemBE[];    // PR-ε 신규
+  readonly autoSuggestedDeductions: readonly AutoSuggestedDeduction[]; // PR-ε 신규 (D36)
   readonly totalBonusScore: number;
   readonly totalDeductionScore: number;
   readonly estimatedScore: number;
@@ -241,10 +256,20 @@ export interface RecommendationDisplayData {
   readonly items: readonly RecommendationItem[];
 }
 
+export interface AutoSuggestedDeductionDisplay {
+  readonly code: string;
+  readonly displayName: string;
+  readonly pointsLabel: string;        // "-6점" (사전 포맷)
+  readonly reason: string;
+  readonly triggerCountLabel: string;  // "관련 워커 1명"
+}
+
 export interface SimulationResponse {
   readonly id: string;
   readonly verdict: VerdictDisplayData;
   readonly scoring: ScoringDisplayData;
+  readonly autoSuggested: readonly AutoSuggestedDeductionDisplay[];        // PR-ε 신규
+  readonly currentAppliedScoringCodes: readonly string[];                  // PR-ε 신규 (재시뮬 누적용)
   readonly quota: QuotaDisplayData;
   readonly timeline: TimelineDisplayData;
   readonly aiSummary: string;
