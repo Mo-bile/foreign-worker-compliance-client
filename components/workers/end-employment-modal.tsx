@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   EMPLOYMENT_END_REASONS,
   EMPLOYMENT_END_REASON_LABELS,
@@ -145,34 +147,41 @@ export function EndEmploymentModal({
               <Controller
                 name="employerFault"
                 control={control}
-                render={({ field }) => (
-                  <div className="flex gap-4 text-sm">
-                    {[
-                      { value: "true", label: "예" },
-                      { value: "false", label: "아니오" },
-                      { value: "null", label: "확인 필요" },
-                    ].map(({ value, label }) => (
-                      <label key={value} className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="employerFault"
-                          value={value}
-                          checked={
-                            (field.value === true && value === "true") ||
-                            (field.value === false && value === "false") ||
-                            (field.value === null && value === "null")
-                          }
-                          onChange={() =>
+                render={({ field }) => {
+                  const radioValue =
+                    field.value === true
+                      ? "true"
+                      : field.value === false
+                        ? "false"
+                        : "null";
+                  return (
+                    <RadioGroup
+                      value={radioValue}
+                      onValueChange={(v) =>
+                        field.onChange(v === "true" ? true : v === "false" ? false : null)
+                      }
+                    >
+                      {[
+                        { value: "true", label: "예" },
+                        { value: "false", label: "아니오" },
+                        { value: "null", label: "확인 필요" },
+                      ].map(({ value, label }) => (
+                        <div
+                          key={value}
+                          className="flex items-center gap-2 cursor-pointer"
+                          onClick={() =>
                             field.onChange(
                               value === "true" ? true : value === "false" ? false : null,
                             )
                           }
-                        />
-                        {label}
-                      </label>
-                    ))}
-                  </div>
-                )}
+                        >
+                          <RadioGroupItem value={value} aria-label={label} />
+                          <span>{label}</span>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  );
+                }}
               />
               {errors.employerFault && (
                 <p className="text-sm text-destructive">{errors.employerFault.message}</p>
@@ -182,12 +191,7 @@ export function EndEmploymentModal({
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="memo">메모 (선택, 최대 500자)</Label>
-            <textarea
-              id="memo"
-              rows={3}
-              {...register("memo")}
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs focus-visible:outline-2 focus-visible:outline-ring resize-none"
-            />
+            <Textarea id="memo" rows={3} {...register("memo")} />
             {errors.memo && <p className="text-sm text-destructive">{errors.memo.message}</p>}
           </div>
 
