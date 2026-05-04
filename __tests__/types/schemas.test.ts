@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from "vitest";
 import {
   registerWorkerRequestSchema,
   updateWorkerRequestSchema,
+  createCompanyRequestSchema,
+  updateCompanyRequestSchema,
   type Nationality,
   type VisaType,
   NATIONALITIES,
@@ -295,5 +297,88 @@ describe("resolveWorkerStatusPriority", () => {
     expect(resolveWorkerStatusPriority("UNKNOWN")).toBeLessThan(
       resolveWorkerStatusPriority("REVIEW_REQUIRED"),
     );
+  });
+});
+
+describe("createCompanyRequestSchema", () => {
+  const valid = {
+    name: "한국전자",
+    businessNumber: "123-45-67890",
+    region: "SEOUL" as const,
+    industryCategory: "MANUFACTURING" as const,
+    address: "서울시 강남구 테헤란로 123",
+    contactPhone: "02-1234-5678",
+  };
+
+  it("필수_필드만으로_통과한다_employeeCount_없이도_OK", () => {
+    const result = createCompanyRequestSchema.safeParse(valid);
+    expect(result.success).toBe(true);
+  });
+
+  it("foreignWorkerCount_필드는_더_이상_요구되지_않는다", () => {
+    const withForeign = { ...valid, foreignWorkerCount: 5 };
+    const result = createCompanyRequestSchema.safeParse(withForeign);
+    expect(result.success).toBe(true); // unknown 필드는 무시됨 (Zod 기본 동작)
+  });
+
+  it("employeeCount_단독_입력해도_통과한다", () => {
+    const withEmployee = { ...valid, employeeCount: 50 };
+    const result = createCompanyRequestSchema.safeParse(withEmployee);
+    expect(result.success).toBe(true);
+  });
+
+  it("domesticInsuredCount가_employeeCount를_초과하면_실패한다", () => {
+    const invalid = { ...valid, employeeCount: 50, domesticInsuredCount: 60 };
+    const result = createCompanyRequestSchema.safeParse(invalid);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const message = result.error.issues[0]?.message ?? "";
+      expect(message).toContain("내국인 피보험자 수");
+    }
+  });
+
+  it("둘_중_하나만_입력되면_refine_검증_생략", () => {
+    const onlyDomestic = { ...valid, domesticInsuredCount: 100 };
+    const onlyEmployee = { ...valid, employeeCount: 50 };
+    expect(createCompanyRequestSchema.safeParse(onlyDomestic).success).toBe(true);
+    expect(createCompanyRequestSchema.safeParse(onlyEmployee).success).toBe(true);
+  });
+
+  it("회사명_누락시_실패한다", () => {
+    const invalid = { ...valid, name: "" };
+    const result = createCompanyRequestSchema.safeParse(invalid);
+    expect(result.success).toBe(false);
+  });
+
+  it("사업자번호_형식이_틀리면_실패한다", () => {
+    const invalid = { ...valid, businessNumber: "12345" };
+    const result = createCompanyRequestSchema.safeParse(invalid);
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("updateCompanyRequestSchema", () => {
+  const valid = {
+    name: "한국전자",
+    region: "SEOUL" as const,
+    industryCategory: "MANUFACTURING" as const,
+    address: "서울시 강남구 테헤란로 123",
+    contactPhone: "02-1234-5678",
+  };
+
+  it("businessNumber_없이_통과한다_update는_사업자번호_제외", () => {
+    const result = updateCompanyRequestSchema.safeParse(valid);
+    expect(result.success).toBe(true);
+  });
+
+  it("foreignWorkerCount_필드는_요구되지_않는다", () => {
+    const withForeign = { ...valid, foreignWorkerCount: 5 };
+    expect(updateCompanyRequestSchema.safeParse(withForeign).success).toBe(true);
+  });
+
+  it("domesticInsuredCount가_employeeCount를_초과하면_실패한다", () => {
+    const invalid = { ...valid, employeeCount: 50, domesticInsuredCount: 60 };
+    const result = updateCompanyRequestSchema.safeParse(invalid);
+    expect(result.success).toBe(false);
   });
 });

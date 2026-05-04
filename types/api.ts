@@ -301,26 +301,32 @@ export const companyBaseFields = z.object({
   subRegion: z.string().optional(),
   industryCategory: z.enum(INDUSTRY_CATEGORIES, { error: "업종을 선택해주세요" }),
   industrySubCategory: z.string().optional(),
-  employeeCount: z.number().int().min(1, "1명 이상이어야 합니다"),
+  employeeCount: z.number().int().min(1, "1명 이상이어야 합니다").optional(),
   domesticInsuredCount: z.number().int().min(0, "0명 이상이어야 합니다").optional(),
-  foreignWorkerCount: z.number().int().min(0, "0명 이상이어야 합니다"),
+  // foreignWorkerCount: 제거 (PR-β D21)
   address: z.string().min(1, "주소를 입력해주세요"),
   contactPhone: z.string().min(1, "연락처를 입력해주세요"),
   contactEmail: z.string().email("올바른 이메일 형식이 아닙니다").optional().or(z.literal("")),
   averageForeignWorkerWage: z.number().positive("양수를 입력해주세요").optional(),
-  recentYearTerminationCount: z.number().int().min(0, "0 이상이어야 합니다").optional(),
+  // recentYearTerminationCount: 제거 (PR-β D21)
 });
 
-function refineWorkerCount<
-  T extends z.ZodType<{ foreignWorkerCount: number; employeeCount: number }>,
+function refineDomesticVsEmployee<
+  T extends z.ZodType<{ domesticInsuredCount?: number; employeeCount?: number }>,
 >(schema: T) {
-  return schema.refine((d) => d.foreignWorkerCount <= d.employeeCount, {
-    message: "외국인 근로자 수는 총 직원 수를 초과할 수 없습니다",
-    path: ["foreignWorkerCount"],
-  });
+  return schema.refine(
+    (d) =>
+      d.domesticInsuredCount == null ||
+      d.employeeCount == null ||
+      d.domesticInsuredCount <= d.employeeCount,
+    {
+      message: "내국인 피보험자 수는 총 직원 수를 초과할 수 없습니다",
+      path: ["domesticInsuredCount"],
+    },
+  );
 }
 
-export const createCompanyRequestSchema = refineWorkerCount(
+export const createCompanyRequestSchema = refineDomesticVsEmployee(
   companyBaseFields.extend({
     businessNumber: z.string().regex(/^\d{3}-\d{2}-\d{5}$/, "사업자번호 형식: xxx-xx-xxxxx"),
   }),
@@ -328,7 +334,7 @@ export const createCompanyRequestSchema = refineWorkerCount(
 
 export type CreateCompanyRequest = z.infer<typeof createCompanyRequestSchema>;
 
-export const updateCompanyRequestSchema = refineWorkerCount(companyBaseFields);
+export const updateCompanyRequestSchema = refineDomesticVsEmployee(companyBaseFields);
 
 export type UpdateCompanyRequest = z.infer<typeof updateCompanyRequestSchema>;
 
@@ -397,6 +403,29 @@ export const updateWorkerRequestSchema = z
 export type UpdateWorkerRequest = z.infer<typeof updateWorkerRequestSchema>;
 
 // ─── Response Types ───────────────────────────────────────
+export interface CompanyDerivedCountsResponse {
+  // 표시·집계 (PR-β /settings/company 화면 활용)
+  readonly activeForeignWorkerCount: number;
+  readonly upcomingForeignWorkerCount: number;
+  readonly endedForeignWorkerCount: number;
+  readonly reviewRequiredForeignWorkerCount: number;
+  readonly recentYearEndedForeignWorkerCount: number;
+
+  // 자동 합산
+  readonly registeredWorkforceTotal: number;
+
+  // 비자별 (PR-β는 activeE9만 노출, 나머지는 PR-EF 활용 예정)
+  readonly activeE9WorkerCount: number;
+  readonly activeH2WorkerCount: number;
+  readonly activeE7WorkerCount: number;
+  readonly activeOtherForeignWorkerCount: number;
+
+  // 통계 (PR-EF 활용 예정, PR-β는 타입만 정의)
+  readonly recentYearEndReasonDistribution: Readonly<Record<string, number>>;
+  readonly recentYearEmployerFaultEndCount: number;
+  readonly workerLifecycleUpdatedAtMax: string | null;
+}
+
 export interface CompanyResponse {
   readonly id: number;
   readonly name: string;
@@ -405,14 +434,15 @@ export interface CompanyResponse {
   readonly subRegion: string | null;
   readonly industryCategory: IndustryCategory;
   readonly industrySubCategory: string | null;
-  readonly employeeCount: number;
+  readonly employeeCount: number | null;
   readonly domesticInsuredCount: number | null;
-  readonly foreignWorkerCount: number;
+  // foreignWorkerCount: 제거 (PR-β: derivedCounts로 대체)
   readonly address: string;
   readonly contactPhone: string;
   readonly contactEmail: string | null;
   readonly averageForeignWorkerWage: number | null;
-  readonly recentYearTerminationCount: number | null;
+  // recentYearTerminationCount: 제거 (PR-β: derivedCounts.recentYearEndedForeignWorkerCount로 대체)
+  readonly derivedCounts: CompanyDerivedCountsResponse;
   readonly createdAt: string;
   readonly updatedAt: string;
 }
