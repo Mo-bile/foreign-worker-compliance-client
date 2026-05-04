@@ -37,21 +37,24 @@ describe("POST /api/simulations", () => {
   });
 
   it("companyId가_없으면_400을_반환한다", async () => {
-    const { companyId: _omit, ...bodyWithoutCompanyId } = validBody;
+    const bodyWithoutCompanyId = { ...validBody } as Partial<typeof validBody>;
+    delete bodyWithoutCompanyId.companyId;
     const req = makePostRequest(bodyWithoutCompanyId);
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
 
   it("desiredWorkers가_없으면_400을_반환한다", async () => {
-    const { desiredWorkers: _omit, ...bodyWithoutDesiredWorkers } = validBody;
+    const bodyWithoutDesiredWorkers = { ...validBody } as Partial<typeof validBody>;
+    delete bodyWithoutDesiredWorkers.desiredWorkers;
     const req = makePostRequest(bodyWithoutDesiredWorkers);
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
 
   it("domesticInsuredCount가_없으면_400을_반환한다", async () => {
-    const { domesticInsuredCount: _omit, ...bodyWithoutDomesticInsuredCount } = validBody;
+    const bodyWithoutDomesticInsuredCount = { ...validBody } as Partial<typeof validBody>;
+    delete bodyWithoutDomesticInsuredCount.domesticInsuredCount;
     const req = makePostRequest(bodyWithoutDomesticInsuredCount);
     const res = await POST(req);
     expect(res.status).toBe(400);

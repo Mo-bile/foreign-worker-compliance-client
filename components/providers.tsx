@@ -3,7 +3,6 @@
 import { ThemeProvider } from "next-themes";
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { toast } from "sonner";
 import { ErrorDialog } from "@/components/common/error-dialog";
 import { Toaster } from "@/components/ui/sonner";
 

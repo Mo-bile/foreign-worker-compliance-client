@@ -85,25 +85,29 @@ describe("simulationRequestSchema", () => {
 
   describe("missing required fields", () => {
     it("fails when desiredWorkers is missing", () => {
-      const { desiredWorkers: _, ...rest } = validBase;
+      const rest = { ...validBase } as Partial<typeof validBase>;
+      delete rest.desiredWorkers;
       const result = simulationRequestSchema.safeParse(rest);
       expect(result.success).toBe(false);
     });
 
     it("fails when desiredTiming is missing", () => {
-      const { desiredTiming: _, ...rest } = validBase;
+      const rest = { ...validBase } as Partial<typeof validBase>;
+      delete rest.desiredTiming;
       const result = simulationRequestSchema.safeParse(rest);
       expect(result.success).toBe(false);
     });
 
     it("fails when domesticInsuredCount is missing", () => {
-      const { domesticInsuredCount: _, ...rest } = validBase;
+      const rest = { ...validBase } as Partial<typeof validBase>;
+      delete rest.domesticInsuredCount;
       const result = simulationRequestSchema.safeParse(rest);
       expect(result.success).toBe(false);
     });
 
     it("fails when appliedScoringCodes is missing", () => {
-      const { appliedScoringCodes: _, ...rest } = validBase;
+      const rest = { ...validBase } as Partial<typeof validBase>;
+      delete rest.appliedScoringCodes;
       const result = simulationRequestSchema.safeParse(rest);
       expect(result.success).toBe(false);
     });

@@ -62,50 +62,42 @@ export function AiAnalysisProgress({ variant, isPending }: AiAnalysisProgressPro
   const totalDuration = TOTAL_DURATION[variant];
 
   const [elapsed, setElapsed] = useState(0);
-  const [done, setDone] = useState(false);
-  const [prevStepIndex, setPrevStepIndex] = useState(-1);
-  const [fadeIn, setFadeIn] = useState(true);
+  const [wasPending, setWasPending] = useState(false);
 
   useEffect(() => {
-    if (!isPending) {
-      if (elapsed > 0) {
-        setDone(true);
-        const timeout = setTimeout(() => {
-          setElapsed(0);
-          setDone(false);
-        }, 600);
-        return () => clearTimeout(timeout);
-      }
-      return;
-    }
+    if (!isPending) return;
 
-    setDone(false);
-    setElapsed(0);
+    const startTimeout = setTimeout(() => {
+      setWasPending(true);
+      setElapsed(0);
+    }, 0);
     const interval = setInterval(() => {
       setElapsed((prev) => prev + 100);
     }, 100);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(startTimeout);
+      clearInterval(interval);
+    };
   }, [isPending]);
 
+  useEffect(() => {
+    if (isPending || !wasPending) return;
+
+    const timeout = setTimeout(() => {
+      setElapsed(0);
+      setWasPending(false);
+    }, 600);
+    return () => clearTimeout(timeout);
+  }, [isPending, wasPending]);
+
+  const done = !isPending && wasPending && elapsed > 0;
   const { stepIndex, percent } = done
     ? { stepIndex: steps.length - 1, percent: 100 }
     : getStepAndProgress(elapsed, steps, totalDuration);
 
-  useEffect(() => {
-    if (stepIndex !== prevStepIndex) {
-      setFadeIn(false);
-      const timeout = setTimeout(() => {
-        setPrevStepIndex(stepIndex);
-        setFadeIn(true);
-      }, 150);
-      return () => clearTimeout(timeout);
-    }
-  }, [stepIndex, prevStepIndex]);
-
   if (!isPending && !done) return null;
 
-  const displayIndex = fadeIn ? stepIndex : prevStepIndex >= 0 ? prevStepIndex : stepIndex;
-  const currentStep = steps[displayIndex] ?? steps[steps.length - 1]!;
+  const currentStep = steps[stepIndex] ?? steps[steps.length - 1]!;
   const StepIcon = ICON_MAP[currentStep.icon];
 
   return (
@@ -114,7 +106,7 @@ export function AiAnalysisProgress({ variant, isPending }: AiAnalysisProgressPro
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[oklch(0.6_0.15_255)]/10">
           <StepIcon className="h-5 w-5 animate-pulse text-[oklch(0.5_0.12_260)]" />
         </div>
-        <div style={{ opacity: fadeIn ? 1 : 0, transition: "opacity 150ms ease-in-out" }}>
+        <div key={stepIndex} className="animate-in fade-in duration-150">
           <p className="text-sm font-medium">{done ? "분석 완료!" : currentStep.label}</p>
           <p className="text-xs text-muted-foreground">
             {done ? "결과를 표시합니다" : currentStep.sub}

@@ -32,7 +32,10 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
     ? Object.fromEntries(metadata.nationalities.map((n) => [n.code, n.koreanName]))
     : (NATIONALITY_LABELS as Record<string, string>);
 
-  const scoringPolicies = metadata?.scoringPolicies ?? [];
+  const scoringPolicies = useMemo(
+    () => metadata?.scoringPolicies ?? [],
+    [metadata?.scoringPolicies],
+  );
   const groupLabelMap = useMemo(() => {
     const map = new Map<string, string>();
     for (const group of metadata?.scoringPolicyGroups ?? []) {
@@ -116,8 +119,9 @@ export function SimulationForm({ company, onSubmit, isPending }: SimulationFormP
   function handleGroupChange(group: string, code: string) {
     setSelectedGroupChoices((prev) => {
       if (prev[group] === code) {
-        const { [group]: _removed, ...rest } = prev;
-        return rest;
+        const next = { ...prev };
+        delete next[group];
+        return next;
       }
 
       return { ...prev, [group]: code };

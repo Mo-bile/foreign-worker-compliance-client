@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
@@ -50,7 +50,6 @@ export function EndEmploymentModal({
     register,
     handleSubmit,
     control,
-    watch,
     formState: { errors },
   } = useForm<EndEmploymentRequest>({
     resolver: zodResolver(endEmploymentRequestSchema),
@@ -62,7 +61,7 @@ export function EndEmploymentModal({
     },
   });
 
-  const reason = watch("reason");
+  const reason = useWatch({ control, name: "reason" });
   const showEmployerFault = reason === "WORKPLACE_CHANGE";
 
   function onSubmit(data: EndEmploymentRequest) {
