@@ -13,6 +13,12 @@ import { mockNotificationLogs, mockTriggerResponse } from "./notification-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
 
+function addDays(isoDate: string, days: number): string {
+  const d = new Date(isoDate);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
 // ─── Shared handler callbacks ───────────────────────────
 
 const getWorkerById: Parameters<typeof http.get>[1] = ({ params }) => {
@@ -74,6 +80,80 @@ const putWorker: Parameters<typeof http.put>[1] = ({ params }) => {
     );
   }
   return new HttpResponse(null, { status: 204 });
+};
+
+const postEndEmployment: Parameters<typeof http.post>[1] = async ({ params, request }) => {
+  const id = Number(params.id);
+  const worker = mockWorkers.find((w) => w.id === id);
+  if (!worker) {
+    return HttpResponse.json(
+      {
+        status: 404,
+        message: `근로자를 찾을 수 없습니다: ${id}`,
+        timestamp: new Date().toISOString(),
+      },
+      { status: 404 },
+    );
+  }
+  if (worker.status === "ENDED") {
+    return HttpResponse.json(
+      {
+        status: 400,
+        message: "이미 고용종료가 확정된 워커입니다",
+        timestamp: new Date().toISOString(),
+      },
+      { status: 400 },
+    );
+  }
+  const body = (await request.json()) as { endedAt?: string };
+  const endedAt = body.endedAt ?? new Date().toISOString().slice(0, 10);
+  return HttpResponse.json(
+    {
+      workerId: id,
+      endedAt,
+      status: "ENDED",
+      createdDeadlines: [
+        {
+          id: 9999,
+          type: "CHANGE_REPORT",
+          dueDate: addDays(endedAt, 15),
+          description: "고용센터 신고 의무",
+        },
+      ],
+      autoCompletedDeadlines: [],
+      preservedDeadlineCount: 0,
+    },
+    { status: 202 },
+  );
+};
+
+const postRestoreEmployment: Parameters<typeof http.post>[1] = ({ params }) => {
+  const id = Number(params.id);
+  const worker = mockWorkers.find((w) => w.id === id);
+  if (!worker) {
+    return HttpResponse.json(
+      {
+        status: 404,
+        message: `근로자를 찾을 수 없습니다: ${id}`,
+        timestamp: new Date().toISOString(),
+      },
+      { status: 404 },
+    );
+  }
+  if (worker.status !== "ENDED") {
+    return HttpResponse.json(
+      {
+        status: 400,
+        message: "고용종료 상태가 아닙니다",
+        timestamp: new Date().toISOString(),
+      },
+      { status: 400 },
+    );
+  }
+  return HttpResponse.json(
+    { workerId: id, status: "ACTIVE", removedChangeReportDeadlineIds: [9999] },
+    { status: 202 },
+  );
 };
 
 const getCompanies: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockCompanies);
@@ -229,6 +309,10 @@ export const handlers = [
   http.post("*/api/workers", postWorker),
   http.post("*/api/workers/korean-name/suggest", postWorkerKoreanNameSuggest),
   http.put("*/api/workers/:id", putWorker),
+  http.post(`${BACKEND}/api/workers/:id/end-employment`, postEndEmployment),
+  http.post(`${BACKEND}/api/workers/:id/restore-employment`, postRestoreEmployment),
+  http.post("*/api/workers/:id/end-employment", postEndEmployment),
+  http.post("*/api/workers/:id/restore-employment", postRestoreEmployment),
 
   // Companies
   http.get(`${BACKEND}/api/companies/:id`, getCompanyById),

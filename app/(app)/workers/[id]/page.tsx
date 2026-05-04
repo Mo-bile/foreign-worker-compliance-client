@@ -1,9 +1,10 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,13 +18,15 @@ import { InsuranceBadge } from "@/components/workers/insurance-badge";
 import { H2Badge } from "@/components/workers/h2-badge";
 import { SpecialtyInsuranceCard } from "@/components/workers/specialty-insurance-card";
 import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-timeline";
+import { EndEmploymentModal } from "@/components/workers/end-employment-modal";
+import { TerminationInfoCard } from "@/components/workers/termination-info-card";
 import {
   NATIONALITY_LABELS,
   VISA_TYPE_LABELS,
   resolveWorkerStatusLabel,
   INSURANCE_TYPE_LABELS,
 } from "@/types/api";
-import { useWorker } from "@/lib/queries/use-workers";
+import { useWorker, useRestoreEmployment } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
 
 export default function WorkerDetailPage({ params }: { readonly params: Promise<{ id: string }> }) {
@@ -31,6 +34,21 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
   const workerId = Number(id);
   const worker = useWorker(workerId);
   const deadlines = useWorkerDeadlines(workerId);
+  const [endModalOpen, setEndModalOpen] = useState(false);
+  const restoreMutation = useRestoreEmployment(workerId);
+
+  function handleRestore(name: string) {
+    restoreMutation.mutate(undefined, {
+      onSuccess: (response) => {
+        const removed = response.removedChangeReportDeadlineIds.length;
+        toast.success(
+          `${name} 고용종료를 복원했습니다. 자동 생성됐던 고용변동신고 데드라인이 ${removed}건 삭제되었습니다.\n` +
+            `자동 완료 처리됐던 데드라인은 그대로 유지되며, 필요 시 데드라인 화면에서 직접 복원해주세요.`,
+        );
+      },
+      onError: (error) => toast.error(error.message),
+    });
+  }
 
   if (worker.isLoading) {
     return (
@@ -65,13 +83,64 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
             )}
           </h1>
         </div>
-        <Link
-          href={`/workers/${workerId}/edit`}
-          className={buttonVariants({ variant: "outline", size: "sm" })}
-        >
-          수정
-        </Link>
+        <div className="flex items-center gap-2">
+          {(w.status === "ACTIVE" || w.status === "UPCOMING") && (
+            <>
+              <Link
+                href={`/workers/${workerId}/edit`}
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                수정
+              </Link>
+              <Button variant="default" size="sm" onClick={() => setEndModalOpen(true)}>
+                고용종료 처리
+              </Button>
+            </>
+          )}
+          {w.status === "REVIEW_REQUIRED" && (
+            <>
+              <Link
+                href={`/workers/${workerId}/edit`}
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                계약정보 수정
+              </Link>
+              <Button variant="default" size="sm" onClick={() => setEndModalOpen(true)}>
+                고용종료 확정
+              </Button>
+            </>
+          )}
+          {w.status === "ENDED" && (
+            <>
+              <Link
+                href={`/workers/${workerId}/edit`}
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                수정
+              </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleRestore(w.name)}
+                disabled={restoreMutation.isPending}
+              >
+                {restoreMutation.isPending ? "복원 중..." : "고용종료 복원"}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
+
+      {w.status === "REVIEW_REQUIRED" && (
+        <div className="rounded-md border border-[var(--signal-orange-bg)] bg-[var(--signal-orange-bg)]/30 p-4 text-sm">
+          <p className="font-medium text-[var(--signal-orange)]">
+            계약종료일이 지난 근로자입니다.
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            실제 고용종료 여부를 확인해 주세요. 우상단의 [고용종료 확정] 또는 [계약정보 수정] 버튼을 사용하세요.
+          </p>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
@@ -153,6 +222,8 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         </CardContent>
       </Card>
 
+      {w.terminationInfo && <TerminationInfoCard terminationInfo={w.terminationInfo} />}
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">보험 자격</CardTitle>
@@ -204,6 +275,15 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         isLoading={deadlines.isLoading}
         isError={deadlines.isError}
       />
+
+      {endModalOpen && (
+        <EndEmploymentModal
+          open
+          onClose={() => setEndModalOpen(false)}
+          workerId={workerId}
+          workerName={w.name}
+        />
+      )}
     </div>
   );
 }
