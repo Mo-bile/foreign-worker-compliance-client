@@ -27,6 +27,9 @@ describe("mockWithinQuotaResponse", () => {
     const { scoringAnalysis } = mockWithinQuotaResponse;
     expect(scoringAnalysis).toHaveProperty("appliedBonusItems");
     expect(scoringAnalysis).toHaveProperty("availableBonusItems");
+    expect(scoringAnalysis).toHaveProperty("appliedDeductionItems");
+    expect(scoringAnalysis).toHaveProperty("availableDeductionItems");
+    expect(scoringAnalysis).toHaveProperty("autoSuggestedDeductions");
     expect(scoringAnalysis).toHaveProperty("totalBonusScore");
     expect(scoringAnalysis).toHaveProperty("totalDeductionScore");
     expect(scoringAnalysis).toHaveProperty("estimatedScore");

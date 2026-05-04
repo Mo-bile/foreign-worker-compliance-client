@@ -282,6 +282,9 @@ describe("SimulationResultResponse shape", () => {
   const mockScoring: ScoringAnalysis = {
     appliedBonusItems: [mockScoringBonusItem],
     availableBonusItems: [],
+    appliedDeductionItems: [],
+    availableDeductionItems: [],
+    autoSuggestedDeductions: [],
     totalBonusScore: 5,
     totalDeductionScore: 0,
     estimatedScore: 72,

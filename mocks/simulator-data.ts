@@ -46,6 +46,25 @@ export const mockWithinQuotaResponse: SimulationResultResponse = {
         applied: false,
       },
     ],
+    // PR-ε 신규 3 필드
+    appliedDeductionItems: [],
+    availableDeductionItems: [
+      {
+        code: "LABOR_VIOLATION_MODERATE",
+        displayName: "노동관계법 위반(폭행폭언·임금체불)",
+        points: 6,
+        applied: false,
+      },
+    ],
+    autoSuggestedDeductions: [
+      {
+        code: "LABOR_VIOLATION_MODERATE",
+        displayName: "노동관계법 위반(폭행폭언·임금체불)",
+        points: 6,
+        reason: "최근 1년 사업주 귀책 사업장 변경 1명",
+        triggerCount: 1,
+      },
+    ],
     totalBonusScore: 8,
     totalDeductionScore: 0,
     estimatedScore: 68,
@@ -192,6 +211,9 @@ export const mockExceededResponse: SimulationResultResponse = {
         applied: false,
       },
     ],
+    appliedDeductionItems: [],
+    availableDeductionItems: [],
+    autoSuggestedDeductions: [],
     totalBonusScore: 8,
     totalDeductionScore: 0,
     estimatedScore: 68,
