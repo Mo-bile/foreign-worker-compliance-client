@@ -15,6 +15,11 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     sourceType: "ENFORCEMENT_RULE",
     officialSourceUrl:
       "https://www.law.go.kr/lsSc.do?menuId=1&subMenuId=15&tabMenuId=81&query=고용허가제",
+    icon: "⚖️",
+    detectedDate: "2026-03-18",
+    dDay: null,
+    badge: { text: "조치 필요", color: "red" },
+    description: "사업장 변경 사유 확대 및 절차 간소화 — 기존 3개월 제한 폐지",
   },
   {
     id: 2,
@@ -29,6 +34,11 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "UPCOMING",
     sourceType: "ENFORCEMENT_DECREE",
     officialSourceUrl: "https://www.law.go.kr/lsSc.do?menuId=1&query=최저임금법",
+    icon: "💰",
+    detectedDate: "2026-04-15",
+    dDay: -58,
+    badge: { text: "조치 필요", color: "orange" },
+    description: "2026년 하반기 최저임금 시간급 10,360원 적용",
   },
   {
     id: 3,
@@ -43,6 +53,11 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "IN_FORCE",
     sourceType: "LAW",
     officialSourceUrl: "https://www.law.go.kr/trtyInfoP.do?trtySeq=1234",
+    icon: "🏥",
+    detectedDate: "2026-02-15",
+    dDay: null,
+    badge: { text: "확인 완료", color: "blue" },
+    description: "캄보디아 국적 근로자 국민연금 이중가입 면제 발효",
   },
   {
     id: 4,
@@ -57,6 +72,11 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "UPCOMING",
     sourceType: "ENFORCEMENT_RULE",
     officialSourceUrl: "https://www.law.go.kr/lsSc.do?menuId=1&query=산업안전보건법",
+    icon: "🦺",
+    detectedDate: "2026-03-20",
+    dDay: 3,
+    badge: { text: "조치 필요", color: "red" },
+    description: "외국인 근로자 안전교육 다국어 의무화",
   },
   {
     id: 5,
@@ -71,6 +91,11 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "RECENTLY_EFFECTIVE",
     sourceType: "ENFORCEMENT_DECREE",
     officialSourceUrl: "https://www.law.go.kr/lsSc.do?menuId=1&query=고용보험법",
+    icon: "🏥",
+    detectedDate: "2026-03-01",
+    dDay: null,
+    badge: { text: "조치 필요", color: "orange" },
+    description: "E-9 비자 근로자 고용보험 적용 범위 확대",
   },
   {
     id: 6,
@@ -85,6 +110,10 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "UPCOMING",
     sourceType: "ENFORCEMENT_DECREE",
     officialSourceUrl: "https://www.law.go.kr/lsSc.do?menuId=1&query=출입국관리법",
+    icon: "🛂",
+    detectedDate: "2026-04-10",
+    dDay: -28,
+    badge: { text: "조치 필요", color: "red" },
   },
   {
     id: 7,
@@ -99,6 +128,10 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "IN_FORCE",
     sourceType: "GUIDANCE",
     officialSourceUrl: "https://www.moel.go.kr/policy/policyinfo/lobar/list.do",
+    icon: "💰",
+    detectedDate: "2026-02-01",
+    dDay: null,
+    badge: { text: "확인 완료", color: "orange" },
   },
   {
     id: 8,
@@ -113,6 +146,10 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "IN_FORCE",
     sourceType: "NOTICE",
     officialSourceUrl: "https://www.nhis.or.kr/nhis/together/wbhaea01600m01.do",
+    icon: "🏥",
+    detectedDate: "2025-12-01",
+    dDay: null,
+    badge: { text: "확인 완료", color: "blue" },
   },
   {
     id: 9,
@@ -127,6 +164,10 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "UPCOMING",
     sourceType: "ENFORCEMENT_DECREE",
     officialSourceUrl: "https://www.law.go.kr/lsSc.do?menuId=1&query=근로기준법",
+    icon: "⚖️",
+    detectedDate: "2026-05-01",
+    dDay: -58,
+    badge: { text: "조치 필요", color: "red" },
   },
   {
     id: 10,
@@ -141,6 +182,10 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "UPCOMING",
     sourceType: "POLICY_NOTICE",
     officialSourceUrl: "https://www.eps.go.kr/",
+    icon: "⚖️",
+    detectedDate: "2026-04-15",
+    dDay: -11,
+    badge: { text: "조치 필요", color: "orange" },
   },
   {
     id: 11,
@@ -155,6 +200,10 @@ export const mockLegalChangesResponse: readonly LegalChange[] = [
     displayStatus: "RECENTLY_EFFECTIVE",
     sourceType: "PRESS_RELEASE",
     officialSourceUrl: "https://www.moel.go.kr/news/enews/report/enewsView.do",
+    icon: "💰",
+    detectedDate: "2026-03-15",
+    dDay: null,
+    badge: { text: "조치 필요", color: "orange" },
   },
 ];
 
@@ -164,37 +213,46 @@ export const mockImpacts: Record<number, LegalImpact> = {
     description:
       "사업장 변경 사유가 확대되어 E-9/H-2 비자 근로자의 이동 가능성이 증가합니다. 근로 환경 개선을 통해 자발적 이직을 방지하는 것이 권장됩니다.",
     actions: [
-      "근로조건 점검 및 개선 사항 확인",
-      "근로자 면담을 통한 불만 사항 파악",
-      "사업장 변경 사유 해당 여부 사전 점검",
+      { label: "근로조건 점검 및 개선 사항 확인", primary: true },
+      { label: "근로자 면담을 통한 불만 사항 파악", primary: false },
+      { label: "사업장 변경 사유 해당 여부 사전 점검", primary: false },
     ],
   },
   2: {
     level: "MEDIUM",
     description:
       "2026년 하반기 최저임금이 시간급 10,360원으로 변경됩니다. 현재 임금이 신규 최저임금에 미달하는 근로자가 있는지 확인이 필요합니다.",
-    actions: ["E-9 근로자 현재 시급 대비 신규 최저임금 비교", "미달 근로자 근로계약서 갱신 준비"],
+    actions: [
+      { label: "E-9 근로자 현재 시급 대비 신규 최저임금 비교", primary: true },
+      { label: "미달 근로자 근로계약서 갱신 준비", primary: false },
+    ],
   },
   4: {
     level: "HIGH",
     description:
       "외국인 근로자 안전교육 자료를 근로자 모국어로 제공해야 합니다. 미이행 시 과태료 부과 대상입니다.",
     actions: [
-      "다국어 안전교육 자료 준비",
-      "안전교육 실시 일정 수립",
-      "교육 이수 기록 관리 체계 점검",
+      { label: "다국어 안전교육 자료 준비", primary: true },
+      { label: "안전교육 실시 일정 수립", primary: false },
+      { label: "교육 이수 기록 관리 체계 점검", primary: false },
     ],
   },
   6: {
     level: "HIGH",
     description:
       "체류자격 변경 시 고용주의 출입국관리사무소 신고 의무가 강화됩니다. 기한 내 미신고 시 과태료 부과 가능합니다.",
-    actions: ["체류자격 변경 대상 근로자 파악", "신고 절차 및 기한 확인"],
+    actions: [
+      { label: "체류자격 변경 대상 근로자 파악", primary: true },
+      { label: "신고 절차 및 기한 확인", primary: false },
+    ],
   },
   9: {
     level: "HIGH",
     description:
       "상시 5인 미만 사업장에도 근로기준법 일부 조항이 확대 적용됩니다. 해당 사업장은 준비가 필요합니다.",
-    actions: ["사업장 적용 대상 여부 확인", "확대 적용 조항 검토 및 준비"],
+    actions: [
+      { label: "사업장 적용 대상 여부 확인", primary: true },
+      { label: "확대 적용 조항 검토 및 준비", primary: false },
+    ],
   },
 };
