@@ -469,7 +469,7 @@ export interface CompanyDerivedCountsResponse {
   readonly activeOtherForeignWorkerCount: number;
 
   // 통계 (PR-EF 활용 예정, PR-β는 타입만 정의)
-  readonly recentYearEndReasonDistribution: Readonly<Record<string, number>>;
+  readonly recentYearEndReasonDistribution: Readonly<Partial<Record<EmploymentEndReason, number>>>;
   readonly recentYearEmployerFaultEndCount: number;
   readonly workerLifecycleUpdatedAtMax: string | null;
 }

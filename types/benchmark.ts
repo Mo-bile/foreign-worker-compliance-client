@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MANAGEMENT_GRADES } from "@/lib/constants/benchmark";
+import type { EmploymentEndReason } from "./api";
 
 // ─── Wage Analysis ──────────────────────────────────────────
 
@@ -124,3 +125,16 @@ export const createBenchmarkRequestSchema = z.object({
   companyId: z.number().int().positive(),
 });
 export type CreateBenchmarkRequest = z.infer<typeof createBenchmarkRequestSchema>;
+
+export interface EndReasonDistributionItem {
+  readonly code: EmploymentEndReason;
+  readonly label: string;
+  readonly count: number;
+  readonly percentage: number;
+}
+
+export interface EndReasonDistributionDisplay {
+  readonly items: readonly EndReasonDistributionItem[];
+  readonly total: number;
+  readonly maxCount: number;
+}
