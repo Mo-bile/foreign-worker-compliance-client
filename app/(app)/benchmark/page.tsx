@@ -16,9 +16,10 @@ import { PositioningCard } from "@/components/benchmark/positioning-card";
 import { BenchmarkEmptyState } from "@/components/benchmark/benchmark-empty-state";
 import { AiAnalysisProgress } from "@/components/common/ai-analysis-progress";
 import { NullableAxisPlaceholder } from "@/components/benchmark/nullable-axis-placeholder";
+import { EndReasonDistributionCard } from "@/components/benchmark/end-reason-distribution-card";
 
 export default function BenchmarkPage() {
-  const { selectedCompanyId } = useCompanyContext();
+  const { selectedCompanyId, selectedCompany } = useCompanyContext();
   const { data: benchmarks, isLoading, isError, error } = useBenchmarkList(selectedCompanyId);
   const createBenchmark = useCreateBenchmark();
   const [activeChecklistCategory, setActiveChecklistCategory] = useState<string | null>(null);
@@ -163,6 +164,11 @@ export default function BenchmarkPage() {
               }}
             />
           </div>
+          {selectedCompany?.derivedCounts && (
+            <EndReasonDistributionCard
+              distribution={selectedCompany.derivedCounts.recentYearEndReasonDistribution}
+            />
+          )}
         </div>
       </div>
 
