@@ -49,4 +49,28 @@ describe("EndReasonDistributionCard", () => {
     render(<EndReasonDistributionCard distribution={{}} />);
     expect(screen.getByText("최근 1년간 이직 기록이 없습니다.")).toBeInTheDocument();
   });
+
+  it("분포 필드가 누락되거나 null이어도 empty state 렌더", () => {
+    const { rerender } = render(<EndReasonDistributionCard distribution={undefined} />);
+    expect(screen.getByText("최근 1년간 이직 기록이 없습니다.")).toBeInTheDocument();
+
+    rerender(<EndReasonDistributionCard distribution={null} />);
+    expect(screen.getByText("최근 1년간 이직 기록이 없습니다.")).toBeInTheDocument();
+  });
+
+  it("알 수 없는 사유 키는 라벨 없이 렌더하지 않고 무시", () => {
+    render(
+      <EndReasonDistributionCard
+        distribution={
+          {
+            CONTRACT_EXPIRY: 1,
+            UNKNOWN_REASON: 4,
+          } as unknown as Record<string, number>
+        }
+      />,
+    );
+    expect(screen.getByText("계약만료")).toBeInTheDocument();
+    expect(screen.getByText("총 1건")).toBeInTheDocument();
+    expect(screen.queryByText("총 5건")).toBeNull();
+  });
 });

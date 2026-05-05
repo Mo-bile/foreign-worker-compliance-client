@@ -5,7 +5,7 @@ import type { EmploymentEndReason } from "@/types/api";
 import { toEndReasonDistributionDisplay } from "@/lib/utils/end-reason-distribution";
 
 interface EndReasonDistributionCardProps {
-  readonly distribution: Readonly<Partial<Record<EmploymentEndReason, number>>>;
+  readonly distribution?: Readonly<Partial<Record<EmploymentEndReason, number>>> | null;
 }
 
 export function EndReasonDistributionCard({ distribution }: EndReasonDistributionCardProps) {
