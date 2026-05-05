@@ -51,8 +51,9 @@ export function EndReasonDistributionCard({ distribution }: EndReasonDistributio
         )}
 
         <p className="text-[10px] text-muted-foreground">
-          ※ 본 통계는 PR-γ 고용종료 처리 결과를 자동 집계합니다. 사유는 사업주가 직접 선택한 값
-          기준이며, 사업장 변경(employerFault) 비율이 높은 경우 D36 자동 감점 후보로 노출됩니다.
+          ※ 최근 1년간 고용종료 처리된 근로자의 종료 사유를 자동 집계합니다. 사유는
+          사업주가 선택한 종료 사유 기준이며, 사업장 변경 비율이 높은 경우 고용 안정성
+          진단에 반영될 수 있습니다.
         </p>
       </CardContent>
     </Card>
