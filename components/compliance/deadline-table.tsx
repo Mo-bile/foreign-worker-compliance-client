@@ -40,7 +40,7 @@ interface DeadlineTableProps {
   readonly limit?: number;
   readonly pagination?: PaginationControlsProps;
   readonly hasUnfilteredData?: boolean;
-  readonly onComplete?: (id: number) => void;
+  readonly onComplete?: (deadline: ComplianceDeadlineResponse) => void;
   readonly isCompleting?: boolean;
   readonly variant?: "overdue" | "upcoming";
 }
@@ -117,7 +117,7 @@ function renderRows(
     isCompleting,
     showWorkerId,
   }: {
-    readonly onComplete?: (id: number) => void;
+    readonly onComplete?: (deadline: ComplianceDeadlineResponse) => void;
     readonly isCompleting?: boolean;
     readonly showWorkerId: boolean;
   },
@@ -136,7 +136,7 @@ function renderRows(
             variant="outline"
             size="sm"
             disabled={deadline.status === "COMPLETED" || isCompleting}
-            onClick={() => onComplete(deadline.id)}
+            onClick={() => onComplete(deadline)}
           >
             {deadline.status === "COMPLETED" ? "완료됨" : "완료"}
           </Button>
@@ -153,7 +153,7 @@ function renderTable(
     isCompleting,
     showWorkerId,
   }: {
-    readonly onComplete?: (id: number) => void;
+    readonly onComplete?: (deadline: ComplianceDeadlineResponse) => void;
     readonly isCompleting?: boolean;
     readonly showWorkerId: boolean;
   },

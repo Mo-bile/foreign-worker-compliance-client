@@ -193,7 +193,7 @@ describe("DeadlineTable", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "완료" }));
 
-    expect(onComplete).toHaveBeenCalledWith(singleWorkerDeadlines[0].id);
+    expect(onComplete).toHaveBeenCalledWith(singleWorkerDeadlines[0]);
   });
 
   describe("아코디언 그룹핑", () => {
@@ -277,7 +277,7 @@ describe("DeadlineTable", () => {
 
       await userEvent.click(screen.getAllByRole("button", { name: "완료" })[0]);
 
-      expect(onComplete).toHaveBeenCalledWith(10);
+      expect(onComplete).toHaveBeenCalledWith(multiWorkerDeadlines[0]);
     });
 
     it("펼쳐진_그룹을_클릭하면_접힌다", async () => {

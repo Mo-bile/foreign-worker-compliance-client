@@ -17,12 +17,41 @@ function getStringField(body: unknown, field: "alertMessage" | "message"): strin
   return typeof value === "string" ? value : undefined;
 }
 
+type MockServerGlobal = typeof globalThis & {
+  __fwcMswServerPromise?: Promise<void>;
+  __fwcMswServerStarted?: boolean;
+};
+
+async function ensureMockServerStarted(): Promise<void> {
+  if (process.env.NEXT_PUBLIC_API_MOCKING !== "enabled") {
+    return;
+  }
+
+  const mockGlobal = globalThis as MockServerGlobal;
+  mockGlobal.__fwcMswServerPromise ??= import("@/mocks/server").then(({ server }) => {
+    if (!mockGlobal.__fwcMswServerStarted) {
+      server.listen({ onUnhandledRequest: "bypass" });
+      mockGlobal.__fwcMswServerStarted = true;
+    }
+  });
+
+  await mockGlobal.__fwcMswServerPromise;
+}
+
 function getBaseUrl(): string {
   const url = process.env.BACKEND_URL;
+  if (!url && process.env.NEXT_PUBLIC_API_MOCKING === "enabled") {
+    return "http://localhost:8080";
+  }
   if (!url) {
     throw new Error("BACKEND_URL environment variable is not set");
   }
   return url;
+}
+
+async function fetchBackend(path: string, init?: RequestInit): Promise<Response> {
+  await ensureMockServerStarted();
+  return fetch(`${getBaseUrl()}${path}`, init);
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -44,14 +73,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 async function get<T>(path: string): Promise<T> {
-  const response = await fetch(`${getBaseUrl()}${path}`, {
+  const response = await fetchBackend(path, {
     headers: { "Content-Type": "application/json" },
   });
   return handleResponse<T>(response);
 }
 
 async function post<T>(path: string, body: unknown): Promise<T> {
-  const response = await fetch(`${getBaseUrl()}${path}`, {
+  const response = await fetchBackend(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -60,8 +89,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 }
 
 async function postAndFollow<T>(path: string, body: unknown): Promise<T> {
-  const base = getBaseUrl();
-  const response = await fetch(`${base}${path}`, {
+  const response = await fetchBackend(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -83,7 +111,7 @@ async function postAndFollow<T>(path: string, body: unknown): Promise<T> {
 }
 
 async function put<T>(path: string, body: unknown): Promise<T> {
-  const response = await fetch(`${getBaseUrl()}${path}`, {
+  const response = await fetchBackend(path, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -92,7 +120,7 @@ async function put<T>(path: string, body: unknown): Promise<T> {
 }
 
 async function putVoid(path: string, body: unknown): Promise<void> {
-  const response = await fetch(`${getBaseUrl()}${path}`, {
+  const response = await fetchBackend(path, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -103,17 +131,17 @@ async function putVoid(path: string, body: unknown): Promise<void> {
   // 204 No Content → body 없음
 }
 
-async function patch<T>(path: string, body: unknown): Promise<T> {
-  const response = await fetch(`${getBaseUrl()}${path}`, {
+async function patch<T>(path: string, body?: unknown): Promise<T> {
+  const response = await fetchBackend(path, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    ...(body !== undefined && { body: JSON.stringify(body) }),
   });
   return handleResponse<T>(response);
 }
 
 async function patchVoid(path: string, body?: unknown): Promise<void> {
-  const response = await fetch(`${getBaseUrl()}${path}`, {
+  const response = await fetchBackend(path, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     ...(body !== undefined && { body: JSON.stringify(body) }),
@@ -124,7 +152,7 @@ async function patchVoid(path: string, body?: unknown): Promise<void> {
 }
 
 async function postTrigger(path: string): Promise<void> {
-  const response = await fetch(`${getBaseUrl()}${path}`, {
+  const response = await fetchBackend(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   });

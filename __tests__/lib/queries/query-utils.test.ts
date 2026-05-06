@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { fetchApi, mutateApi, throwResponseError } from "@/lib/queries/query-utils";
+import {
+  fetchApi,
+  mutateApi,
+  patchApiWithBody,
+  throwResponseError,
+} from "@/lib/queries/query-utils";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
@@ -138,5 +143,45 @@ describe("mutateApi", () => {
   it("네트워크_에러시_errorMessage를_사용한다", async () => {
     mockFetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
     await expect(mutateApi("/api/test", "POST", {}, "저장 실패")).rejects.toThrow("저장 실패");
+  });
+});
+
+describe("patchApiWithBody", () => {
+  it("성공_시_파싱된_응답을_반환한다", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ ok: true }),
+    });
+
+    const result = await patchApiWithBody<{ ok: boolean }>("/api/test", "fail", { x: 1 });
+
+    expect(result).toEqual({ ok: true });
+    expect(mockFetch).toHaveBeenCalledWith("/api/test", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ x: 1 }),
+    });
+  });
+
+  it("4xx_응답이면_alertMessage를_message로_던진다", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      headers: new Headers({ "Content-Type": "application/json" }),
+      json: () => Promise.resolve({ alertMessage: "잘못된 요청" }),
+    });
+
+    await expect(patchApiWithBody("/api/test", "fail", {})).rejects.toThrow("잘못된 요청");
+  });
+
+  it("응답_JSON_파싱_실패_시_에러", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.reject(new SyntaxError("Unexpected token")),
+    });
+
+    await expect(patchApiWithBody("/api/test", "fail", {})).rejects.toThrow(
+      /응답 형식 오류/,
+    );
   });
 });

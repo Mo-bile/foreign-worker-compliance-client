@@ -1,6 +1,12 @@
 import { http, HttpResponse } from "msw";
-import type { CompanyResponse } from "@/types/api";
-import { mockWorkers, mockOverdueDeadlines, mockUpcomingDeadlines, mockCompanies } from "./data";
+import type { CompanyResponse, ComplianceDeadlineResponse, WorkerResponse } from "@/types/api";
+import {
+  mockWorkers,
+  mockOverdueDeadlines,
+  mockUpcomingDeadlines,
+  mockCompletedDeadlines,
+  mockCompanies,
+} from "./data";
 import { mockDashboardRaw } from "@/mocks/dashboard-data";
 import { transformDashboardResponse } from "@/lib/transforms/dashboard-transform";
 import { mockWithinQuotaResponse } from "@/mocks/simulator-data";
@@ -12,6 +18,49 @@ import { mockMetadata, MOCK_SCORING_POLICIES } from "./metadata-data";
 import { mockNotificationLogs, mockTriggerResponse } from "./notification-data";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
+const REGISTERED_WORKER_ID = 9_999;
+const mockRegisteredWorker: WorkerResponse = {
+  ...mockWorkers[0],
+  id: REGISTERED_WORKER_ID,
+  name: "Nguyen Van Test",
+  koreanName: null,
+  nationality: "VIETNAM",
+  visaType: "E9",
+  visaExpiryDate: "2027-12-31",
+  dateOfBirth: "1990-01-01",
+  contractStartDate: "2025-02-01",
+  contractEndDate: null,
+  contactPhone: null,
+  contactEmail: null,
+  jobPosition: null,
+  passportNumber: null,
+  entryDate: "2025-01-15",
+  registrationNumber: null,
+  companyId: 1,
+};
+const mockInsuranceNextCycleDeadline: ComplianceDeadlineResponse = {
+  id: 10_006,
+  workerId: 1,
+  workerName: "Nguyen Van A",
+  deadlineType: "EXIT_GUARANTEE_INSURANCE",
+  dueDate: "2027-05-06",
+  status: "PENDING",
+  description: "출국만기보험 (다음 cycle)",
+};
+const mockHistoryCompletedDeadline: ComplianceDeadlineResponse = {
+  id: 10_007,
+  workerId: 1,
+  workerName: "Nguyen Van A",
+  deadlineType: "WAGE_GUARANTEE_INSURANCE",
+  dueDate: "2026-02-20",
+  status: "COMPLETED",
+  description: "임금체불보증보험",
+  completedAt: "2026-05-06",
+  renewedUntil: "2027-05-06",
+  referenceNumber: "HISTORY-E2E",
+  evidenceUrl: null,
+  note: null,
+};
 
 function addDays(isoDate: string, days: number): string {
   const d = new Date(isoDate);
@@ -26,7 +75,9 @@ function normalizeOptionalDate(value: unknown): string | null {
 // ─── Shared handler callbacks ───────────────────────────
 
 const getWorkerById: Parameters<typeof http.get>[1] = ({ params }) => {
-  const worker = mockWorkers.find((w) => w.id === Number(params.id));
+  const worker =
+    mockWorkers.find((w) => w.id === Number(params.id)) ??
+    (Number(params.id) === REGISTERED_WORKER_ID ? mockRegisteredWorker : undefined);
   if (!worker) {
     return HttpResponse.json(
       {
@@ -46,19 +97,33 @@ const getWorkers: Parameters<typeof http.get>[1] = ({ request }) => {
   const url = new URL(request.url);
   const companyId = url.searchParams.get("companyId");
   if (companyId) {
-    return HttpResponse.json(mockWorkers.filter((w) => w.id % 3 === Number(companyId) % 3));
+    return HttpResponse.json(mockWorkers);
   }
   return HttpResponse.json(mockWorkers);
 };
 
 const postWorker: Parameters<typeof http.post>[1] = async ({ request }) => {
   const body = (await request.json()) as Record<string, unknown>;
-  return HttpResponse.json({
+  const newWorker: WorkerResponse = {
     ...mockWorkers[0],
-    id: 3,
+    id: REGISTERED_WORKER_ID,
     name: body.name as string,
     koreanName: typeof body.koreanName === "string" ? body.koreanName : null,
-  });
+    nationality: body.nationality as WorkerResponse["nationality"],
+    visaType: body.visaType as WorkerResponse["visaType"],
+    visaExpiryDate: body.visaExpiryDate as string,
+    dateOfBirth: body.dateOfBirth as string,
+    contractStartDate: body.contractStartDate as string,
+    contractEndDate: typeof body.contractEndDate === "string" ? body.contractEndDate : null,
+    contactPhone: typeof body.contactPhone === "string" ? body.contactPhone : null,
+    contactEmail: typeof body.contactEmail === "string" ? body.contactEmail : null,
+    jobPosition: typeof body.jobPosition === "string" ? body.jobPosition : null,
+    passportNumber: typeof body.passportNumber === "string" ? body.passportNumber : null,
+    entryDate: typeof body.entryDate === "string" ? body.entryDate : null,
+    registrationNumber: typeof body.registrationNumber === "string" ? body.registrationNumber : null,
+    companyId: Number(body.companyId),
+  };
+  return HttpResponse.json(newWorker);
 };
 
 const postWorkerKoreanNameSuggest: Parameters<typeof http.post>[1] = async ({ request }) => {
@@ -71,7 +136,9 @@ const postWorkerKoreanNameSuggest: Parameters<typeof http.post>[1] = async ({ re
 
 const putWorker: Parameters<typeof http.put>[1] = async ({ params, request }) => {
   const id = Number(params.id);
-  const worker = mockWorkers.find((w) => w.id === id);
+  const worker =
+    mockWorkers.find((w) => w.id === id) ??
+    (id === REGISTERED_WORKER_ID ? mockRegisteredWorker : undefined);
   if (!worker) {
     return HttpResponse.json(
       {
@@ -237,17 +304,69 @@ const getComplianceOverdue: Parameters<typeof http.get>[1] = () =>
   HttpResponse.json(mockOverdueDeadlines);
 
 const getComplianceUpcoming: Parameters<typeof http.get>[1] = () =>
-  HttpResponse.json(mockUpcomingDeadlines);
+  HttpResponse.json([
+    mockUpcomingDeadlines[0],
+    mockInsuranceNextCycleDeadline,
+    ...mockUpcomingDeadlines.slice(1),
+  ]);
 
 const getComplianceByWorker: Parameters<typeof http.get>[1] = ({ params }) => {
-  const deadlines = [...mockOverdueDeadlines, ...mockUpcomingDeadlines].filter(
-    (d) => d.workerId === Number(params.id),
-  );
+  const deadlines = [
+    ...mockOverdueDeadlines,
+    ...mockUpcomingDeadlines,
+    mockInsuranceNextCycleDeadline,
+    ...mockCompletedDeadlines,
+    mockHistoryCompletedDeadline,
+  ].filter((d) => d.workerId === Number(params.id));
   return HttpResponse.json(deadlines);
 };
 
-const patchComplianceComplete: Parameters<typeof http.patch>[1] = () =>
-  new HttpResponse(null, { status: 204 });
+const patchComplianceComplete: Parameters<typeof http.patch>[1] = async ({
+  params,
+  request,
+}) => {
+  const id = Number(params.id);
+  const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+  const completedAt = (body.completedAt as string | undefined) ?? "2026-05-06";
+
+  const target =
+    mockUpcomingDeadlines.find((d) => d.id === id) ??
+    mockOverdueDeadlines.find((d) => d.id === id);
+
+  let nextDeadlineId: number | null = null;
+  let nextDeadlineDueDate: string | null = null;
+  let nextDeadlineType: string | null = null;
+
+  if (target) {
+    const type = target.deadlineType;
+    let dueDate: string | null = null;
+    if ((type === "VISA_EXPIRY" || type === "CONTRACT_RENEWAL") && body.nextDueDate) {
+      dueDate = body.nextDueDate as string;
+    } else if (
+      (type === "EXIT_GUARANTEE_INSURANCE" || type === "WAGE_GUARANTEE_INSURANCE") &&
+      body.renewedUntil
+    ) {
+      dueDate = body.renewedUntil as string;
+    }
+
+    if (dueDate) {
+      nextDeadlineId = id + 10_000;
+      nextDeadlineDueDate = dueDate;
+      nextDeadlineType = type;
+    }
+  }
+
+  return HttpResponse.json(
+    {
+      deadlineId: id,
+      completedAt,
+      nextDeadlineId,
+      nextDeadlineDueDate,
+      nextDeadlineType,
+    },
+    { status: 202 },
+  );
+};
 
 const getMetadata: Parameters<typeof http.get>[1] = () => HttpResponse.json(mockMetadata);
 

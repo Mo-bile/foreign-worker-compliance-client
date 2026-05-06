@@ -298,3 +298,33 @@ describe("WorkerForm", () => {
     expect(received).toHaveProperty("koreanName", "");
   });
 });
+
+describe("WorkerForm — edit mode", () => {
+  const baseEditWorker = {
+    ...mockWorkers[0],
+    status: "ACTIVE" as const,
+    passportNumber: "M11111111",
+    registrationNumber: "950315-1234567",
+    entryDate: "2024-06-15",
+  };
+
+  it("edit_모드에서_passport_ARC_entryDate가_prefill된다", async () => {
+    renderWithProviders(
+      <WorkerForm mode="edit" worker={baseEditWorker} workerId={baseEditWorker.id} />,
+    );
+
+    expect(screen.getByLabelText("여권번호")).toHaveValue("M11111111");
+    expect(screen.getByLabelText("외국인등록번호")).toHaveValue("950315-1234567");
+    expect(screen.getByLabelText("입국일")).toHaveValue("2024-06-15");
+  });
+
+  it("ENDED_워커는_모든_입력과_제출_버튼이_disabled", async () => {
+    const endedWorker = { ...baseEditWorker, status: "ENDED" as const };
+    renderWithProviders(<WorkerForm mode="edit" worker={endedWorker} workerId={endedWorker.id} />);
+
+    expect(screen.getByLabelText("이름")).toBeDisabled();
+    expect(screen.getByLabelText("여권번호")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "수정" })).toBeDisabled();
+    expect(screen.getByText(/고용종료된 근로자입니다.*복원.*실행/i)).toBeInTheDocument();
+  });
+});

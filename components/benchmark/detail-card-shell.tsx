@@ -1,8 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
-import type { SignalColor, DataSource } from "@/types/shared";
-import type { BenchmarkDataRow } from "@/types/benchmark";
+import type { SignalColor, DataSource, DataRow } from "@/types/shared";
 import { DataSourceChips } from "./data-source-chips";
 import { CollapsibleInsight } from "./collapsible-insight";
+
+type BenchmarkDataRow = DataRow & {
+  readonly color?: SignalColor;
+};
 
 const badgeColors: Record<SignalColor, string> = {
   green: "bg-signal-green-bg text-signal-green",

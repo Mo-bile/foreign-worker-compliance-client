@@ -63,7 +63,7 @@ describe("usePaginatedUpcomingDeadlines", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.deadlines).toBeDefined();
     expect(result.current.deadlines!.currentPage).toBe(1);
-    expect(result.current.deadlines!.totalItems).toBe(25);
+    expect(result.current.deadlines!.totalItems).toBe(28);
   });
 
   it("주요_기한_유형_필터가_적용된다", async () => {

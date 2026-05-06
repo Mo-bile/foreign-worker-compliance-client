@@ -3,29 +3,12 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { InsuranceBadge } from "@/components/workers/insurance-badge";
-import { H2Badge } from "@/components/workers/h2-badge";
-import { SpecialtyInsuranceCard } from "@/components/workers/specialty-insurance-card";
-import { WorkerDeadlineTimeline } from "@/components/workers/worker-deadline-timeline";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EndEmploymentModal } from "@/components/workers/end-employment-modal";
-import { TerminationInfoCard } from "@/components/workers/termination-info-card";
-import {
-  NATIONALITY_LABELS,
-  VISA_TYPE_LABELS,
-  resolveWorkerStatusLabel,
-  INSURANCE_TYPE_LABELS,
-} from "@/types/api";
+import { WorkerCompletedHistoryTab } from "@/components/workers/worker-completed-history-tab";
+import { WorkerInfoTab } from "@/components/workers/worker-info-tab";
 import { useWorker, useRestoreEmployment } from "@/lib/queries/use-workers";
 import { useWorkerDeadlines } from "@/lib/queries/use-compliance";
 
@@ -43,7 +26,7 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         const removed = response.removedChangeReportDeadlineIds.length;
         toast.success(
           `${name} 고용종료를 복원했습니다. 자동 생성됐던 고용변동신고 데드라인이 ${removed}건 삭제되었습니다.\n` +
-            `자동 완료 처리됐던 데드라인은 그대로 유지되며, 필요 시 데드라인 화면에서 직접 복원해주세요.`,
+            "자동 완료 처리됐던 데드라인은 그대로 유지되며, 필요 시 데드라인 화면에서 직접 복원해주세요.",
         );
       },
       onError: (error) => toast.error(error.message),
@@ -142,139 +125,23 @@ export default function WorkerDetailPage({ params }: { readonly params: Promise<
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">기본 정보</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid gap-4 md:grid-cols-2">
-            <div>
-              <dt className="text-sm text-muted-foreground">생년월일</dt>
-              <dd className="font-medium">{w.dateOfBirth}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">국적</dt>
-              <dd className="font-medium">{NATIONALITY_LABELS[w.nationality]}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">비자 유형</dt>
-              <dd className="font-medium">
-                <span className="font-mono text-xs">{w.visaType}</span>
-                <span className="ml-1.5">{VISA_TYPE_LABELS[w.visaType]}</span>
-                <H2Badge visaType={w.visaType} />
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">비자 만료일</dt>
-              <dd className="font-medium">{w.visaExpiryDate}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">상태</dt>
-              <dd className="font-medium">{resolveWorkerStatusLabel(w.status)}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">계약 시작일</dt>
-              <dd className="font-medium">{w.contractStartDate}</dd>
-            </div>
-            {w.contractEndDate && (
-              <div>
-                <dt className="text-sm text-muted-foreground">계약 종료일</dt>
-                <dd className="font-medium">{w.contractEndDate}</dd>
-              </div>
-            )}
-            {w.jobPosition && (
-              <div>
-                <dt className="text-sm text-muted-foreground">직무</dt>
-                <dd className="font-medium">{w.jobPosition}</dd>
-              </div>
-            )}
-            {w.entryDate && (
-              <div>
-                <dt className="text-sm text-muted-foreground">입국일</dt>
-                <dd className="font-medium">{w.entryDate}</dd>
-              </div>
-            )}
-            {w.passportNumber && (
-              <div>
-                <dt className="text-sm text-muted-foreground">여권번호</dt>
-                <dd className="font-medium">{w.passportNumber}</dd>
-              </div>
-            )}
-            {w.registrationNumber && (
-              <div>
-                <dt className="text-sm text-muted-foreground">외국인등록번호</dt>
-                <dd className="font-medium">{w.registrationNumber}</dd>
-              </div>
-            )}
-            {w.contactPhone && (
-              <div>
-                <dt className="text-sm text-muted-foreground">연락처</dt>
-                <dd className="font-medium">{w.contactPhone}</dd>
-              </div>
-            )}
-            {w.contactEmail && (
-              <div>
-                <dt className="text-sm text-muted-foreground">이메일</dt>
-                <dd className="font-medium">{w.contactEmail}</dd>
-              </div>
-            )}
-          </dl>
-        </CardContent>
-      </Card>
-
-      {w.terminationInfo && <TerminationInfoCard terminationInfo={w.terminationInfo} />}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">보험 자격</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {w.insuranceEligibilities.length === 0 ? (
-            <p className="text-muted-foreground text-sm py-4 text-center">
-              보험 자격 정보가 없습니다
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>보험 유형</TableHead>
-                  <TableHead>상태</TableHead>
-                  <TableHead>사유</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {w.insuranceEligibilities.map((ie) => (
-                  <TableRow key={ie.insuranceType}>
-                    <TableCell className="font-medium">
-                      {INSURANCE_TYPE_LABELS[ie.insuranceType] ?? ie.insuranceType}
-                    </TableCell>
-                    <TableCell>
-                      <InsuranceBadge status={ie.status} />
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      <div>{ie.reason}</div>
-                      {ie.note !== null && (
-                        <p className="mt-1 text-xs text-muted-foreground/70">💡 {ie.note}</p>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-          {w.insuranceDisclaimer && (
-            <p className="mt-3 text-[11px] text-muted-foreground/60">※ {w.insuranceDisclaimer}</p>
-          )}
-        </CardContent>
-      </Card>
-
-      <SpecialtyInsuranceCard visaType={w.visaType} deadlines={deadlines.data ?? []} />
-
-      <WorkerDeadlineTimeline
-        deadlines={deadlines.data}
-        isLoading={deadlines.isLoading}
-        isError={deadlines.isError}
-      />
+      <Tabs defaultValue="info" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="info">정보</TabsTrigger>
+          <TabsTrigger value="history">완료 이력</TabsTrigger>
+        </TabsList>
+        <TabsContent value="info">
+          <WorkerInfoTab
+            worker={w}
+            deadlines={deadlines.data}
+            isDeadlinesLoading={deadlines.isLoading}
+            isDeadlinesError={deadlines.isError}
+          />
+        </TabsContent>
+        <TabsContent value="history">
+          <WorkerCompletedHistoryTab workerId={workerId} />
+        </TabsContent>
+      </Tabs>
 
       {endModalOpen && (
         <EndEmploymentModal
