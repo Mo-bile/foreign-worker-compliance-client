@@ -416,7 +416,7 @@ function generateUpcomingDeadline(id: number): ComplianceDeadlineResponse {
 }
 
 // 기존 2건 유지 + 20건 추가 = 총 22건 overdue (> 20 for pagination)
-export const mockOverdueDeadlines: readonly ComplianceDeadlineResponse[] = [
+export const mockOverdueDeadlines: ComplianceDeadlineResponse[] = [
   {
     id: 1,
     workerId: 1,
@@ -439,7 +439,25 @@ export const mockOverdueDeadlines: readonly ComplianceDeadlineResponse[] = [
 ];
 
 // 기존 3건 유지 + 22건 추가 = 총 25건 upcoming
-export const mockUpcomingDeadlines: readonly ComplianceDeadlineResponse[] = [
+export const mockUpcomingDeadlines: ComplianceDeadlineResponse[] = [
+  {
+    id: 6,
+    workerId: 1,
+    workerName: "Nguyen Van A",
+    deadlineType: "EXIT_GUARANTEE_INSURANCE",
+    dueDate: "2026-02-15",
+    status: "APPROACHING",
+    description: "출국만기보험",
+  },
+  {
+    id: 7,
+    workerId: 1,
+    workerName: "Nguyen Van A",
+    deadlineType: "WAGE_GUARANTEE_INSURANCE",
+    dueDate: "2026-02-20",
+    status: "APPROACHING",
+    description: "임금체불보증보험",
+  },
   {
     id: 3,
     workerId: 1,
@@ -468,4 +486,21 @@ export const mockUpcomingDeadlines: readonly ComplianceDeadlineResponse[] = [
     description: "비자 만료 임박",
   },
   ...Array.from({ length: 22 }, (_, i) => generateUpcomingDeadline(i + 200)),
+];
+
+export const mockCompletedDeadlines: ComplianceDeadlineResponse[] = [
+  {
+    id: 9001,
+    workerId: 1,
+    workerName: "NGUYEN VAN AN",
+    deadlineType: "EXIT_GUARANTEE_INSURANCE",
+    dueDate: "2026-04-15",
+    status: "COMPLETED",
+    description: "출국만기보험",
+    completedAt: "2026-04-10",
+    referenceNumber: "POL-2026-0410-AAA",
+    renewedUntil: "2027-04-10",
+    evidenceUrl: "https://example.com/policy/AAA",
+    note: "초기 가입 완료",
+  },
 ];

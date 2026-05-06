@@ -23,13 +23,11 @@ test.describe("워커 고용종료 lifecycle 회귀 방지 (PR-γ)", () => {
     await expect(page.getByRole("alertdialog")).toBeVisible();
   });
 
-  test("ENDED_워커_contract_편집_시도_시_400_차단_토스트", async ({ page }) => {
+  test("ENDED_워커_edit_페이지는_계약_필드와_제출이_disabled", async ({ page }) => {
     await page.goto("/workers/6/edit");
-    await page.getByLabel("계약 종료일").fill("2027-01-01");
-    await page.getByRole("button", { name: /수정$/ }).click();
 
-    const notifications = page.locator('section[aria-label="Notifications alt+T"]');
-    await expect(notifications.getByText(/이 워커는 고용종료 상태입니다/)).toBeVisible();
-    await expect(notifications.getByText(/고용종료를 복원해주세요/)).toBeVisible();
+    await expect(page.getByLabel("계약 종료일")).toBeDisabled();
+    await expect(page.getByRole("button", { name: /^수정$/ })).toBeDisabled();
+    await expect(page.getByText(/고용종료된 근로자입니다.*복원.*실행/)).toBeVisible();
   });
 });

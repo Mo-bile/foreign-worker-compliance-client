@@ -73,6 +73,7 @@ export function WorkerForm(props: WorkerFormProps) {
   const suggestKoreanNameMutation = useSuggestWorkerKoreanName();
   const [koreanNameMessage, setKoreanNameMessage] = useState<string | null>(null);
   const isPending = isEdit ? updateMutation.isPending : registerMutation.isPending;
+  const isEnded = isEdit && props.worker.status === "ENDED";
   const {
     data: companies = [],
     isLoading: companiesLoading,
@@ -120,6 +121,10 @@ export function WorkerForm(props: WorkerFormProps) {
           contactPhone: props.worker.contactPhone ?? "",
           contactEmail: props.worker.contactEmail ?? "",
           jobPosition: props.worker.jobPosition ?? "",
+          // PR-FE-all (lifecycle)
+          passportNumber: props.worker.passportNumber ?? "",
+          registrationNumber: props.worker.registrationNumber ?? "",
+          entryDate: props.worker.entryDate ?? "",
         }
       : {
           name: "",
@@ -209,6 +214,10 @@ export function WorkerForm(props: WorkerFormProps) {
         contractStartDate: data.contractStartDate,
         contractEndDate: data.contractEndDate,
         jobPosition: data.jobPosition,
+        // PR-FE-all (lifecycle)
+        passportNumber: data.passportNumber,
+        registrationNumber: data.registrationNumber,
+        entryDate: data.entryDate,
       };
 
       updateMutation.mutate(updateData, {
@@ -245,6 +254,7 @@ export function WorkerForm(props: WorkerFormProps) {
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <CardContent className="grid grid-cols-1 gap-4 pb-6 md:grid-cols-2">
+          <fieldset disabled={isEnded} aria-disabled={isEnded} className="contents">
           <FormField<WorkerFormValues>
             label="이름"
             name="name"
@@ -431,15 +441,13 @@ export function WorkerForm(props: WorkerFormProps) {
           />
 
           {/* 입국일 */}
-          {!isEdit && (
-            <FormField<WorkerFormValues>
-              label="입국일"
-              name="entryDate"
-              register={register}
-              errors={errors}
-              type="date"
-            />
-          )}
+          <FormField<WorkerFormValues>
+            label="입국일"
+            name="entryDate"
+            register={register}
+            errors={errors}
+            type="date"
+          />
 
           {/* 계약 시작일 */}
           <FormField<WorkerFormValues>
@@ -470,27 +478,23 @@ export function WorkerForm(props: WorkerFormProps) {
             />
           )}
 
-          {/* 여권번호 (선택) */}
-          {!isEdit && (
-            <FormField<WorkerFormValues>
-              label="여권번호 (선택)"
-              name="passportNumber"
-              register={register}
-              errors={errors}
-              placeholder="M12345678"
-            />
-          )}
+          {/* 여권번호 */}
+          <FormField<WorkerFormValues>
+            label={isEdit ? "여권번호" : "여권번호 (선택)"}
+            name="passportNumber"
+            register={register}
+            errors={errors}
+            placeholder="M12345678"
+          />
 
-          {/* 외국인등록번호 (선택) */}
-          {!isEdit && (
-            <FormField<WorkerFormValues>
-              label="외국인등록번호 (선택)"
-              name="registrationNumber"
-              register={register}
-              errors={errors}
-              placeholder="000000-0000000"
-            />
-          )}
+          {/* 외국인등록번호 */}
+          <FormField<WorkerFormValues>
+            label={isEdit ? "외국인등록번호" : "외국인등록번호 (선택)"}
+            name="registrationNumber"
+            register={register}
+            errors={errors}
+            placeholder="000000-0000000"
+          />
 
           {/* 연락처 (선택) */}
           <FormField<WorkerFormValues>
@@ -511,13 +515,20 @@ export function WorkerForm(props: WorkerFormProps) {
             type="email"
             placeholder="example@email.com"
           />
+          </fieldset>
         </CardContent>
+
+        {isEnded && (
+          <p role="status" className="px-6 pb-2 text-sm text-[var(--signal-orange)]">
+            고용종료된 근로자입니다. 수정하려면 먼저 [고용종료 복원]을 실행하세요.
+          </p>
+        )}
 
         <CardFooter className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={() => router.back()}>
             취소
           </Button>
-          <Button type="submit" disabled={isPending || (!isEdit && companiesLoading)}>
+          <Button type="submit" disabled={isPending || isEnded || (!isEdit && companiesLoading)}>
             {isPending ? (isEdit ? "수정 중..." : "등록 중...") : isEdit ? "수정" : "등록"}
           </Button>
         </CardFooter>

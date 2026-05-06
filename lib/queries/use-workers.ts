@@ -64,6 +64,9 @@ export function useUpdateWorker(workerId: number) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workers"] });
       queryClient.invalidateQueries({ queryKey: ["workers", workerId] });
+      // PR-FE-all (lifecycle): passport/ARC/entryDate 변경이 데드라인·점수에 반영
+      queryClient.invalidateQueries({ queryKey: ["compliance"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 }

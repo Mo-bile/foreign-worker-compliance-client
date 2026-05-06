@@ -50,6 +50,29 @@ export async function patchApi(endpoint: string, errorMessage: string): Promise<
   // 204 No Content → body 없음
 }
 
+export async function patchApiWithBody<T>(
+  endpoint: string,
+  errorMessage: string,
+  body: unknown,
+): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(endpoint, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch (error) {
+    throw new Error(errorMessage, { cause: error });
+  }
+  if (!res.ok) return throwResponseError(res, errorMessage);
+  try {
+    return (await res.json()) as T;
+  } catch (error) {
+    throw new Error(`${errorMessage} (응답 형식 오류)`, { cause: error });
+  }
+}
+
 export async function mutateApi<T>(
   endpoint: string,
   method: string,

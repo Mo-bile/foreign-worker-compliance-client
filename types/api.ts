@@ -442,6 +442,16 @@ export const updateWorkerRequestSchema = z
       .optional()
       .or(z.literal("")),
     jobPosition: z.string().optional().or(z.literal("")),
+    // PR-FE-all (lifecycle): D-신규-F 정합성을 위해 update에도 합류
+    passportNumber: z.string().min(1, "여권번호를 입력해주세요").max(20),
+    registrationNumber: z
+      .string()
+      .max(14)
+      .regex(/^(\d{6}-\d{7}|\d{1,13})$/, "외국인등록번호 형식: 000000-0000000")
+      .optional()
+      .or(z.literal(""))
+      .transform((v) => v || undefined),
+    entryDate: z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD"),
   })
   .refine((d) => !d.contractEndDate || d.contractEndDate >= d.contractStartDate, {
     message: "계약 종료일은 시작일 이후여야 합니다",
@@ -542,6 +552,13 @@ export interface ComplianceDeadlineResponse {
   readonly dueDate: string;
   readonly status: DeadlineStatus;
   readonly description: string;
+  // PR-FE-all (lifecycle): BE PR-BE-deadline에서 6필드 옵셔널 응답 추가
+  readonly completedAt?: string | null;
+  readonly nextDueDate?: string | null;
+  readonly renewedUntil?: string | null;
+  readonly referenceNumber?: string | null;
+  readonly evidenceUrl?: string | null;
+  readonly note?: string | null;
 }
 
 export interface ErrorResponse {

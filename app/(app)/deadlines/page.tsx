@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Info } from "lucide-react";
-import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -12,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DeadlineCompleteModal } from "@/components/compliance/deadline-complete-modal";
 import { DeadlineTable } from "@/components/compliance/deadline-table";
 import { DeadlineChart } from "@/components/dashboard/deadline-chart";
 import {
@@ -19,7 +19,6 @@ import {
   usePaginatedOverdueDeadlines,
   usePaginatedUpcomingDeadlines,
   useUpcomingDeadlines,
-  useCompleteDeadline,
 } from "@/lib/queries/use-compliance";
 import { useCompanyContext } from "@/lib/contexts/company-context";
 import type { ComplianceFilterValues } from "@/lib/queries/use-compliance";
@@ -29,7 +28,7 @@ import {
   DEADLINE_STATUSES,
   DEADLINE_STATUS_LABELS,
 } from "@/types/api";
-import type { DeadlineType, DeadlineStatus } from "@/types/api";
+import type { ComplianceDeadlineResponse, DeadlineType, DeadlineStatus } from "@/types/api";
 
 export default function CompliancePage() {
   const searchParams = useSearchParams();
@@ -43,6 +42,7 @@ export default function CompliancePage() {
   const [statusFilter, setStatusFilter] = useState<DeadlineStatus | "ALL">("ALL");
   const [overduePage, setOverduePage] = useState(1);
   const [upcomingPage, setUpcomingPage] = useState(1);
+  const [openDeadline, setOpenDeadline] = useState<ComplianceDeadlineResponse | null>(null);
 
   const filters: ComplianceFilterValues = {
     deadlineType: deadlineTypeFilter,
@@ -55,19 +55,6 @@ export default function CompliancePage() {
   // useUpcomingDeadlines(30) is already called inside usePaginatedUpcomingDeadlines above,
   // so React Query deduplicates — no extra fetch for the chart.
   const upcomingAll = useUpcomingDeadlines(30, selectedCompanyId);
-
-  const completeMutation = useCompleteDeadline();
-
-  const handleComplete = useCallback(
-    (id: number) => {
-      completeMutation.mutate(id, {
-        onSuccess: () => {
-          toast.success("주요 기한이 완료 처리되었습니다");
-        },
-      });
-    },
-    [completeMutation],
-  );
 
   const resetPages = useCallback(() => {
     setOverduePage(1);
@@ -103,7 +90,7 @@ export default function CompliancePage() {
               resetPages();
             }}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger aria-label="주요 기한 유형" className="w-48">
               <SelectValue placeholder="주요 기한 유형 전체">{deadlineTypeFilter === "ALL" ? "전체" : DEADLINE_TYPE_LABELS[deadlineTypeFilter as DeadlineType]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -122,7 +109,7 @@ export default function CompliancePage() {
               resetPages();
             }}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger aria-label="기한 상태" className="w-40">
               <SelectValue placeholder="상태 전체">{statusFilter === "ALL" ? "전체" : DEADLINE_STATUS_LABELS[statusFilter as DeadlineStatus]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -144,8 +131,7 @@ export default function CompliancePage() {
         isLoading={overdue.isLoading}
         isError={overdue.isError}
         hasUnfilteredData={(overdueAll.data?.length ?? 0) > 0}
-        onComplete={handleComplete}
-        isCompleting={completeMutation.isPending}
+        onComplete={setOpenDeadline}
         pagination={
           overdue.deadlines && overdue.deadlines.totalPages > 0
             ? {
@@ -167,8 +153,7 @@ export default function CompliancePage() {
           isLoading={upcoming.isLoading}
           isError={upcoming.isError}
           hasUnfilteredData={(upcomingAll.data?.length ?? 0) > 0}
-          onComplete={handleComplete}
-          isCompleting={completeMutation.isPending}
+          onComplete={setOpenDeadline}
           pagination={
             upcoming.deadlines && upcoming.deadlines.totalPages > 0
               ? {
@@ -187,6 +172,11 @@ export default function CompliancePage() {
           isError={upcomingAll.isError}
         />
       </div>
+
+      <DeadlineCompleteModal
+        deadline={openDeadline}
+        onClose={() => setOpenDeadline(null)}
+      />
     </div>
   );
 }

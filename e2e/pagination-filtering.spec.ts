@@ -18,7 +18,7 @@ test.describe("Worker 페이지 페이지네이션 및 필터링", () => {
   test("필터_변경시_1페이지로_리셋된다", async ({ page }) => {
     await page.getByRole("button", { name: "다음 페이지" }).click();
     await expect(page.getByText(/총 \d+건 중 21-/)).toBeVisible();
-    await page.getByPlaceholder("이름 또는 국적으로 검색...").fill("Worker");
+    await page.getByPlaceholder("검색어 입력...").fill("Worker");
     await expect(page.getByText(/총 \d+건 중 1-/)).toBeVisible();
   });
 });
@@ -34,7 +34,7 @@ test.describe("Compliance 페이지 필터링", () => {
   });
 
   test("주요_기한_유형_보기_조건이_동작한다", async ({ page }) => {
-    await page.getByRole("combobox").first().click();
+    await page.getByRole("combobox", { name: "주요 기한 유형" }).click();
     await page.getByRole("option", { name: "비자 만료" }).click();
     await expect(page.getByText("보기 조건:")).toBeVisible();
   });

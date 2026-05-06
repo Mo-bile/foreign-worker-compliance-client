@@ -1,13 +1,18 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchApi, patchApi } from "./query-utils";
+import { fetchApi, patchApiWithBody } from "./query-utils";
 import type {
   ComplianceDeadlineResponse,
   DeadlineType,
   DeadlineStatus,
   FilterOption,
 } from "@/types/api";
+import type {
+  CompleteDeadlinePayload,
+  CompleteDeadlineSummaryResponse,
+} from "@/types/compliance";
 import { paginateItems } from "@/lib/pagination";
 import type { PaginatedResult } from "@/lib/pagination";
 
@@ -59,6 +64,22 @@ export function useWorkerDeadlines(workerId: number) {
       ),
     enabled: workerId > 0,
   });
+}
+
+export function useCompletedDeadlinesByWorker(workerId: number) {
+  const query = useWorkerDeadlines(workerId);
+  const data = useMemo(
+    () =>
+      query.data
+        ?.filter((deadline) => deadline.status === "COMPLETED")
+        .slice()
+        .sort((left, right) =>
+          (right.completedAt ?? "").localeCompare(left.completedAt ?? ""),
+        ),
+    [query.data],
+  );
+
+  return { ...query, data };
 }
 
 export interface ComplianceFilterValues {
@@ -117,11 +138,22 @@ export function usePaginatedUpcomingDeadlines(
 export function useCompleteDeadline() {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, number>({
-    mutationFn: (deadlineId) =>
-      patchApi(`/api/compliance/${deadlineId}/complete`, "주요 기한 완료 처리에 실패했습니다"),
+  return useMutation<
+    CompleteDeadlineSummaryResponse,
+    Error,
+    { id: number; body: CompleteDeadlinePayload }
+  >({
+    mutationFn: ({ id, body }) =>
+      patchApiWithBody<CompleteDeadlineSummaryResponse>(
+        `/api/compliance/${id}/complete`,
+        "주요 기한 완료 처리에 실패했습니다",
+        body,
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["compliance"] });
+      queryClient.invalidateQueries({ queryKey: ["workers"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
 }
