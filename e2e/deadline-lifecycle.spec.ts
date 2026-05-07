@@ -18,7 +18,7 @@ test.describe("PR-FE-all: 데드라인 lifecycle", () => {
     await page.getByLabel("갱신 만료일").fill("2027-05-06");
     await page.getByRole("button", { name: "완료" }).click();
 
-    await expect(page.getByText(/다음 기한이.*자동 생성/)).toBeVisible();
+    await expect(page.getByText(/다음 데드라인이.*자동 생성되었습니다/)).toBeVisible();
     if ((await workerGroup.getAttribute("aria-expanded")) !== "true") {
       await workerGroup.click();
     }

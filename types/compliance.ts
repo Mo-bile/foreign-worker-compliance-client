@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { DeadlineType } from "./api";
+import type { DeadlineType, DeadlineSummary } from "./api";
 
 const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const isoDate = z.string().regex(isoDateRegex, "날짜 형식: YYYY-MM-DD");
@@ -68,11 +68,8 @@ export const DEADLINE_COMPLETION_FIELDS: Record<DeadlineType, readonly Completio
 };
 
 export interface CompleteDeadlineSummaryResponse {
-  readonly deadlineId: number;
-  readonly completedAt: string;
-  readonly nextDeadlineId: number | null;
-  readonly nextDeadlineDueDate: string | null;
-  readonly nextDeadlineType: DeadlineType | null;
+  readonly completedDeadlineId: number;
+  readonly createdDeadlines: readonly DeadlineSummary[];
 }
 
 export const NEXT_DUE_DATE_LABEL: Partial<Record<DeadlineType, string>> = {

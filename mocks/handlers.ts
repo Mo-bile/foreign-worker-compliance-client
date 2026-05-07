@@ -327,15 +327,17 @@ const patchComplianceComplete: Parameters<typeof http.patch>[1] = async ({
 }) => {
   const id = Number(params.id);
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
-  const completedAt = (body.completedAt as string | undefined) ?? "2026-05-06";
 
   const target =
     mockUpcomingDeadlines.find((d) => d.id === id) ??
     mockOverdueDeadlines.find((d) => d.id === id);
 
-  let nextDeadlineId: number | null = null;
-  let nextDeadlineDueDate: string | null = null;
-  let nextDeadlineType: string | null = null;
+  const createdDeadlines: Array<{
+    id: number;
+    type: ComplianceDeadlineResponse["deadlineType"];
+    dueDate: string;
+    description: string;
+  }> = [];
 
   if (target) {
     const type = target.deadlineType;
@@ -350,20 +352,17 @@ const patchComplianceComplete: Parameters<typeof http.patch>[1] = async ({
     }
 
     if (dueDate) {
-      nextDeadlineId = id + 10_000;
-      nextDeadlineDueDate = dueDate;
-      nextDeadlineType = type;
+      createdDeadlines.push({
+        id: id + 10_000,
+        type,
+        dueDate,
+        description: target.description,
+      });
     }
   }
 
   return HttpResponse.json(
-    {
-      deadlineId: id,
-      completedAt,
-      nextDeadlineId,
-      nextDeadlineDueDate,
-      nextDeadlineType,
-    },
+    { completedDeadlineId: id, createdDeadlines },
     { status: 202 },
   );
 };
