@@ -80,11 +80,16 @@ export function DeadlineCompleteModal({ deadline, onClose }: DeadlineCompleteMod
       { id: activeDeadline.id, body },
       {
         onSuccess: (summary) => {
-          if (summary.nextDeadlineDueDate) {
-            const dueLabel = new Date(summary.nextDeadlineDueDate).toLocaleDateString("ko-KR");
-            toast.success(`완료 처리되었습니다. 다음 기한이 ${dueLabel}에 자동 생성되었습니다.`);
-          } else {
+          const created = summary.createdDeadlines;
+          if (created.length === 0) {
             toast.success("완료 처리되었습니다");
+          } else {
+            const first = created[0];
+            const dueLabel = new Date(first.dueDate).toLocaleDateString("ko-KR");
+            const extra = created.length > 1 ? ` (외 ${created.length - 1}건)` : "";
+            toast.success(
+              `완료 처리되었습니다. 다음 데드라인이 ${dueLabel}에 자동 생성되었습니다${extra}.`,
+            );
           }
           onClose();
         },

@@ -24,19 +24,22 @@ function makeRequest(body: unknown) {
 describe("PATCH /api/compliance/[id]/complete", () => {
   it("BE_202_summary를_그대로_통과시킨다", async () => {
     server.use(
-      http.patch(`${BACKEND}/api/compliance/:id/complete`, async ({ request }) => {
-        const body = await request.json();
-        return HttpResponse.json(
+      http.patch(`${BACKEND}/api/compliance/:id/complete`, () =>
+        HttpResponse.json(
           {
-            deadlineId: 42,
-            completedAt: (body as Record<string, unknown>).completedAt,
-            nextDeadlineId: 99,
-            nextDeadlineDueDate: "2027-05-06",
-            nextDeadlineType: "EXIT_GUARANTEE_INSURANCE",
+            completedDeadlineId: 42,
+            createdDeadlines: [
+              {
+                id: 99,
+                type: "EXIT_GUARANTEE_INSURANCE",
+                dueDate: "2027-05-06",
+                description: "출국만기보험",
+              },
+            ],
           },
           { status: 202 },
-        );
-      }),
+        ),
+      ),
     );
 
     const res = await PATCH(makeRequest({ completedAt: "2026-05-06" }), {
@@ -45,7 +48,10 @@ describe("PATCH /api/compliance/[id]/complete", () => {
 
     expect(res.status).toBe(202);
     const json = await res.json();
-    expect(json).toMatchObject({ deadlineId: 42, nextDeadlineId: 99 });
+    expect(json).toMatchObject({
+      completedDeadlineId: 42,
+      createdDeadlines: [{ id: 99, type: "EXIT_GUARANTEE_INSURANCE" }],
+    });
   });
 
   it("BE_502_시_502를_그대로_반환한다", async () => {

@@ -31,11 +31,15 @@ describe("useCompleteDeadline", () => {
       http.patch("*/api/compliance/:id/complete", () =>
         HttpResponse.json(
           {
-            deadlineId: 42,
-            completedAt: "2026-05-06",
-            nextDeadlineId: 99,
-            nextDeadlineDueDate: "2027-05-06",
-            nextDeadlineType: "EXIT_GUARANTEE_INSURANCE",
+            completedDeadlineId: 42,
+            createdDeadlines: [
+              {
+                id: 99,
+                type: "EXIT_GUARANTEE_INSURANCE",
+                dueDate: "2027-05-06",
+                description: "출국만기보험",
+              },
+            ],
           },
           { status: 202 },
         ),
@@ -55,8 +59,8 @@ describe("useCompleteDeadline", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(result.current.data).toMatchObject({
-      deadlineId: 42,
-      nextDeadlineId: 99,
+      completedDeadlineId: 42,
+      createdDeadlines: [{ id: 99, type: "EXIT_GUARANTEE_INSURANCE" }],
     });
     expect(spy).toHaveBeenCalledWith({ queryKey: ["compliance"] });
     expect(spy).toHaveBeenCalledWith({ queryKey: ["workers"] });

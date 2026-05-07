@@ -9,6 +9,16 @@ import { DEADLINE_COMPLETION_FIELDS } from "@/types/compliance";
 import type { ComplianceDeadlineResponse } from "@/types/api";
 import { DEADLINE_TYPES } from "@/types/api";
 
+const toastSuccessSpy = vi.fn();
+const toastErrorSpy = vi.fn();
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: (message: string) => toastSuccessSpy(message),
+    error: (message: string) => toastErrorSpy(message),
+  },
+}));
+
 beforeAll(() => server.listen());
 afterEach(() => {
   server.resetHandlers();
@@ -70,11 +80,15 @@ describe("DeadlineCompleteModal - submit", () => {
         captured = (await request.json()) as Record<string, unknown>;
         return HttpResponse.json(
           {
-            deadlineId: 1,
-            completedAt: captured.completedAt,
-            nextDeadlineId: 99,
-            nextDeadlineDueDate: "2027-06-15",
-            nextDeadlineType: "EXIT_GUARANTEE_INSURANCE",
+            completedDeadlineId: 1,
+            createdDeadlines: [
+              {
+                id: 99,
+                type: "EXIT_GUARANTEE_INSURANCE",
+                dueDate: "2027-06-15",
+                description: "출국만기보험",
+              },
+            ],
           },
           { status: 202 },
         );
@@ -111,5 +125,93 @@ describe("DeadlineCompleteModal - submit", () => {
 
     expect(await screen.findByText("갱신 만료일은 완료일 이후여야 합니다")).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe("DeadlineCompleteModal — toast variants", () => {
+  function setupCompleteResponse(summary: {
+    completedDeadlineId: number;
+    createdDeadlines: Array<{ id: number; type: string; dueDate: string; description: string }>;
+  }) {
+    server.use(
+      http.patch("*/api/compliance/:id/complete", () =>
+        HttpResponse.json(summary, { status: 202 }),
+      ),
+    );
+  }
+
+  it("createdDeadlines가_빈_배열이면_단순_완료_토스트만_노출한다", async () => {
+    setupCompleteResponse({ completedDeadlineId: 1, createdDeadlines: [] });
+
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    renderModal({ ...baseDeadline, deadlineType: "HEALTH_INSURANCE_ENROLLMENT" }, onClose);
+
+    await user.clear(screen.getByLabelText(/완료일/));
+    await user.type(screen.getByLabelText(/완료일/), "2026-05-07");
+    await user.click(screen.getByRole("button", { name: "완료" }));
+
+    await waitFor(() => expect(toastSuccessSpy).toHaveBeenCalled());
+    expect(toastSuccessSpy).toHaveBeenCalledWith("완료 처리되었습니다");
+  });
+
+  it("createdDeadlines_1개면_다음_데드라인_안내를_포함한다", async () => {
+    setupCompleteResponse({
+      completedDeadlineId: 1,
+      createdDeadlines: [
+        {
+          id: 99,
+          type: "EXIT_GUARANTEE_INSURANCE",
+          dueDate: "2027-06-15",
+          description: "출국만기보험",
+        },
+      ],
+    });
+
+    const user = userEvent.setup();
+    renderModal(baseDeadline);
+
+    await user.clear(screen.getByLabelText(/완료일/));
+    await user.type(screen.getByLabelText(/완료일/), "2026-05-07");
+    await user.type(screen.getByLabelText(/갱신 만료일/), "2027-06-15");
+    await user.click(screen.getByRole("button", { name: "완료" }));
+
+    await waitFor(() => expect(toastSuccessSpy).toHaveBeenCalled());
+    const message = toastSuccessSpy.mock.calls[0][0] as string;
+    expect(message).toContain("다음 데드라인이");
+    expect(message).toContain("자동 생성되었습니다");
+    expect(message).not.toContain("외 ");
+  });
+
+  it("createdDeadlines_2개면_외_N건_표기를_포함한다", async () => {
+    setupCompleteResponse({
+      completedDeadlineId: 1,
+      createdDeadlines: [
+        {
+          id: 99,
+          type: "EXIT_GUARANTEE_INSURANCE",
+          dueDate: "2027-06-15",
+          description: "출국만기보험",
+        },
+        {
+          id: 100,
+          type: "WAGE_GUARANTEE_INSURANCE",
+          dueDate: "2027-07-01",
+          description: "임금체불보증보험",
+        },
+      ],
+    });
+
+    const user = userEvent.setup();
+    renderModal(baseDeadline);
+
+    await user.clear(screen.getByLabelText(/완료일/));
+    await user.type(screen.getByLabelText(/완료일/), "2026-05-07");
+    await user.type(screen.getByLabelText(/갱신 만료일/), "2027-06-15");
+    await user.click(screen.getByRole("button", { name: "완료" }));
+
+    await waitFor(() => expect(toastSuccessSpy).toHaveBeenCalled());
+    const message = toastSuccessSpy.mock.calls[0][0] as string;
+    expect(message).toContain("(외 1건)");
   });
 });
